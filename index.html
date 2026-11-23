@@ -47,7 +47,7 @@ h1 span{display:block;margin-top:7px;font-size:12.5px;font-weight:650;letter-spa
 
 /* ---------- 탭 ---------- */
 nav{position:sticky;top:0;z-index:30;padding:8px 12px;background:rgba(244,241,233,.9);backdrop-filter:blur(14px) saturate(1.15);-webkit-backdrop-filter:blur(14px) saturate(1.15);border-bottom:1px solid var(--line)}
-nav .w{display:flex;gap:4px;max-width:1000px;margin:0 auto;overflow-x:auto;scrollbar-width:none;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:4px}
+nav .w{display:flex;gap:4px;width:fit-content;max-width:100%;margin:0 auto;overflow-x:auto;scrollbar-width:none;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:4px}
 nav .w::-webkit-scrollbar{display:none}
 nav button{flex:0 0 auto;background:transparent;border:0;color:var(--ink3);padding:9px 16px;border-radius:999px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;min-height:40px;white-space:nowrap;transition:background .15s,color .15s}
 nav button.on{background:var(--ink);color:#fdfbf5;box-shadow:0 8px 16px -10px rgba(26,25,21,.75)}
@@ -71,7 +71,8 @@ main{padding:16px 14px 6px;max-width:1000px;margin:0 auto}
 .kpi-item .v{display:block;margin-top:3px;font-size:27px;font-weight:800;letter-spacing:-.035em;line-height:1.15;font-variant-numeric:tabular-nums}
 .kpi-item.amber .v{color:var(--amber)}
 .kpi-item.green .v{color:var(--green)}
-.kpi-item .note{display:block;margin-top:2px;font-size:12px;color:var(--ink3);font-weight:600}
+.kpi-item .k-note{display:block;margin-top:3px;font-size:12px;color:var(--ink3);font-weight:600;letter-spacing:0}
+.kpi-item .v em{font-style:normal;font-size:15px;font-weight:750;color:var(--ink3);margin-left:2px;letter-spacing:0}
 
 /* ---------- 구성 ---------- */
 .krow{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line);flex-wrap:wrap}
@@ -121,7 +122,7 @@ button.danger{color:var(--red);border-color:var(--red-line);background:var(--red
 
 /* ---------- 장비 카드 ---------- */
 .gear-grid{display:grid;grid-template-columns:1fr;gap:10px}
-.gear{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px}
+.gear{position:relative;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px}
 .gear.is-loaded{border-left:4px solid var(--amber-solid);background:linear-gradient(180deg,#fffcf4 0%,var(--surface) 60%)}
 .gear.is-repair{border-left:4px solid #d98551}
 .gear-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
@@ -129,7 +130,7 @@ button.danger{color:var(--red);border-color:var(--red-line);background:var(--red
 .gear .tags{margin-top:9px}
 .gear .film-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:11px}
 .gear-notes{margin-top:8px}
-.gear-ops{display:flex;gap:7px;justify-content:flex-end;align-items:center;flex-wrap:wrap;margin-top:12px;padding-top:11px;border-top:1px solid var(--line)}
+.gear-ops{display:flex;gap:7px;justify-content:flex-end;align-items:center;flex-wrap:wrap;margin-top:auto;padding-top:11px;border-top:1px solid var(--line)}
 
 /* ---------- 장전 필름 카드 ---------- */
 .film-grid{display:grid;grid-template-columns:1fr;gap:9px}
@@ -139,7 +140,7 @@ button.danger{color:var(--red);border-color:var(--red-line);background:var(--red
 .fb-name{font-size:14.5px;font-weight:700;line-height:1.4;min-width:0;word-break:keep-all}
 .fb-format{flex:0 0 auto;font-size:12px;font-weight:650;color:var(--ink3);padding-top:2px}
 .fb-badge{display:flex;flex-wrap:wrap;gap:6px}
-.fb-bot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:auto}
+.fb-bot{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:auto}
 
 /* ---------- 조합 추천 선택 ---------- */
 .intro{margin:0 0 12px}
@@ -147,11 +148,12 @@ button.danger{color:var(--red);border-color:var(--red-line);background:var(--red
 .pick-label{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:750;color:var(--ink2);margin:16px 0 8px}
 .step{width:22px;height:22px;flex:0 0 auto;border-radius:50%;background:var(--ink);color:#fdfbf5;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
 .pick-chips{display:flex;flex-wrap:wrap;gap:7px}
-.pick-chips button{background:var(--surface);border:1px solid var(--line2);color:var(--ink);border-radius:12px;padding:10px 13px;font-size:14px;font-weight:650;min-height:46px;line-height:1.25;text-align:left;cursor:pointer;letter-spacing:-.01em}
+.pick-chips button{flex:0 0 auto;background:var(--surface);border:1px solid var(--line2);color:var(--ink);border-radius:12px;padding:10px 13px;font-size:14px;font-weight:650;min-height:46px;line-height:1.25;text-align:left;cursor:pointer;letter-spacing:-.01em}
+.pick-chips button.reset{color:var(--ink3);border-style:dashed;font-weight:600;padding:10px 11px}
 .pick-chips button .m{display:block;font-size:11.5px;font-weight:600;color:var(--ink3);margin-top:2px}
 .pick-chips button.on{background:var(--ink);border-color:var(--ink);color:#fdfbf5}
 .pick-chips button.on .m{color:#cfc8b8}
-.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+select[hidden]{display:none}
 
 /* ---------- 조합 결과 ---------- */
 .combo{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:11px;box-shadow:var(--shadow)}
@@ -708,14 +710,14 @@ function filmSuggestions(purpose, body, count){
 }
 
 /* ================= 요약 ================= */
-function kpi(label, value, note, tone){
+function kpi(label, value, note, tone, unit){
   return '<div class="kpi-item' + (tone ? ' ' + tone : '') + '">'
     + '<span class="lb">' + esc(label) + '</span>'
-    + '<span class="v">' + esc(value) + '</span>'
-    + (note ? '<span class="note">' + esc(note) + '</span>' : '')
+    + '<span class="v">' + esc(value) + (unit ? '<em>' + esc(unit) + '</em>' : '') + '</span>'
+    + (note ? '<span class="k-note">' + esc(note) + '</span>' : '')
     + '</div>';
 }
-function stat(label, value){ return kpi(label, value, '', ''); }
+function stat(label, value){ return kpi(label, value, '', '', ''); }
 
 function renderHome(){
   var bodies = data.bodies.length, lenses = data.lenses.length, adapters = data.adapters.length;
@@ -746,10 +748,10 @@ function renderHome(){
   var h = '';
 
   h += '<div class="kpi">'
-    + kpi('바디', bodies + '대', filmBodies.length ? '필름 바디 ' + filmBodies.length + '대' : '필름 바디 없음', '')
-    + kpi('렌즈', lenses + '개', adapters ? '컨버터 ' + adapters + '개' : '컨버터 없음', '')
-    + kpi('장전 중', loadedCount + '대', filmBodies.length ? '필름 바디 ' + filmBodies.length + '대 중' : '필름 바디 없음', 'amber')
-    + kpi('필름 재고', rolls + '롤', rolls ? (data.films || []).length + '종 등록' : '등록 없음', 'green')
+    + kpi('바디', bodies, filmBodies.length ? '필름 바디 ' + filmBodies.length + '대' : '필름 바디 없음', '', '대')
+    + kpi('렌즈', lenses, adapters ? '컨버터 ' + adapters + '개' : '컨버터 없음', '', '개')
+    + kpi('장전 중', loadedCount, filmBodies.length ? '필름 바디 ' + filmBodies.length + '대 중' : '필름 바디 없음', 'amber', '대')
+    + kpi('필름 재고', rolls, rolls ? (data.films || []).length + '종 등록' : '등록 없음', 'green', '롤')
     + '</div>';
 
   h += '<div class="card"><div class="panel-head"><h3>구성</h3>'
@@ -804,8 +806,7 @@ function renderHome(){
         + '<div class="fb-format">' + esc(formatLabel(b.format)) + '</div></div>'
         + '<div class="fb-badge">' + loadedBadge(b) + '</div>'
         + (loadedDetail(b) || (isLoaded ? '' : '<div class="dim">아직 필름이 들어 있지 않아요</div>'))
-        + '<div class="fb-bot"><span class="dim">' + (isLoaded ? '촬영 중' : '비어 있음') + '</span>'
-        + '<button class="ghost sm" data-loaded="' + esc(b.id) + '">변경</button></div>'
+        + '<div class="fb-bot"><button class="ghost sm" data-loaded="' + esc(b.id) + '">변경</button></div>'
         + '</div>';
     });
     h += '</div></div>';
@@ -983,22 +984,22 @@ function renderRec(){
   h += '<div class="pick-block">'
     + '<div class="pick-label"><span class="step">1</span> 바디 고르기</div>'
     + '<div class="pick-chips" id="pickBodyChips">'
-    + '<button type="button" data-pick-body="">선택 안 함</button>';
+    + '<button type="button" class="reset" data-pick-body="">선택 안 함</button>';
   data.bodies.forEach(function(b){
     h += '<button type="button" data-pick-body="' + esc(b.id) + '">' + esc(nameOf(b))
       + '<span class="m">' + esc(b.bodyType || '종류 미지정') + (b.fixedFocal ? ' · 고정 ' + esc(b.fixedFocal) + 'mm' : '') + '</span></button>';
   });
-  h += '</div><select id="recBody" class="sr-only" aria-label="바디 선택">' + recBodyOptions() + '</select></div>';
+  h += '</div><select id="recBody" hidden aria-label="바디 선택">' + recBodyOptions() + '</select></div>';
 
   h += '<div class="pick-block">'
     + '<div class="pick-label"><span class="step">2</span> 또는 렌즈 고르기 <span class="dim" style="font-weight:600">바디를 고르면 이쪽은 비워져요</span></div>'
     + '<div class="pick-chips" id="pickLensChips">'
-    + '<button type="button" data-pick-lens="">선택 안 함</button>';
+    + '<button type="button" class="reset" data-pick-lens="">선택 안 함</button>';
   data.lenses.forEach(function(l){
     h += '<button type="button" data-pick-lens="' + esc(l.id) + '">' + esc(l.model)
       + '<span class="m">' + esc(l.mount) + ' · ' + esc(l.focal) + 'mm f/' + esc(l.aperture) + '</span></button>';
   });
-  h += '</div><select id="recLens" class="sr-only" aria-label="렌즈 선택">' + recLensOptions() + '</select></div>';
+  h += '</div><select id="recLens" hidden aria-label="렌즈 선택">' + recLensOptions() + '</select></div>';
 
   h += '<div class="pick-block">'
     + '<div class="pick-label"><span class="step">3</span> 촬영 목적</div>'
@@ -1007,7 +1008,7 @@ function renderRec(){
     h += '<button type="button" data-pick-purpose="' + esc(p) + '">' + esc(p)
       + '<span class="m">' + esc(PURPOSES[p].lo) + '–' + esc(PURPOSES[p].hi) + 'mm</span></button>';
   });
-  h += '</div><select id="recPurpose" class="sr-only" aria-label="촬영 목적">';
+  h += '</div><select id="recPurpose" hidden aria-label="촬영 목적">';
   Object.keys(PURPOSES).forEach(function(p){
     h += '<option value="' + esc(p) + '">' + esc(p) + ' · ' + esc(PURPOSES[p].lo) + '–' + esc(PURPOSES[p].hi) + 'mm</option>';
   });
@@ -1026,10 +1027,12 @@ function syncRecChips(){
   var p = document.getElementById('recPurpose');
   function mark(sel, attr){
     var nodes = document.querySelectorAll('[' + attr + ']');
+    var cur = sel && sel.value ? sel.value : '';
     for(var i = 0; i < nodes.length; i++){
       var v = nodes[i].getAttribute(attr) || '';
-      var cur = sel && sel.value ? sel.value : '';
-      nodes[i].classList.toggle('on', cur === v);
+      var hit = !!v && cur === v;
+      nodes[i].classList.toggle('on', hit);
+      if(nodes[i].setAttribute) nodes[i].setAttribute('aria-pressed', hit ? 'true' : 'false');
     }
   }
   mark(b, 'data-pick-body');
@@ -1144,10 +1147,14 @@ function renderFilm(){
     var k = f.format || '기타';
     byFmt[k] = (byFmt[k] || 0) + (Number(f.rolls) || 0);
   });
+  var filmsN = (data.films || []).length;
+  var soon = (data.films || []).filter(function(f){ var st = expiryState(f.expiry); return st && st.cls !== 'ok'; }).length;
   var h = '';
   h += '<div class="kpi">'
-    + kpi('보유 롤', totalRolls + '롤', (data.films || []).length ? (data.films || []).length + '종 등록' : '등록 없음', 'green')
-    + Object.keys(byFmt).map(function(k){ return kpi(k, byFmt[k] + '롤', '', ''); }).join('')
+    + kpi('보유 롤', totalRolls, filmsN ? filmsN + '종 등록' : '등록 없음', 'green', '롤')
+    + kpi('등록 스톡', filmsN, filmsN ? '포맷 ' + Object.keys(byFmt).length + '가지' : '추가해 주세요', '', '종')
+    + kpi('만료 임박', soon, soon ? '먼저 써야 해요' : '걱정 없어요', soon ? 'amber' : '', '건')
+    + Object.keys(byFmt).map(function(k){ return kpi(k, byFmt[k], '', '', '롤'); }).join('')
     + '</div>';
 
   h += '<div class="card"><div class="panel-head"><h3>필름 재고</h3><div class="head-ops">'
