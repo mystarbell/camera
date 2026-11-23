@@ -3647,6 +3647,19 @@ function paintLightbox(){
     + '</div>';
   el.classList.add('on');
 }
+/* 장소·메모를 고칠 때 라이트박스를 통째로 다시 그리면 입력 포커스가 날아간다 — 설명 줄만 갱신 */
+function refreshLboxMeta(){
+  var it = lboxState.list[lboxState.idx];
+  if(!it) return;
+  var sub = (document.querySelector ? document.querySelector('#lbox .lbox-sub') : null);
+  if(!sub) return;
+  var sc = it.scan;
+  var map = sc.place ? spotMapsUrl({place: sc.place}) : '';
+  sub.innerHTML = esc(timeLabel(sc.at))
+    + (map ? ' · <a class="lnk" href="' + esc(map) + '" target="_blank" rel="noopener">🗺️ ' + esc(sc.place) + '</a>'
+           : (sc.place ? ' · ' + esc(sc.place) : ''))
+    + (sc.note ? ' · ' + esc(sc.note) : '');
+}
 function closeLightbox(){
   var el = document.getElementById('lbox');
   if(!el) return;
@@ -3868,12 +3881,12 @@ document.addEventListener('change', function(e){
   if(t.hasAttribute && t.hasAttribute('data-gallens')){ galLens = t.value; document.getElementById('tab-hist').innerHTML = renderHist(); return; }
   if(t.hasAttribute && t.hasAttribute('data-scannote')){
     var snIds = String(t.getAttribute('data-scannote')).split(':');
-    if(updateScan(snIds[0], snIds[1], {note: t.value})){ toast('메모를 저장했어요'); paintLightbox(); }
+    if(updateScan(snIds[0], snIds[1], {note: t.value})){ toast('메모를 저장했어요'); refreshLboxMeta(); }
     return;
   }
   if(t.hasAttribute && t.hasAttribute('data-scanplace')){
     var spIds2 = String(t.getAttribute('data-scanplace')).split(':');
-    if(updateScan(spIds2[0], spIds2[1], {place: t.value})){ toast('장소를 저장했어요'); paintLightbox(); }
+    if(updateScan(spIds2[0], spIds2[1], {place: t.value})){ toast('장소를 저장했어요'); refreshLboxMeta(); }
     return;
   }
   if(t.id === 'fileIn'){
