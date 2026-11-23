@@ -143,6 +143,11 @@ button.danger{color:var(--red);border-color:var(--red-line);background:var(--red
 .fb-format{flex:0 0 auto;font-size:12px;font-weight:650;color:var(--ink3);padding-top:2px}
 .fb-badge{display:flex;flex-wrap:wrap;gap:6px}
 .fb-bot{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:auto}
+.fb-advice{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line2)}
+.fb-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:5px}
+.fb-tags .tag{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-line);font-weight:750}
+.fb-why{font-size:12.5px;line-height:1.55;color:var(--ink2);word-break:keep-all}
+.fb-empty{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:13px;padding-top:12px;border-top:1px solid var(--line)}
 
 /* ---------- 조합 추천 선택 ---------- */
 .intro{margin:0 0 12px}
@@ -935,6 +940,128 @@ function filmSuggestions(purpose, body, count, sit){
   return scored.slice(0, count || 2);
 }
 
+/* ================= 장전된 조합의 추천 상황 ================= */
+var ISO_STEPS = [50, 100, 125, 160, 200, 250, 400, 800, 1600, 3200];
+function isoFromStock(stock){
+  var t = String(stock || '');
+  for(var i = 0; i < ISO_STEPS.length; i++){
+    var re = new RegExp('(^|[^0-9])' + ISO_STEPS[i] + '([^0-9]|$)');
+    if(re.test(t)) return ISO_STEPS[i];
+  }
+  return null;
+}
+/* 장전된 스톡의 ISO·타입·성격 — 보유 목록 → 카탈로그 → 이름 순으로 찾음 */
+function filmProfile(body){
+  var stock = loadedStock(body);
+  if(!stock) return null;
+  var key = maskStock(stock);
+  var hit = null, own = null;
+  (data.filmCatalog || []).forEach(function(f){ if(!hit && maskStock(f.stock) === key) hit = f; });
+  (data.films || []).forEach(function(f){ if(!own && maskStock(f.stock) === key) own = f; });
+  var src = hit || own || {};
+  var iso = loadedIsoOf(body);
+  if(iso === null) iso = isoFromStock(stock);
+  if(iso === null && own && own.iso) iso = Number(own.iso);
+  if(iso === null && hit && hit.iso) iso = Number(hit.iso);
+  var name = stock + ' ' + (src.type || '') + ' ' + (src.character || '');
+  return {
+    stock: stock, iso: iso === null ? null : Number(iso), type: src.type || '', character: src.character || '',
+    bw: /흑백|ilford|hp5|delta|tri-x|fomapan|acros/i.test(name),
+    slide: /슬라이드|velvia|provia|ektachrome|e100/i.test(name),
+    portrait: /portra/i.test(name),
+    warm: /gold|colorplus|ultramax/i.test(name)
+  };
+}
+/* 바디 + 렌즈 + 장전 필름을 함께 보고 "어디에 적합한지"를 규칙으로 계산 */
+function loadedSituations(body, lensOpt, filmOpt){
+  var lens = lensOpt === undefined ? fixedLens(body) : lensOpt;
+  var fixed = !!(lens && lens.fixed);
+  var c = {body: body, lens: lens || {}, fixed: fixed};
+  var afLens = !lens || /AF-S|AF NIKKOR|AF Zoom|AF Micro/i.test(lens.model || '');
+  var af = fixed ? !!AF_FIXED[body.id] : (body.id === 'nikon-f80' && afLens);
+  var ae = fixed ? !!AE_BODIES[body.id] : (body.id === 'nikon-f80' && afLens);
+  var w = bodyWeightOf(body) + (lens && !fixed ? lensWeightOf(lens) : 0);
+  var pk = !!(fixed && POCKET_BODIES[body.id] && w <= 450);
+  var med = isMedium(c);
+  var square = (body.format === '127-44');
+  var eq = lens ? equivFocal(lens, body, 1) : null;
+  var ap = lens && lens.aperture ? Number(lens.aperture) : null;
+  var fp = filmOpt && filmOpt.stock !== undefined ? filmOpt : filmProfile(body);
+  var iso = fp && fp.iso ? fp.iso : null;
+  var bigIso = !!(iso && iso >= 400);
+  var mood = bigIso ? '흐린 날' : '맑은 날';
+  var isoLab = iso ? 'ISO ' + iso : '';
+  var lensLab = eq ? (eq + 'mm' + (ap ? ' f/' + ap : '')) : '렌즈 교환식';
+  var filmLab = fp ? fp.stock : '';
+  var shots = [];
+  function add(label, p, why){ if(p > 0) shots.push({label: label, p: Math.round(p), why: why}); }
+
+  /* 아이랑 외출 */
+  var s = 55;
+  if(af) s += 26; else s -= 16;
+  if(ae) s += 8;
+  if(ap && ap <= 2.8) s += 7;
+  if(bigIso) s += 12; else if(iso && iso <= 100) s -= 8;
+  if(eq && eq >= 85) s -= 20;
+  if(med) s -= 10;
+  add('아이랑 외출', s, (af ? 'AF' : '수동 초점') + ' ' + lensLab + (isoLab ? ' · ' + isoLab : '')
+    + (af ? ' — 움직이는 아이를 바로 잡기 좋아요' : ' — 아이를 따라가기엔 느려요'));
+
+  /* 도시 스냅 (날씨는 필름 ISO로) */
+  s = 50;
+  if(eq && eq >= 28 && eq <= 55) s += 26; else if(eq) s -= 10;
+  if(af) s += 8;
+  if(pk) s += 8;
+  if(iso && iso >= 100 && iso <= 400) s += 8; else if(iso && iso > 800) s -= 8;
+  if(med) s -= 8;
+  add(mood + ' 도시 스냅', s, lensLab + (af ? ' AF' : '') + (pk ? ' · 주머니 크기' : '') + (isoLab ? ' · ' + isoLab : '') + ' — 거리를 걸으며 담기 좋아요');
+
+  /* 인물·감성 */
+  s = 46;
+  if(eq && eq >= 40 && eq <= 85) s += 16;
+  else if(eq && eq >= 28) s += 4;
+  if(ap && ap <= 2.8) s += 12;
+  if(med) s += 24;
+  if(fp && fp.portrait) s += 20;
+  if(fp && fp.bw) s += 2;
+  add(med ? (mood + (square ? ' 정사각 인물' : ' 중형 인물')) : (mood + ' 인물·감성'), s,
+    lensLab + (filmLab ? ' + ' + filmLab : '') + (med ? ' — 큰 판형으로 피부톤과 계조를 살려요' : ' — 배경을 정리한 인물에 좋아요'));
+
+  /* 혼자 산책 */
+  s = 48;
+  if(med) s += 18;
+  if(!af) s += 10;
+  if(pk) s += 12;
+  if(iso && iso <= 400) s += 6;
+  if(w <= 500) s += 6;
+  if(eq && eq >= 120) s -= 12;
+  add('느긋한 혼자 산책', s, (med ? '중형 판형' : (pk ? '주머니 크기' : '수동 조작')) + ' · ' + lensLab
+    + (isoLab ? ' · ' + isoLab : '') + ' — 천천히 구도 잡으며 걷기 좋아요');
+
+  /* 여행·풍경 */
+  s = 46;
+  if(eq && eq <= 35) s += 22; else if(eq && eq <= 50) s += 12;
+  if(pk) s += 8;
+  if(iso && iso >= 100 && iso <= 400) s += 6;
+  add('여행·풍경', s, lensLab + (isoLab ? ' · ' + isoLab : '') + ' — 풍경과 거리를 두루 담아요');
+
+  /* 실내·저조도 */
+  s = 38;
+  if(iso && iso >= 800) s += 26; else if(iso && iso >= 400) s += 8;
+  if(ap && ap <= 2) s += 10;
+  if(ae) s += 6;
+  add('실내·저조도', s, isoLab + (ap ? ' · f/' + ap : '') + ' — 빛이 약한 곳에서도 노출이 서요');
+
+  shots.sort(function(a, b){ return b.p - a.p; });
+  var top = shots.filter(function(x){ return x.p >= 62; }).slice(0, 2);
+  if(!top.length) top = shots.slice(0, 2);
+  return {
+    tags: top.map(function(x){ return x.label; }),
+    reason: top.length ? top[0].why : '',
+    scores: shots
+  };
+}
+
 /* ================= 요약 ================= */
 function kpi(label, value, note, tone, unit){
   return '<div class="kpi-item' + (tone ? ' ' + tone : '') + '">'
@@ -1021,21 +1148,36 @@ function renderHome(){
     h += '</div>';
   }
 
+  var loadedBodies = filmBodies.filter(function(b){ return !!loadedStock(b); });
+  var emptyBodies = filmBodies.filter(function(b){ return !loadedStock(b); });
   if(filmBodies.length){
-    h += '<div class="card"><div class="panel-head"><h3>장전 중인 필름</h3>'
-      + '<span class="count">' + esc(loadedCount) + '대 장전 · 총 ' + esc(filmBodies.length) + '대</span></div>'
-      + '<div class="film-grid">';
-    filmBodies.forEach(function(b){
-      var isLoaded = !!loadedStock(b);
-      h += '<div class="fb' + (isLoaded ? ' loaded' : '') + '">'
-        + '<div class="fb-top"><div class="fb-name">' + esc(nameOf(b)) + '</div>'
-        + '<div class="fb-format">' + esc(formatLabel(b.format)) + '</div></div>'
-        + '<div class="fb-badge">' + loadedBadge(b) + '</div>'
-        + loadedDetail(b)
-        + '<div class="fb-bot"><button class="ghost sm" data-loaded="' + esc(b.id) + '">변경</button></div>'
+    h += '<div class="card"><div class="panel-head"><h3>장전 중인 기체</h3>'
+      + '<span class="count">' + esc(loadedBodies.length) + '대 · 필름 바디 ' + esc(filmBodies.length) + '대</span></div>';
+    if(!loadedBodies.length){
+      h += '<div class="muted">지금 필름이 장전된 기체가 없어요. 장비 탭에서 🎞️ 필름을 눌러 장전하면 여기에 어디에 맞는지가 함께 나와요.</div>';
+    }else{
+      h += '<div class="film-grid">';
+      loadedBodies.forEach(function(b){
+        var adv = loadedSituations(b);
+        h += '<div class="fb loaded">'
+          + '<div class="fb-top"><div class="fb-name">' + esc(nameOf(b)) + '</div>'
+          + '<div class="fb-format">' + esc(formatLabel(b.format)) + '</div></div>'
+          + '<div class="fb-badge">' + loadedBadge(b) + '</div>'
+          + loadedDetail(b)
+          + '<div class="fb-advice"><div class="fb-tags">'
+          +   adv.tags.map(function(t){ return '<span class="tag">' + esc(t) + '</span>'; }).join('')
+          + '</div><div class="fb-why">' + esc(adv.reason) + '</div></div>'
+          + '<div class="fb-bot"><button class="ghost sm" data-loaded="' + esc(b.id) + '">변경</button></div>'
+          + '</div>';
+      });
+      h += '</div>';
+    }
+    if(emptyBodies.length){
+      h += '<div class="fb-empty"><span class="dim">미삽입 ' + esc(emptyBodies.length) + '대</span>'
+        + emptyBodies.map(function(b){ return '<span class="tag">' + esc(nameOf(b)) + '</span>'; }).join('')
         + '</div>';
-    });
-    h += '</div></div>';
+    }
+    h += '</div>';
   }
 
   h += '<div class="card"><div class="panel-head"><h3>바로 가기</h3><span class="count">개인 기록 ' + esc(privCount) + '건</span></div>'
@@ -1060,15 +1202,50 @@ function privLine(type, id){
   if(p.memo && reveal) parts.push(p.memo);
   return '<div class="priv' + (reveal ? '' : ' off') + '">🔒 ' + esc(parts.join(' · ')) + '</div>';
 }
+function gearBodyCard(b, withAdvice){
+  var film = isFilmBody(b);
+  var isLoaded = film && !!loadedStock(b);
+  var repair = /수리|점검|오버홀/.test(b.status || '');
+  var statusPill = (b.status && b.status !== '보유') ? ' <span class="pill ' + (repair ? 'warn' : '') + '">' + esc(b.status) + '</span>' : '';
+  var tags = '<span class="tag">' + esc(b.bodyType || '종류 미지정') + '</span>'
+    + '<span class="tag">' + esc(formatLabel(b.format)) + '</span>'
+    + '<span class="tag">마운트 ' + esc(b.mount || '미지정') + '</span>'
+    + (b.fixedFocal ? '<span class="tag">고정 ' + esc(b.fixedFocal + 'mm' + (b.fixedAperture ? ' f/' + b.fixedAperture : '')) + '</span>' : '');
+  var adv = (withAdvice && isLoaded) ? loadedSituations(b) : null;
+  return '<article class="gear' + (repair ? ' is-repair' : (isLoaded ? ' is-loaded' : '')) + '">'
+    + '<div class="gear-top"><div class="gear-name">' + esc(nameOf(b)) + '</div>' + statusPill + '</div>'
+    + '<div class="tags">' + tags + '</div>'
+    + (film ? '<div class="film-row">' + loadedBadge(b) + '</div>' + loadedDetail(b) : '')
+    + (adv ? '<div class="fb-advice"><div class="fb-tags">'
+        + adv.tags.map(function(t){ return '<span class="tag">' + esc(t) + '</span>'; }).join('')
+        + '</div><div class="fb-why">' + esc(adv.reason) + '</div></div>' : '')
+    + (b.notes ? '<div class="dim gear-notes">' + esc(b.notes) + '</div>' : '')
+    + privLine('bodies', b.id)
+    + '<div class="gear-ops">'
+    + (film ? '<button class="ghost sm" data-loaded="' + esc(b.id) + '">🎞️ 필름</button>' : '')
+    + '<button class="ghost sm" data-edit="bodies:' + esc(b.id) + '">수정</button>'
+    + '</div></article>';
+}
 function renderGear(){
   var h = '';
   h += '<div class="note"><b>공개 저장소에 올라가는 건 초기값뿐이에요.</b> 여기서 고친 내용과 '
     + '<span class="lock">🔒</span> 시리얼·구입가·개인 메모는 이 브라우저(localStorage)에만 남고 서버로 가지 않아요.</div>';
 
   h += '<div class="chips" id="gearFilter">'
-    + chipBtn('all', '전체') + chipBtn('bodies', '바디') + chipBtn('lenses', '렌즈')
+    + chipBtn('all', '전체') + chipBtn('bodies', '바디') + chipBtn('loaded', '장전 중') + chipBtn('lenses', '렌즈')
     + chipBtn('adapters', '컨버터') + chipBtn('films', '필름')
     + '</div>';
+
+  if(gearFilter === 'loaded'){
+    var loadedList = data.bodies.filter(function(b){ return isFilmBody(b) && !!loadedStock(b); });
+    h += '<div class="card"><div class="panel-head"><h3>장전 중인 기체</h3><div class="head-ops">'
+      + '<span class="count">' + esc(loadedList.length) + '대</span>'
+      + '<button class="ghost sm" data-add="bodies">+ 추가</button></div></div>';
+    if(!loadedList.length) h += '<div class="muted">필름이 장전된 바디가 없어요. 바디 카드의 🎞️ 필름 버튼으로 장전하면 여기에 모여요.</div>';
+    h += '<div class="gear-grid">';
+    loadedList.forEach(function(b){ h += gearBodyCard(b, true); });
+    h += '</div></div>';
+  }
 
   if(gearFilter === 'all' || gearFilter === 'bodies'){
     h += '<div class="card"><div class="panel-head"><h3>바디</h3><div class="head-ops">'
@@ -1076,26 +1253,7 @@ function renderGear(){
       + '<button class="ghost sm" data-add="bodies">+ 추가</button></div></div>';
     if(!data.bodies.length) h += '<div class="muted">없어요. 필름 SLR·RF·TLR·중형·컴팩트, 디지털까지 모두 추가할 수 있어요.</div>';
     h += '<div class="gear-grid">';
-    data.bodies.forEach(function(b){
-      var film = isFilmBody(b);
-      var isLoaded = film && !!loadedStock(b);
-      var repair = /수리|점검|오버홀/.test(b.status || '');
-      var statusPill = (b.status && b.status !== '보유') ? ' <span class="pill ' + (repair ? 'warn' : '') + '">' + esc(b.status) + '</span>' : '';
-      var tags = '<span class="tag">' + esc(b.bodyType || '종류 미지정') + '</span>'
-        + '<span class="tag">' + esc(formatLabel(b.format)) + '</span>'
-        + '<span class="tag">마운트 ' + esc(b.mount || '미지정') + '</span>'
-        + (b.fixedFocal ? '<span class="tag">고정 ' + esc(b.fixedFocal + 'mm' + (b.fixedAperture ? ' f/' + b.fixedAperture : '')) + '</span>' : '');
-      h += '<article class="gear' + (repair ? ' is-repair' : (isLoaded ? ' is-loaded' : '')) + '">'
-        + '<div class="gear-top"><div class="gear-name">' + esc(nameOf(b)) + '</div>' + statusPill + '</div>'
-        + '<div class="tags">' + tags + '</div>'
-        + (film ? '<div class="film-row">' + loadedBadge(b) + '</div>' + loadedDetail(b) : '')
-        + (b.notes ? '<div class="dim gear-notes">' + esc(b.notes) + '</div>' : '')
-        + privLine('bodies', b.id)
-        + '<div class="gear-ops">'
-        + (film ? '<button class="ghost sm" data-loaded="' + esc(b.id) + '">🎞️ 필름</button>' : '')
-        + '<button class="ghost sm" data-edit="bodies:' + esc(b.id) + '">수정</button>'
-        + '</div></article>';
-    });
+    data.bodies.forEach(function(b){ h += gearBodyCard(b, false); });
     h += '</div></div>';
   }
 
