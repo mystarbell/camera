@@ -373,6 +373,14 @@ function inventoryFor(stock, filmFmt){
     return fk && key && (fk === key || fk.indexOf(key) >= 0 || key.indexOf(fk) >= 0);
   });
 }
+function invSummary(s){
+  if(!s.inv || !s.inv.length) return {txt:'재고 미등록', cls:'bad'};
+  if(s.rolls > 0){
+    var exp = s.inv.map(function(x){ return expiryState(x.expiry); }).filter(function(x){ return x && x.cls !== 'ok'; })[0];
+    return {txt:'보유 ' + s.rolls + '롤' + (exp ? ' · ' + exp.text : ''), cls: exp ? (exp.cls === 'bad' ? 'bad' : 'warn') : 'ok'};
+  }
+  return {txt:'재고 0롤', cls:'bad'};
+}
 function filmSuggestions(purpose, body, count){
   var want = filmFormatOf(body);
   if(!want) return [];
@@ -640,19 +648,19 @@ function runRec(){
     }else if(!sugg.length){
       h += '<div class="muted" style="margin-top:6px">이 포맷(' + esc(filmFormatOf(c.body) || '-') + ')에 맞는 스톡이 카탈로그에 없어요. 필름 탭에서 직접 등록해 주세요.</div>';
     }else{
-      h += '<div class="muted" style="margin-top:8px;font-weight:700;color:var(--text)">필름 추천</div>';
-      sugg.forEach(function(s){
-        var invTxt, invCls;
-        if(!s.inv.length){ invTxt = '재고 미등록'; invCls = 'bad'; }
-        else if(s.rolls > 0){
-    var exp = s.inv.map(function(x){ return expiryState(x.expiry); }).filter(function(x){ return x && x.cls !== 'ok'; })[0];
-          invTxt = '보유 ' + s.rolls + '롤' + (exp ? ' · ' + exp.text : '');
-          invCls = exp && exp.cls === 'bad' ? 'bad' : (exp ? 'warn' : 'ok');
-        }else{ invTxt = '재고 0롤'; invCls = 'bad'; }
-        h += '<div class="item"><div><div class="t">' + esc(s.film.stock) + '</div>'
-          + '<div class="d">ISO ' + esc(s.film.iso) + ' · ' + esc(s.film.type || '') + (s.film.character ? ' · ' + esc(s.film.character) : '') + '</div>'
-          + '</div><div class="ops"><span class="pill ' + invCls + '">' + esc(invTxt) + '</span></div></div>';
-      });
+      var top = sugg[0];
+      var inv = invSummary(top);
+      if(i === 0){
+        h += '<div class="muted" style="margin-top:8px;font-weight:700;color:var(--text)">필름 추천</div>';
+        sugg.forEach(function(s){
+          var is = invSummary(s);
+          h += '<div class="item"><div><div class="t">' + esc(s.film.stock) + '</div>'
+            + '<div class="d">ISO ' + esc(s.film.iso) + ' · ' + esc(s.film.type || '') + (s.film.character ? ' · ' + esc(s.film.character) : '') + '</div>'
+            + '</div><div class="ops"><span class="pill ' + is.cls + '">' + esc(is.txt) + '</span></div></div>';
+        });
+      }else{
+        h += '<div class="d" style="margin-top:7px">필름 ' + esc(top.film.stock) + ' <span class="pill ' + inv.cls + '">' + esc(inv.txt) + '</span></div>';
+      }
     }
     h += '</div>';
   });
