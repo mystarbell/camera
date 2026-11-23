@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0e0f12" />
+<meta name="description" content="카메라·렌즈·이종교배 컨버터·필름 재고 관리 대시보드" />
+<title>CAMERA · 카메라 컬렉션</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%B7%3C/text%3E%3C/svg%3E" />
+<style>
+:root{
+  --bg:#0e0f12; --card:#171a1f; --card2:#1e2229; --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.18);
+  --text:#eef1f4; --muted:#9aa3ad; --dim:#6f7883; --accent:#e0a95f; --accent2:#6fc2b4; --warn:#f0b866; --bad:#e98b8b; --ok:#79d0a6;
+  --r:16px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",Roboto,sans-serif;letter-spacing:-.01em;padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+header{padding:20px 16px 8px}
+h1{font-size:18px;margin:0 0 4px;letter-spacing:.14em;font-weight:700}
+h1 span{letter-spacing:-.01em;color:var(--muted);font-weight:600;font-size:13px;margin-left:6px}
+.sub{font-size:12px;color:var(--muted)}
+nav{display:flex;gap:6px;padding:8px 12px;position:sticky;top:0;background:rgba(14,15,18,.94);backdrop-filter:blur(12px);z-index:20;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:0 0 auto;background:transparent;border:1px solid transparent;color:var(--muted);padding:8px 13px;border-radius:999px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer}
+nav button.on{background:var(--card2);color:var(--text);border-color:var(--line2)}
+main{padding:14px 12px 8px;max-width:940px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.card h3{margin:0 0 8px;font-size:14px;letter-spacing:-.01em}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.muted{color:var(--muted);font-size:12px;line-height:1.5}
+.dim{color:var(--dim);font-size:11px;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(76px,1fr));gap:8px;margin-bottom:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:11px 12px;min-width:0}
+.stat span{font-size:11px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat b{display:block;font-size:20px;margin-top:2px;letter-spacing:-.02em}
+.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line2);color:var(--muted);margin:2px 4px 2px 0;white-space:nowrap}
+.pill.warn{color:var(--warn);border-color:rgba(240,184,102,.4)}
+.pill.ok{color:var(--ok);border-color:rgba(121,208,166,.4)}
+.pill.bad{color:var(--bad);border-color:rgba(233,139,139,.4)}
+.pill.gold{color:var(--accent);border-color:rgba(224,169,95,.45)}
+select,input,textarea{width:100%;background:var(--card2);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:10px;font-size:15px;font-family:inherit;appearance:none}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 17px) 52%,calc(100% - 12px) 52%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:32px}
+input[type=date]{min-height:42px}
+textarea{min-height:64px;resize:vertical}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+button.btn{background:var(--accent);color:#241a0c;border:0;border-radius:10px;padding:11px 16px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer}
+button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line2);border-radius:10px;padding:9px 12px;font-size:13px;font-family:inherit;cursor:pointer}
+button.sm{padding:5px 9px;font-size:12px;border-radius:8px}
+button.danger{color:var(--bad);border-color:rgba(233,139,139,.4)}
+.item{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}
+.item>div:first-child{min-width:0}
+.item .t{font-size:14px;font-weight:600;line-height:1.35}
+.item .d{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}
+.item .ops{display:flex;gap:6px;flex-shrink:0;align-items:flex-start}
+.rec{border-left:3px solid var(--accent2);padding:2px 0 2px 11px;margin:12px 0}
+.rec .h{font-size:14px;font-weight:700;line-height:1.4}
+.rec .h em{font-style:normal;color:var(--dim);font-weight:600;font-size:12px;margin-right:5px}
+.hidden{display:none}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-bottom:8px}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:0 0 auto;background:transparent;border:1px solid var(--line2);color:var(--muted);border-radius:999px;padding:6px 11px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer}
+.chips button.on{background:var(--card2);color:var(--text);border-color:rgba(255,255,255,.3)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:flex-end;z-index:50}
+.modal.on{display:flex}
+.sheet{background:var(--card);width:100%;max-height:90vh;overflow:auto;-webkit-overflow-scrolling:touch;border-radius:18px 18px 0 0;padding:10px 16px calc(20px + env(safe-area-inset-bottom));border-top:1px solid var(--line2)}
+.sheet .grab{width:38px;height:4px;background:var(--line2);border-radius:99px;margin:2px auto 12px}
+.sheet h3{margin:0;font-size:16px}
+.sect{font-size:11px;letter-spacing:.08em;color:var(--dim);margin:18px 0 2px;padding-top:12px;border-top:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#252a32;border:1px solid var(--line2);color:var(--text);padding:9px 16px;border-radius:999px;font-size:13px;opacity:0;transition:.2s;pointer-events:none;z-index:80;max-width:86vw;text-align:center}
+.toast.on{opacity:1}
+.lock{font-size:11px;color:var(--accent);border:1px solid rgba(224,169,95,.45);border-radius:6px;padding:0 5px;margin-left:5px}
+.priv{font-size:12px;color:var(--warn);margin-top:4px;line-height:1.5;word-break:break-all}
+.priv.off{color:var(--dim)}
+.bar{height:4px;background:var(--card2);border-radius:99px;overflow:hidden;margin-top:5px}
+.bar i{display:block;height:100%;background:var(--accent2)}
+.note{border:1px dashed var(--line2);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:10px}
+.note b{color:var(--text)}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+footer{max-width:940px;margin:0 auto;padding:4px 16px 20px;font-size:11px;color:var(--dim);line-height:1.6}
+@media(min-width:720px){ h1{font-size:20px} main{padding:18px 16px} }
+</style>
+</head>
+<body>
+<header>
+  <h1>CAMERA<span>카메라 컬렉션</span></h1>
+  <div class="sub" id="subline">바디 · 렌즈 · 이종교배 컨버터 · 필름 재고</div>
+</header>
+<nav id="nav">
+  <button data-tab="home" class="on">요약</button>
+  <button data-tab="gear">장비</button>
+  <button data-tab="rec">조합 추천</button>
+  <button data-tab="film">필름</button>
+  <button data-tab="data">데이터</button>
+</nav>
+<main>
+  <section id="tab-home"></section>
+  <section id="tab-gear" class="hidden"></section>
+  <section id="tab-rec" class="hidden"></section>
+  <section id="tab-film" class="hidden"></section>
+  <section id="tab-data" class="hidden"></section>
+</main>
+<footer>
+  이 페이지는 공개 저장소에서 내려받는 화면이고, 장비 목록의 초기값은 공개 정보입니다.<br>
+  시리얼번호·구입가·개인 메모는 이 기기 브라우저에만 저장되고 어디에도 전송되지 않습니다.
+</footer>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+<noscript><div style="padding:20px">이 대시보드는 JavaScript가 필요합니다.</div></noscript>
+
+<script id="seed-data" type="application/json">
+{
+  "bodies": [
+    {"id":"rollei-baby","bodyType":"필름 TLR","maker":"Rollei","model":"Baby Rolleiflex 4×4","mount":"고정 렌즈","format":"127-44","fixedFocal":60,"fixedAperture":2.8,"status":"수리 중 · 오버홀(12월 초순 예상)","notes":"고정 60mm f/2.8 추정 — 렌즈 표기 확인 필요. 127 필름 사용."},
+    {"id":"rollei-35","bodyType":"필름 컴팩트","maker":"Rollei","model":"Rollei 35","mount":"고정 렌즈","format":"35mm","fixedFocal":40,"fixedAperture":3.5,"status":"보유","notes":"40mm f/3.5 추정(35·35S·35T 중 모델 확인 필요)."},
+    {"id":"nikon-f80","bodyType":"필름 SLR","maker":"Nikon","model":"F80","mount":"Nikon F","format":"35mm","fixedFocal":null,"fixedAperture":null,"status":"보유","notes":"이베이에서 영입. AF-S는 AF 구동, Ai는 수동(측광 일부 제한)."},
+    {"id":"olympus-unknown","bodyType":"","maker":"Olympus","model":"모델 확인 필요","mount":"확인 필요","format":"35mm","fixedFocal":null,"fixedAperture":null,"status":"확인 필요","notes":"올림푸스 모델·마운트 확인 후 정리. 필름 SLR/RF/컴팩트 중 어느 쪽인지도 함께."}
+  ],
+  "lenses": [
+    {"id":"n300pf","maker":"Nikon","model":"AF-S NIKKOR 300mm f/4E PF ED VR","mount":"Nikon F","focal":300,"aperture":4,"format":"35mm","notes":"PF 회절 렌즈, 경량 망원."},
+    {"id":"n24","maker":"Nikon","model":"AF-S NIKKOR 24mm f/1.4G ED","mount":"Nikon F","focal":24,"aperture":1.4,"format":"35mm","notes":"풍경·실내 주력 광각."},
+    {"id":"n50","maker":"Nikon","model":"AF-S NIKKOR 50mm f/1.4G","mount":"Nikon F","focal":50,"aperture":1.4,"format":"35mm","notes":"인물·아이들 스냅 주력."},
+    {"id":"n35ai","maker":"Nikon","model":"Ai Nikkor 35mm f/1.4S","mount":"Nikon F","focal":35,"aperture":1.4,"format":"35mm","notes":"수동 Ai. F80에서 노출계 연동(측광 일부 제한)."}
+  ],
+  "adapters": [],
+  "films": [],
+  "filmCatalog": [
+    {"stock":"Kodak Portra 400","iso":400,"type":"컬러 네거티브","formats":["35mm","120"],"bestFor":["인물","실내","여행","스냅"],"character":"부드러운 피부톤, 관용도 넓음"},
+    {"stock":"Kodak Portra 800","iso":800,"type":"컬러 네거티브","formats":["35mm","120"],"bestFor":["실내","인물"],"character":"실내 아이들 스냅에 강함"},
+    {"stock":"Kodak Ektar 100","iso":100,"type":"컬러 네거티브","formats":["35mm","120"],"bestFor":["풍경","여행"],"character":"고채도·미세 입자"},
+    {"stock":"Kodak Gold 200","iso":200,"type":"컬러 네거티브","formats":["35mm"],"bestFor":["여행","스냅"],"character":"따뜻한 색, 가성비"},
+    {"stock":"Fujifilm Velvia 50","iso":50,"type":"슬라이드","formats":["35mm","120"],"bestFor":["풍경"],"character":"강한 채도, 노출 정확도 요구"},
+    {"stock":"Fujifilm Provia 100F","iso":100,"type":"슬라이드","formats":["35mm","120"],"bestFor":["풍경","여행"],"character":"중립적 색, 깔끔한 계조"},
+    {"stock":"Kodak Ektachrome E100","iso":100,"type":"슬라이드","formats":["35mm","120"],"bestFor":["풍경","스냅"],"character":"차분한 청록, 현대적 슬라이드"},
+    {"stock":"Ilford HP5 Plus","iso":400,"type":"흑백","formats":["35mm","120"],"bestFor":["인물","여행","스냅"],"character":"관용도 큰 클래식 흑백"},
+    {"stock":"Ilford Delta 3200","iso":3200,"type":"흑백","formats":["35mm","120"],"bestFor":["실내"],"character":"어두운 실내·야간용 고감도"},
+    {"stock":"CineStill 800T","iso":800,"type":"컬러 네거티브(텅스텐)","formats":["35mm"],"bestFor":["실내"],"character":"야간·형광등 아래 할레이션"}
+  ]
+}
+</script>
+
+<script>
+/* ================= 기본 정의 ================= */
+var KEY = 'camera-dash-v1';
+var PKEY = 'camera-dash-private-v1';   /* 시리얼·구입가·개인메모: 이 기기에만 */
+
+var FORMATS = {
+  '35mm':    {label:'35mm 필름', crop:1.00, film:'35mm'},
+  '120-645': {label:'120 · 6×4.5', crop:0.62, film:'120'},
+  '120-66':  {label:'120 · 6×6', crop:0.55, film:'120'},
+  '120-67':  {label:'120 · 6×7', crop:0.50, film:'120'},
+  '127-44':  {label:'127 · 4×4', crop:0.77, film:'127'},
+  'ff':      {label:'디지털 풀프레임', crop:1.00, film:null},
+  'aps-c':   {label:'디지털 APS-C', crop:1.50, film:null},
+  'm43':     {label:'디지털 M4/3', crop:2.00, film:null}
+};
+var BODY_TYPE_LIST = ['필름 SLR','필름 레인지파인더','필름 TLR','필름 중형','필름 컴팩트','디지털','디지털 미러리스','디지털 DSLR','기타'];
+var MOUNTS = ['Nikon F','Canon EF','Canon RF','Sony E','Sony A','Fujifilm X','Leica M','Leica M39(LTM)','M42','Pentax K','Contax/Yashica','Olympus OM','Rollei QBM','Mamiya 645','Pentax 645','Hasselblad V','고정 렌즈'];
+var PURPOSES = {
+  '인물': {lo:70, hi:135, ideal:100, why:'얼굴이 왜곡 없이 커지고 배경을 정리하기 쉬운 화각'},
+  '풍경': {lo:20, hi:35,  ideal:28,  why:'넓게 담으면서 원근 왜곡이 과하지 않은 화각'},
+  '여행': {lo:28, hi:50,  ideal:35,  why:'풍경과 인물을 한 렌즈로 오가기 좋은 화각'},
+  '실내': {lo:35, hi:55,  ideal:40,  why:'좁은 실내에서 배경과 사람을 함께 담는 화각'},
+  '스냅': {lo:35, hi:70,  ideal:50,  why:'눈에 보이는 그대로, 거리 두고 자연스럽게 담는 화각'}
+};
+
+/* ================= 상태 ================= */
+var seed = JSON.parse(document.getElementById('seed-data').textContent);
+var data = loadData();
+var priv = loadPriv();
+var reveal = false;
+var gearFilter = 'all';
+var recAuto = true;
+
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+
+function normalize(d){
+  d.bodies = d.bodies || []; d.lenses = d.lenses || []; d.adapters = d.adapters || [];
+  d.films = d.films || []; d.filmCatalog = d.filmCatalog || clone(seed.filmCatalog);
+  d.bodies.forEach(function(b){ if(b.bodyType === undefined) b.bodyType = ''; });
+  return d;
+}
+function loadData(){
+  try{
+    var raw = localStorage.getItem(KEY);
+    if(raw){
+      var d = JSON.parse(raw);
+      if(d && d.bodies && d.lenses) return normalize(d);
+    }
+  }catch(e){}
+  return normalize(clone(seed));
+}
+function saveData(){
+  try{ localStorage.setItem(KEY, JSON.stringify(data)); }
+  catch(e){ toast('이 브라우저에 저장할 수 없어요'); }
+}
+function loadPriv(){
+  try{
+    var raw = localStorage.getItem(PKEY);
+    if(raw){
+      var p = JSON.parse(raw);
+      if(p && typeof p === 'object'){
+        p.bodies = p.bodies || {}; p.lenses = p.lenses || {}; p.adapters = p.adapters || {}; p.films = p.films || {};
+        return p;
+      }
+    }
+  }catch(e){}
+  return {bodies:{}, lenses:{}, adapters:{}, films:{}};
+}
+function savePriv(){
+  try{ localStorage.setItem(PKEY, JSON.stringify(priv)); }
+  catch(e){ toast('개인 기록을 저장할 수 없어요'); }
+}
+function privFor(type, id){ var m = priv[type] || {}; return m[id] || null; }
+function hasPriv(type, id){ var p = privFor(type, id); return !!(p && (p.serial || p.price || p.boughtAt || p.memo)); }
+
+/* ================= 유틸 ================= */
+function esc(s){
+  return String(s === undefined || s === null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function uid(prefix){ return prefix + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
+function toast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(t._h); t._h = setTimeout(function(){ t.classList.remove('on'); }, 1900);
+}
+function num(v){ var n = Number(v); return isFinite(n) && v !== '' && v !== null ? n : null; }
+function money(v){ var n = num(v); return n === null ? '' : n.toLocaleString('ko-KR') + '원'; }
+function bodyById(id){ return data.bodies.filter(function(b){ return b.id === id; })[0]; }
+function lensById(id){ return data.lenses.filter(function(l){ return l.id === id; })[0]; }
+function formatLabel(f){ return FORMATS[f] ? FORMATS[f].label : (f || '포맷 미지정'); }
+function filmFormatOf(body){ return body && FORMATS[body.format] ? FORMATS[body.format].film : null; }
+function isDigital(body){ return !!body && FORMATS[body.format] && FORMATS[body.format].film === null; }
+function aov(eq){ return Math.round(2 * Math.atan(43.2666 / (2 * eq)) * 180 / Math.PI); }
+function maskSerial(s){
+  var t = String(s || '');
+  if(t.length <= 4) return t ? '••••' : '';
+  return '••••' + t.slice(-4);
+}
+function monthIndex(str){
+  var m = /^(\d{4})-(\d{2})/.exec(String(str || ''));
+  return m ? Number(m[1]) * 12 + Number(m[2]) - 1 : null;
+}
+function nowMonthIndex(){ var d = new Date(); return d.getFullYear() * 12 + d.getMonth(); }
+function expiryState(str){
+  var i = monthIndex(str); if(i === null) return null;
+  var n = nowMonthIndex();
+  if(i < n) return {cls:'bad', text:'만료됨'};
+  if(i - n <= 2) return {cls:'warn', text:'만료 임박'};
+  return {cls:'ok', text:'사용 가능'};
+}
+function maskStock(s){
+  return String(s || '').toLowerCase()
+    .replace(/코닥|후지|후지필름|kodak|fujifilm|fuji|ilford|cinestill|film|필름|plus|professional/g,'')
+    .replace(/[\s\-_\.·,()\[\]]/g,'');
+}
+
+/* ================= 조합 계산 ================= */
+function fixedLens(body){
+  if(body.fixedFocal === null || body.fixedFocal === undefined || body.fixedFocal === '') return null;
+  return {id: body.id + '-fixed', maker: body.maker, model: (body.model || '') + ' 고정 렌즈', mount: body.mount || '고정 렌즈',
+          focal: Number(body.fixedFocal), aperture: num(body.fixedAperture), fixed: true};
+}
+/* 렌즈 마운트 → 바디 마운트: 직결 또는 컨버터 최대 2단 경유 */
+function mountPath(lensMount, bodyMount){
+  if(!lensMount || !bodyMount) return null;
+  if(lensMount === bodyMount) return {hops:0, chain:[], factor:1, adapter:null};
+  var queue = [{mount:lensMount, chain:[], factor:1}];
+  var seen = {}; seen[lensMount] = true;
+  while(queue.length){
+    var cur = queue.shift();
+    if(cur.chain.length >= 2) continue;
+    for(var i = 0; i < data.adapters.length; i++){
+      var a = data.adapters[i];
+      if(!a || a.from !== cur.mount || seen[a.to]) continue;
+      var chain = cur.chain.concat([a]);
+      var factor = cur.factor * (Number(a.factor) || 1);
+      if(a.to === bodyMount) return {hops:chain.length, chain:chain, factor:factor, adapter:chain[0]};
+      seen[a.to] = true;
+      queue.push({mount:a.to, chain:chain, factor:factor});
+    }
+  }
+  return null;
+}
+function equivFocal(lens, body, factor){
+  var crop = FORMATS[body.format] ? FORMATS[body.format].crop : 1;
+  return Math.max(1, Math.round(Number(lens.focal) * (factor || 1) * crop));
+}
+function purposeScore(eq, aperture, purpose){
+  var t = PURPOSES[purpose] || PURPOSES['스냅'];
+  var s;
+  if(eq >= t.lo && eq <= t.hi){
+    var span = Math.max(1, (t.hi - t.lo) / 2);
+    s = 86 + 14 * (1 - Math.min(1, Math.abs(eq - t.ideal) / span));
+  }else{
+    var d = eq < t.lo ? (t.lo - eq) : (eq - t.hi);
+    s = Math.max(8, 78 - d * 1.15);
+  }
+  var ap = Number(aperture);
+  if(ap){
+    if(ap <= 1.8) s += 10; else if(ap <= 2.8) s += 6; else if(ap <= 4) s += 3; else if(ap >= 5.6) s -= 2;
+  }
+  return Math.max(8, Math.min(100, Math.round(s)));
+}
+function buildCombos(bodyId, lensId, purpose){
+  var out = [];
+  if(bodyId){
+    var body = bodyById(bodyId);
+    if(!body) return out;
+    var fl = fixedLens(body);
+    if(fl){
+      var eq0 = equivFocal(fl, body, 1);
+      out.push({body:body, lens:fl, eq:eq0, path:{hops:0, chain:[], factor:1}, score:purposeScore(eq0, fl.aperture, purpose), fixed:true});
+    }else{
+      data.lenses.forEach(function(lens){
+        var p = mountPath(lens.mount, body.mount);
+        if(!p) return;
+        var eq = equivFocal(lens, body, p.factor);
+        var pen = p.hops === 1 ? 4 : (p.hops >= 2 ? 9 : 0);
+        out.push({body:body, lens:lens, eq:eq, path:p, score:purposeScore(eq, lens.aperture, purpose) - pen, fixed:false});
+      });
+    }
+  }else if(lensId){
+    var lens = lensById(lensId);
+    if(!lens) return out;
+    data.bodies.forEach(function(b){
+      var fl = fixedLens(b);
+      if(fl) return; /* 고정 렌즈 바디는 렌즈 교환 불가 */
+      var p = mountPath(lens.mount, b.mount);
+      if(!p) return;
+      var eq = equivFocal(lens, b, p.factor);
+      var pen = p.hops === 1 ? 4 : (p.hops >= 2 ? 9 : 0);
+      out.push({body:b, lens:lens, eq:eq, path:p, score:purposeScore(eq, lens.aperture, purpose) - pen, fixed:false});
+    });
+  }
+  out.sort(function(a,b){ return b.score - a.score; });
+  return out;
+}
+function adapterText(path){
+  if(!path || !path.hops) return '직결';
+  var label = path.chain.map(function(a){
+    var f = Number(a.factor) || 1;
+    var fTxt = f === 1 ? '유리 없음' : (f < 1 ? f + '× 스피드부스터' : f + '× 텔레컨버터');
+    return a.name + ' (' + a.from + '→' + a.to + ', ' + fTxt + ')';
+  }).join(' + ');
+  return '컨버터 ' + label;
+}
+
+/* ---------- 필름 추천 + 재고 ---------- */
+function inventoryFor(stock, filmFmt){
+  var key = maskStock(stock);
+  return (data.films || []).filter(function(f){
+    if(filmFmt && f.format && f.format !== 'any' && f.format !== filmFmt) return false;
+    var fk = maskStock(f.stock);
+    return fk && key && (fk === key || fk.indexOf(key) >= 0 || key.indexOf(fk) >= 0);
+  });
+}
+function filmSuggestions(purpose, body, count){
+  var want = filmFormatOf(body);
+  if(!want) return [];
+  var pool = (data.filmCatalog || []).filter(function(f){
+    var fmts = f.formats || [];
+    return !fmts.length || fmts.indexOf(want) >= 0 || fmts.indexOf('any') >= 0;
+  });
+  var scored = pool.map(function(f){
+    var s = 40;
+    if((f.bestFor || []).indexOf(purpose) >= 0) s = 100;
+    else if((f.bestFor || []).length) s = 55;
+    if(purpose === '실내'){ if(f.iso >= 800) s += 14; else if(f.iso >= 400) s += 8; else s -= 12; }
+    if(purpose === '풍경'){ if(f.iso <= 100) s += 14; else if(f.iso >= 400) s -= 10; }
+    if(purpose === '인물'){ if(f.iso >= 200 && f.iso <= 400) s += 8; if(/흑백/.test(f.type || '')) s -= 12; }
+    if(purpose === '여행'){ if(f.iso >= 200 && f.iso <= 400) s += 10; }
+    var inv = inventoryFor(f.stock, want);
+    var rolls = inv.reduce(function(n,x){ return n + (Number(x.rolls) || 0); }, 0);
+    if(rolls > 0) s += 12;
+    return {film:f, score:s, rolls:rolls, inv:inv};
+  }).sort(function(a,b){ return b.score - a.score; });
+  return scored.slice(0, count || 2);
+}
+
+/* ================= 요약 ================= */
+function renderHome(){
+  var bodies = data.bodies.length, lenses = data.lenses.length, adapters = data.adapters.length;
+  var rolls = (data.films || []).reduce(function(n,f){ return n + (Number(f.rolls) || 0); }, 0);
+  var mounts = {};
+  data.lenses.forEach(function(l){ var m = l.mount || '미지정'; mounts[m] = (mounts[m] || 0) + 1; });
+  var mountStr = Object.keys(mounts).map(function(m){ return m + ' ' + mounts[m]; }).join(' · ') || '없음';
+  var types = {};
+  data.bodies.forEach(function(b){ var t = b.bodyType || '종류 미지정'; types[t] = (types[t] || 0) + 1; });
+  var typeStr = Object.keys(types).map(function(t){ return t + ' ' + types[t]; }).join(' · ') || '없음';
+  var repair = data.bodies.filter(function(b){ return /수리|점검|오버홀/.test(b.status || ''); });
+  var unknown = data.bodies.concat(data.lenses).filter(function(x){
+    return /확인 필요/.test((x.status || '') + ' ' + (x.model || '') + ' ' + (x.mount || '') + ' ' + (x.bodyType || ''));
+  });
+  var lowFilm = [], expFilm = [];
+  (data.films || []).forEach(function(f){
+    if((Number(f.rolls) || 0) <= 1) lowFilm.push(f);
+    var st = expiryState(f.expiry);
+    if(st && (st.cls === 'bad' || st.cls === 'warn')) expFilm.push({f:f, st:st});
+  });
+  var privCount = 0;
+  ['bodies','lenses','adapters','films'].forEach(function(t){
+    privCount += Object.keys(priv[t] || {}).filter(function(id){ return hasPriv(t, id); }).length;
+  });
+
+  var h = '';
+  h += '<div class="grid">';
+  h += stat('바디', bodies) + stat('렌즈', lenses) + stat('컨버터', adapters) + stat('필름 재고', rolls + '롤');
+  h += '</div>';
+
+  h += '<div class="card"><h3>구성</h3>'
+    + '<div class="muted">바디 종류 · ' + esc(typeStr) + '</div>'
+    + '<div class="muted" style="margin-top:6px">렌즈 마운트 · ' + esc(mountStr) + '</div>'
+    + '</div>';
+
+  if(repair.length){
+    h += '<div class="card"><h3>수리·점검 중</h3>';
+    repair.forEach(function(b){
+      h += '<div class="item"><div><div class="t">' + esc((b.maker||'') + ' ' + (b.model||'')) + '</div>'
+        + '<div class="d">' + esc(b.status) + '</div></div>'
+        + '<div class="ops"><span class="pill warn">진행 중</span></div></div>';
+    });
+    h += '</div>';
+  }else{
+    h += '<div class="card"><h3>수리·점검 중</h3><div class="muted">지금은 없어요.</div></div>';
+  }
+
+  if(unknown.length){
+    h += '<div class="card"><h3>확인해서 채울 것</h3>';
+    unknown.forEach(function(x){
+      h += '<div class="item"><div><div class="t">' + esc((x.maker||'') + ' ' + (x.model||'')) + '</div>'
+        + '<div class="d">' + esc(x.notes || x.status || '') + '</div></div>'
+        + '<div class="ops"><span class="pill warn">확인 필요</span></div></div>';
+    });
+    h += '</div>';
+  }
+
+  if(lowFilm.length || expFilm.length){
+    h += '<div class="card"><h3>필름 알림</h3>';
+    lowFilm.forEach(function(f){
+      h += '<div class="item"><div><div class="t">' + esc(f.stock) + '</div>'
+        + '<div class="d">' + esc(f.format || '') + ' · ' + esc((Number(f.rolls)||0) + '롤 남음') + '</div></div>'
+        + '<div class="ops"><span class="pill warn">재고 부족</span></div></div>';
+    });
+    expFilm.forEach(function(x){
+      h += '<div class="item"><div><div class="t">' + esc(x.f.stock) + '</div>'
+        + '<div class="d">' + esc(x.f.format || '') + ' · ' + esc(x.f.expiry) + ' 만료</div></div>'
+        + '<div class="ops"><span class="pill ' + x.st.cls + '">' + esc(x.st.text) + '</span></div></div>';
+    });
+    h += '</div>';
+  }
+
+  h += '<div class="card"><h3>바로 가기</h3><div class="btns">'
+    + '<button class="ghost" data-goto="rec">조합 추천 받기</button>'
+    + '<button class="ghost" data-add="bodies">바디 추가</button>'
+    + '<button class="ghost" data-add="adapters">컨버터 추가</button>'
+    + '<button class="ghost" data-add="films">필름 추가</button>'
+    + '</div>'
+    + '<div class="dim" style="margin-top:10px">개인 기록(시리얼·구입가·메모)이 있는 장비 ' + esc(privCount) + '개 · 이 기기에만 저장</div>'
+    + (privCount ? '<div class="btns"><button class="ghost sm" id="btnReveal2">' + (reveal ? '개인정보 숨기기' : '개인정보 보기') + '</button></div>' : '')
+    + '</div>';
+  return h;
+}
+function stat(label, value){
+  return '<div class="stat"><span>' + esc(label) + '</span><b>' + esc(value) + '</b></div>';
+}
+
+/* ================= 장비 ================= */
+function privLine(type, id){
+  if(!hasPriv(type, id)) return '';
+  var p = privFor(type, id), parts = [];
+  if(p.serial) parts.push('시리얼 ' + (reveal ? p.serial : maskSerial(p.serial)));
+  if(num(p.price) !== null) parts.push(reveal ? '구입가 ' + money(p.price) + (p.boughtAt ? ' (' + p.boughtAt + ')' : '') : '구입가 ••••');
+  if(p.memo && reveal) parts.push(p.memo);
+  return '<div class="priv' + (reveal ? '' : ' off') + '">🔒 ' + esc(parts.join(' · ')) + '</div>';
+}
+function renderGear(){
+  var h = '';
+  h += '<div class="note"><b>공개 저장소에 올라가는 건 초기값뿐이에요.</b> 여기서 고친 내용과 '
+    + '<span class="lock">🔒</span> 시리얼·구입가·개인 메모는 이 브라우저(localStorage)에만 남고 서버로 가지 않아요.</div>';
+
+  h += '<div class="chips" id="gearFilter">'
+    + chipBtn('all', '전체') + chipBtn('bodies', '바디') + chipBtn('lenses', '렌즈')
+    + chipBtn('adapters', '컨버터') + chipBtn('films', '필름')
+    + '</div>';
+
+  if(gearFilter === 'all' || gearFilter === 'bodies'){
+    h += '<div class="card"><div class="row"><h3>바디</h3><button class="ghost sm" data-add="bodies">+ 추가</button></div>';
+    if(!data.bodies.length) h += '<div class="muted">없어요. 필름 SLR·RF·TLR·중형·컴팩트, 디지털까지 모두 추가할 수 있어요.</div>';
+    data.bodies.forEach(function(b){
+      h += '<div class="item"><div>'
+        + '<div class="t">' + esc((b.maker||'') + ' ' + (b.model||'')) + '</div>'
+        + '<div class="d">' + esc(b.bodyType || '종류 미지정') + ' · ' + esc(formatLabel(b.format)) + ' · 마운트 ' + esc(b.mount || '미지정')
+        + (b.fixedFocal ? ' · 고정 ' + esc(b.fixedFocal + 'mm' + (b.fixedAperture ? ' f/' + b.fixedAperture : '')) : '')
+        + '</div>'
+        + (b.status ? '<div class="d"><span class="pill ' + (/수리|점검|오버홀/.test(b.status) ? 'warn' : '') + '">' + esc(b.status) + '</span></div>' : '')
+        + (b.notes ? '<div class="dim">' + esc(b.notes) + '</div>' : '')
+        + privLine('bodies', b.id)
+        + '</div><div class="ops"><button class="ghost sm" data-edit="bodies:' + esc(b.id) + '">수정</button></div></div>';
+    });
+    h += '</div>';
+  }
+
+  if(gearFilter === 'all' || gearFilter === 'lenses'){
+    h += '<div class="card"><div class="row"><h3>렌즈</h3><button class="ghost sm" data-add="lenses">+ 추가</button></div>';
+    if(!data.lenses.length) h += '<div class="muted">아직 없어요.</div>';
+    data.lenses.forEach(function(l){
+      h += '<div class="item"><div>'
+        + '<div class="t">' + esc(l.model) + '</div>'
+        + '<div class="d">' + esc(l.mount || '미지정') + ' · ' + esc(l.focal + 'mm') + (l.aperture ? ' · f/' + esc(l.aperture) : '')
+        + ' · ' + esc(formatLabel(l.format)) + '</div>'
+        + (l.notes ? '<div class="dim">' + esc(l.notes) + '</div>' : '')
+        + privLine('lenses', l.id)
+        + '</div><div class="ops"><button class="ghost sm" data-edit="lenses:' + esc(l.id) + '">수정</button></div></div>';
+    });
+    h += '</div>';
+  }
+
+  if(gearFilter === 'all' || gearFilter === 'adapters'){
+    h += '<div class="card"><div class="row"><h3>이종교배 컨버터</h3><button class="ghost sm" data-add="adapters">+ 추가</button></div>';
+    if(!data.adapters.length){
+      h += '<div class="muted">컨버터를 등록하면 조합 추천이 이종교배까지 계산해요.<br>'
+        + '예: M42 → Nikon F (유리 없음, 1×), Nikon F → Sony E (0.71× 스피드부스터)</div>';
+    }
+    data.adapters.forEach(function(a){
+      var f = Number(a.factor) || 1;
+      var fTxt = f === 1 ? '유리 없음' : (f < 1 ? f + '× 스피드부스터' : f + '× 텔레컨버터');
+      h += '<div class="item"><div>'
+        + '<div class="t">' + esc(a.name) + '</div>'
+        + '<div class="d">' + esc(a.from) + ' → ' + esc(a.to) + ' · ' + esc(fTxt) + '</div>'
+        + (a.notes ? '<div class="dim">' + esc(a.notes) + '</div>' : '')
+        + privLine('adapters', a.id)
+        + '</div><div class="ops"><button class="ghost sm" data-edit="adapters:' + esc(a.id) + '">수정</button></div></div>';
+    });
+    h += '</div>';
+  }
+
+  if(gearFilter === 'all' || gearFilter === 'films'){
+    h += '<div class="card"><div class="row"><h3>필름 재고</h3><button class="ghost sm" data-add="films">+ 추가</button></div>';
+    if(!data.films.length) h += '<div class="muted">아직 없어요. 필름 탭에서 스톡·ISO·롤 수·유효기간을 넣어 두면 조합 추천에 재고가 붙어요.</div>';
+    data.films.forEach(function(f){
+      h += '<div class="item"><div><div class="t">' + esc(f.stock) + '</div>'
+        + '<div class="d">' + esc(f.format || '') + ' · ISO ' + esc(f.iso) + ' · ' + esc(Number(f.rolls) || 0) + '롤'
+        + (f.expiry ? ' · ' + esc(f.expiry) + ' 만료' : '') + '</div>'
+        + privLine('films', f.id)
+        + '</div><div class="ops"><button class="ghost sm" data-edit="films:' + esc(f.id) + '">수정</button></div></div>';
+    });
+    h += '</div>';
+  }
+
+  h += '<div class="btns"><button class="ghost" id="btnReveal">' + (reveal ? '🔓 개인정보 숨기기' : '🔒 개인정보 보기') + '</button></div>';
+  return h;
+}
+function chipBtn(key, label){
+  return '<button data-filter="' + key + '" class="' + (gearFilter === key ? 'on' : '') + '">' + label + '</button>';
+}
+
+/* ================= 조합 추천 ================= */
+function renderRec(){
+  var h = '';
+  h += '<div class="card"><h3>조합 추천</h3>'
+    + '<div class="muted">바디를 고르면 그 바디에 물릴 렌즈를, 렌즈를 고르면 그 렌즈를 물릴 바디를 찾아요. 직결과 컨버터 경유를 한 번에 비교합니다.</div>'
+    + '<label>1) 바디 고르기</label><select id="recBody"><option value="">— 선택 안 함 —</option>';
+  data.bodies.forEach(function(b){
+    h += '<option value="' + esc(b.id) + '">' + esc((b.maker||'') + ' ' + (b.model||'') + (b.bodyType ? ' · ' + b.bodyType : '')) + '</option>';
+  });
+  h += '</select>'
+    + '<label>또는 2) 렌즈 고르기 <span class="dim">(바디를 고르면 이쪽은 비워져요)</span></label><select id="recLens"><option value="">— 선택 안 함 —</option>';
+  data.lenses.forEach(function(l){
+    h += '<option value="' + esc(l.id) + '">' + esc(l.model) + ' · ' + esc(l.mount) + ' ' + esc(l.focal) + 'mm</option>';
+  });
+  h += '</select>'
+    + '<label>3) 촬영 목적</label><select id="recPurpose">';
+  Object.keys(PURPOSES).forEach(function(p){
+    h += '<option value="' + esc(p) + '">' + esc(p) + ' · ' + esc(PURPOSES[p].lo) + '–' + esc(PURPOSES[p].hi) + 'mm</option>';
+  });
+  h += '</select>'
+    + '<div class="btns"><button class="btn" id="recGo">추천 받기</button></div></div>';
+  h += '<div id="recOut"><div class="card"><div class="muted">바디나 렌즈 중 하나를 고르면 바로 계산돼요.</div></div></div>';
+  return h;
+}
+
+function runRec(){
+  var bodyEl = document.getElementById('recBody');
+  var lensEl = document.getElementById('recLens');
+  var purEl = document.getElementById('recPurpose');
+  var out = document.getElementById('recOut');
+  if(!bodyEl || !lensEl || !out) return;
+  var bodyId = bodyEl.value, lensId = lensEl.value, purpose = purEl.value;
+  if(!bodyId && !lensId){
+    out.innerHTML = '<div class="card"><div class="muted">바디나 렌즈 중 하나를 골라 주세요.</div></div>';
+    return;
+  }
+  var combos = buildCombos(bodyId, lensId, purpose).slice(0, 6);
+  if(!combos.length){
+    var extra = data.adapters.length ? '' : ' 컨버터가 아직 하나도 없어서 이종교배 조합은 나오지 않아요 — 장비 탭에서 컨버터를 추가하면 계산돼요.';
+    out.innerHTML = '<div class="card"><div class="muted">이 조건에 맞는 조합이 없어요.' + esc(extra) + '</div></div>';
+    return;
+  }
+  var p = PURPOSES[purpose];
+  var h = '<div class="card"><h3>' + esc(purpose) + ' 추천 조합</h3>'
+    + '<div class="muted">목표 화각 ' + esc(p.lo) + '–' + esc(p.hi) + 'mm (35mm 환산) · ' + esc(p.why) + '</div></div>';
+
+  combos.forEach(function(c, i){
+    var digital = isDigital(c.body);
+    var sugg = digital ? [] : filmSuggestions(purpose, c.body, 2);
+    var f = formatLabel(c.body.format);
+    h += '<div class="card"><div class="rec" style="border-left-color:' + (i === 0 ? 'var(--accent)' : 'var(--accent2)') + '">'
+      + '<div class="h"><em>' + (i + 1) + '</em>' + esc((c.body.maker||'') + ' ' + (c.body.model||'')) + ' + ' + esc(c.lens.model) + '</div>'
+      + '<div class="d">' + esc(f) + ' · 마운트 ' + esc(c.lens.mount || '-') + '→' + esc(c.body.mount || '-') + ' · ' + esc(adapterText(c.path)) + '</div>'
+      + '<div class="d" style="margin-top:6px"><b style="font-size:18px;letter-spacing:-.02em">' + esc(c.eq) + 'mm</b>'
+      + '<span class="dim"> · 35mm 환산 · 화각 ' + esc(aov(c.eq)) + '° · 최대 f/' + esc(c.lens.aperture || '-') + '</span></div>'
+      + '<div class="d">적합도 ' + esc(c.score) + '점'
+      + (c.path && c.path.hops ? ' <span class="pill warn">이종교배 ' + esc(c.path.hops) + '단</span>' : ' <span class="pill ok">직결</span>')
+      + (c.fixed ? ' <span class="pill">고정 렌즈</span>' : '')
+      + '</div>'
+      + '<div class="bar"><i style="width:' + Math.max(6, Math.min(100, c.score)) + '%;background:' + (c.score >= 80 ? 'var(--ok)' : c.score >= 60 ? 'var(--accent)' : 'var(--bad)') + '"></i></div>'
+      + '</div>';
+
+    if(digital){
+      h += '<div class="muted" style="margin-top:6px">디지털 바디 — 필름 추천은 건너뜁니다.</div>';
+    }else if(!sugg.length){
+      h += '<div class="muted" style="margin-top:6px">이 포맷(' + esc(filmFormatOf(c.body) || '-') + ')에 맞는 스톡이 카탈로그에 없어요. 필름 탭에서 직접 등록해 주세요.</div>';
+    }else{
+      h += '<div class="muted" style="margin-top:8px;font-weight:700;color:var(--text)">필름 추천</div>';
+      sugg.forEach(function(s){
+        var invTxt, invCls;
+        if(!s.inv.length){ invTxt = '재고 미등록'; invCls = 'bad'; }
+        else if(s.rolls > 0){
+          var exp = s.inv.map(function(x){ return expiryState(x.expiry); }).filter(function(x){ return x && x.cls !== 'ok'; })[0];
+          invTxt = '보유 ' + s.rolls + '롤' + (exp ? ' · ' + exp.text : '');
+          invCls = exp && exp.cls === 'bad' ? 'bad' : (exp ? 'warn' : 'ok');
+        }else{ invTxt = '재고 0롤'; invCls = 'bad'; }
+        h += '<div class="item"><div><div class="t">' + esc(s.film.stock) + '</div>'
+          + '<div class="d">ISO ' + esc(s.film.iso) + ' · ' + esc(s.film.type || '') + (s.film.character ? ' · ' + esc(s.film.character) : '') + '</div>'
+          + '</div><div class="ops"><span class="pill ' + invCls + '">' + esc(invTxt) + '</span></div></div>';
+      });
+    }
+    h += '</div>';
+  });
+
+  /* 이 바디/포맷에 쓸 수 있는 보유 필름 전체 */
+  var fmtUsed = null;
+  if(bodyId){ fmtUsed = filmFormatOf(bodyById(bodyId)); }
+  else if(lensId){ var lsel = lensById(lensId); fmtUsed = lsel && FORMATS[lsel.format] ? FORMATS[lsel.format].film : null; }
+  if(!fmtUsed && lensId){ fmtUsed = '35mm'; }
+  if(fmtUsed){
+    var held = (data.films || []).filter(function(f){ return !f.format || f.format === 'any' || f.format === fmtUsed; });
+    if(held.length){
+      h += '<div class="card"><h3>' + esc(fmtUsed) + ' 보유 필름</h3>';
+      held.forEach(function(f){
+        var st = expiryState(f.expiry);
+        h += '<div class="item"><div><div class="t">' + esc(f.stock) + '</div>'
+          + '<div class="d">ISO ' + esc(f.iso) + ' · ' + esc(Number(f.rolls) || 0) + '롤'
+          + (f.expiry ? ' · ' + esc(f.expiry) + ' 만료' : '') + '</div></div>'
+          + '<div class="ops">' + (st ? '<span class="pill ' + st.cls + '">' + esc(st.text) + '</span>' : '')
+          + '<span class="pill ' + ((Number(f.rolls) || 0) > 0 ? 'ok' : 'bad') + '">' + esc(Number(f.rolls) || 0) + '롤</span></div></div>';
+      });
+      h += '</div>';
+    }
+  }
+  out.innerHTML = h;
+}
+
+/* ================= 필름 ================= */
+function renderFilm(){
+  var totalRolls = (data.films || []).reduce(function(n,f){ return n + (Number(f.rolls) || 0); }, 0);
+  var byFmt = {};
+  (data.films || []).forEach(function(f){
+    var k = f.format || '기타';
+    byFmt[k] = (byFmt[k] || 0) + (Number(f.rolls) || 0);
+  });
+  var h = '';
+  h += '<div class="grid">'
+    + stat('보유 롤', totalRolls + '롤')
+    + Object.keys(byFmt).map(function(k){ return stat(k, byFmt[k] + '롤'); }).join('')
+    + '</div>';
+
+  h += '<div class="card"><div class="row"><h3>필름 재고</h3><button class="ghost sm" data-add="films">+ 추가</button></div>';
+  if(!data.films.length){
+    h += '<div class="muted">아직 등록된 필름이 없어요. 상자에 있는 스톡·ISO·롤 수·유효기간을 넣어 두면 조합 추천에 재고가 붙어요.</div>';
+  }
+  data.films.forEach(function(f){
+    var st = expiryState(f.expiry);
+    var rolls = Number(f.rolls) || 0;
+    h += '<div class="item"><div><div class="t">' + esc(f.stock) + '</div>'
+      + '<div class="d">' + esc(f.format || '포맷 미지정') + ' · ISO ' + esc(f.iso)
+      + (f.expiry ? ' · ' + esc(f.expiry) + ' 만료' : ' · 유효기간 미입력') + '</div>'
+      + (f.notes ? '<div class="dim">' + esc(f.notes) + '</div>' : '')
+      + privLine('films', f.id)
+      + '</div><div class="ops">'
+      + '<span class="pill ' + (rolls > 1 ? 'ok' : 'bad') + '">' + esc(rolls) + '롤</span>'
+      + (st ? '<span class="pill ' + st.cls + '">' + esc(st.text) + '</span>' : '')
+      + '<button class="ghost sm" data-roll="' + esc(f.id) + '" data-dir="-1">−</button>'
+      + '<button class="ghost sm" data-roll="' + esc(f.id) + '" data-dir="1">+</button>'
+      + '<button class="ghost sm" data-edit="films:' + esc(f.id) + '">수정</button>'
+      + '</div></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="card"><h3>스톡 카탈로그</h3><div class="muted" style="margin-bottom:6px">조합 추천이 쓰는 기본 목록이에요. 필름을 추가할 때 스톡명을 여기서 고르면 재고가 자동으로 연결돼요.</div>';
+  (data.filmCatalog || []).forEach(function(f){
+    h += '<div class="item"><div><div class="t">' + esc(f.stock) + ' <span class="dim">ISO ' + esc(f.iso) + '</span></div>'
+      + '<div class="d">' + esc(f.type) + ' · ' + esc((f.formats || []).join(' / ')) + ' · ' + esc((f.bestFor || []).join('·')) + '</div>'
+      + '<div class="dim">' + esc(f.character || '') + '</div></div></div>';
+  });
+  h += '</div>';
+  return h;
+}
+
+/* ================= 데이터 ================= */
+function renderData(){
+  var privItems = 0;
+  ['bodies','lenses','adapters','films'].forEach(function(t){
+    privItems += Object.keys(priv[t] || {}).filter(function(id){ return hasPriv(t, id); }).length;
+  });
+  return '<div class="card"><h3>백업 · 복원</h3>'
+    + '<div class="note"><b>장비 목록 JSON</b>에는 시리얼·구입가·개인 메모가 들어가지 않아요. 공유하거나 다른 사람에게 보여도 안전한 내용만 담깁니다.</div>'
+    + '<div class="btns">'
+    + '<button class="ghost" id="btnExport">장비 목록 내보내기</button>'
+    + '<button class="ghost" id="btnImport">장비 목록 가져오기</button>'
+    + '<button class="ghost" id="btnCopy">목록 복사</button>'
+    + '</div>'
+    + '<input type="file" id="fileIn" accept="application/json,.json" class="hidden">'
+    + '<div class="sect">개인 기록 ' + esc(privItems) + '건 · 이 기기에만</div>'
+    + '<div class="note">시리얼번호·구입가·개인 메모는 <b>이 브라우저에만</b> 저장돼요. 기기를 바꾸거나 사파리 데이터를 지우면 사라지니, 아래로 따로 백업해 두세요. 이 파일은 공개 저장소에 올리면 안 됩니다.</div>'
+    + '<div class="btns">'
+    + '<button class="ghost" id="btnPrivExport">🔒 개인 기록 내보내기</button>'
+    + '<button class="ghost" id="btnPrivImport">🔒 개인 기록 가져오기</button>'
+    + '</div>'
+    + '<input type="file" id="filePriv" accept="application/json,.json" class="hidden">'
+    + '<div class="sect">초기화</div>'
+    + '<div class="btns"><button class="ghost danger" id="btnReset">장비 목록을 초기값으로</button>'
+    + '<button class="ghost danger" id="btnPrivClear">개인 기록 모두 지우기</button></div>'
+    + '<div class="dim" style="margin-top:10px">저장 위치 · 이 브라우저 localStorage (' + esc(KEY) + ', ' + esc(PKEY) + ')</div>'
+    + '</div>';
+}
+
+/* ================= 편집 시트 ================= */
+var SCHEMA = {
+  bodies: {label:'바디', fields:[
+    {k:'maker', l:'제조사', t:'text', ph:'Nikon / Rollei / Olympus'},
+    {k:'model', l:'모델', t:'text', ph:'F80 / Baby Rolleiflex 4×4'},
+    {k:'bodyType', l:'종류', t:'select', opts:BODY_TYPE_LIST, blank:'종류 선택'},
+    {k:'mount', l:'마운트', t:'text', list:MOUNTS, ph:'Nikon F / 고정 렌즈'},
+    {k:'format', l:'포맷', t:'select', opts:Object.keys(FORMATS), blank:'포맷 선택'},
+    {k:'fixedFocal', l:'고정 렌즈 초점(mm) — 렌즈 교환식이면 비움', t:'number', ph:'60'},
+    {k:'fixedAperture', l:'고정 렌즈 최대 조리개', t:'number', ph:'2.8'},
+    {k:'status', l:'상태', t:'text', ph:'보유 / 수리 중 / 확인 필요'},
+    {k:'notes', l:'공개 메모 (페이지에 보여도 되는 내용)', t:'textarea', ph:'필름 포맷, 사용감 등'}
+  ]},
+  lenses: {label:'렌즈', fields:[
+    {k:'model', l:'모델명', t:'text', ph:'AF-S NIKKOR 50mm f/1.4G'},
+    {k:'maker', l:'제조사', t:'text', ph:'Nikon'},
+    {k:'mount', l:'마운트', t:'text', list:MOUNTS, ph:'Nikon F'},
+    {k:'focal', l:'초점거리(mm)', t:'number', ph:'50'},
+    {k:'aperture', l:'최대 조리개', t:'number', ph:'1.4'},
+    {k:'format', l:'커버 포맷', t:'select', opts:Object.keys(FORMATS), blank:'포맷 선택'},
+    {k:'notes', l:'공개 메모', t:'textarea'}
+  ]},
+  adapters: {label:'컨버터', fields:[
+    {k:'name', l:'이름', t:'text', ph:'Nikon F → Sony E 스피드부스터'},
+    {k:'from', l:'렌즈 쪽 마운트', t:'text', list:MOUNTS, ph:'Nikon F'},
+    {k:'to', l:'바디 쪽 마운트', t:'text', list:MOUNTS, ph:'Sony E'},
+    {k:'factor', l:'배율 (유리 없으면 1 · 스피드부스터 0.71 · 텔레컨버터 1.4)', t:'number', ph:'1'},
+    {k:'notes', l:'공개 메모', t:'textarea', ph:'자동 초점 여부, 개조 상태 등'}
+  ]},
+  films: {label:'필름', fields:[
+    {k:'stock', l:'스톡명', t:'text', list:(seed.filmCatalog || []).map(function(f){ return f.stock; }), ph:'Kodak Portra 400'},
+    {k:'iso', l:'ISO (감도)', t:'number', ph:'400'},
+    {k:'format', l:'포맷', t:'select', opts:['35mm','120','127','any'], blank:'포맷 선택'},
+    {k:'rolls', l:'보유 롤 수', t:'number', ph:'3'},
+    {k:'expiry', l:'유효기간 (YYYY-MM)', t:'month'},
+    {k:'notes', l:'공개 메모', t:'textarea', ph:'냉장 보관, 개봉 여부 등'}
+  ]}
+};
+var PRIV_FIELDS = [
+  {k:'serial', l:'시리얼번호', t:'text', ph:'본체 바닥 각인'},
+  {k:'price', l:'구입가(원)', t:'number', ph:'650000'},
+  {k:'boughtAt', l:'구입일', t:'date'},
+  {k:'memo', l:'개인 메모 (수리 이력·판매자·구매처)', t:'textarea'}
+];
+
+function fieldHtml(def, cur){
+  var v = cur && cur[def.k] !== undefined && cur[def.k] !== null ? cur[def.k] : '';
+  var h = '<label>' + esc(def.l) + '</label>';
+  if(def.t === 'select'){
+    h += '<select data-k="' + esc(def.k) + '"><option value="">' + esc(def.blank || '— 선택 —') + '</option>';
+    (def.opts || []).forEach(function(o){
+      if(o === '') return;
+      h += '<option value="' + esc(o) + '"' + (String(v) === String(o) ? ' selected' : '') + '>' + esc(FORMATS[o] ? FORMATS[o].label : o) + '</option>';
+    });
+    h += '</select>';
+  }else if(def.t === 'textarea'){
+    h += '<textarea data-k="' + esc(def.k) + '" placeholder="' + esc(def.ph || '') + '">' + esc(v) + '</textarea>';
+  }else{
+    var listAttr = def.list ? ' list="dl-' + esc(def.k) + '"' : '';
+    var type = def.t === 'number' ? 'number' : (def.t === 'date' ? 'date' : (def.t === 'month' ? 'month' : 'text'));
+    h += '<input type="' + type + '" data-k="' + esc(def.k) + '" value="' + esc(v) + '" placeholder="' + esc(def.ph || '') + '"' + listAttr + ' />';
+    if(def.list){
+      h += '<datalist id="dl-' + esc(def.k) + '">' + def.list.map(function(o){ return '<option value="' + esc(o) + '"></option>'; }).join('') + '</datalist>';
+    }
+  }
+  return h;
+}
+function openSheet(type, id){
+  var cfg = SCHEMA[type];
+  if(!cfg) return;
+  var list = data[type] || [];
+  var cur = id ? list.filter(function(x){ return x.id === id; })[0] : null;
+  var p = cur ? (privFor(type, id) || {}) : {};
+  var h = '<div class="grab"></div>'
+    + '<div class="row"><h3>' + esc(cfg.label) + (cur ? ' 수정' : ' 추가') + '</h3>'
+    + '<button class="ghost sm" id="sheetClose">닫기</button></div>';
+  cfg.fields.forEach(function(d){ h += fieldHtml(d, cur); });
+  h += '<div class="sect">개인 기록 · 이 기기에만 저장</div>'
+    + '<div class="dim" style="margin-bottom:2px">공개 페이지와 장비 목록 JSON에는 들어가지 않아요.</div>';
+  PRIV_FIELDS.forEach(function(d){ h += fieldHtml(d, p); });
+  h += '<div class="btns" style="margin-top:16px">'
+    + '<button class="btn" id="sheetSave">저장</button>'
+    + (cur ? '<button class="ghost danger" id="sheetDel">삭제</button>' : '')
+    + '</div>';
+  var sheet = document.getElementById('sheet');
+  sheet.innerHTML = h;
+  document.getElementById('modal').classList.add('on');
+  document.getElementById('sheetClose').onclick = closeSheet;
+
+  document.getElementById('sheetSave').onclick = function(){
+    var obj = cur ? cur : {id: uid(type)};
+    cfg.fields.forEach(function(d){
+      var el = sheet.querySelector('[data-k="' + d.k + '"]');
+      var raw = el ? String(el.value).trim() : '';
+      if(d.t === 'number') obj[d.k] = raw === '' ? null : Number(raw);
+      else obj[d.k] = raw;
+    });
+    var pObj = {};
+    PRIV_FIELDS.forEach(function(d){
+      var el = sheet.querySelector('[data-k="' + d.k + '"]');
+      var raw = el ? String(el.value).trim() : '';
+      if(d.t === 'number') pObj[d.k] = raw === '' ? null : Number(raw);
+      else pObj[d.k] = raw;
+    });
+    if(!cur) data[type].push(obj);
+    var keep = pObj.serial || pObj.memo || (pObj.price !== null && pObj.price !== undefined && pObj.price !== '') || pObj.boughtAt;
+    priv[type] = priv[type] || {};
+    if(keep) priv[type][obj.id] = pObj;
+    else delete priv[type][obj.id];
+    saveData(); savePriv(); closeSheet(); renderAll(); toast('저장했어요');
+  };
+  if(cur){
+    document.getElementById('sheetDel').onclick = function(){
+      if(!confirm('이 항목을 삭제할까요? 개인 기록도 함께 지워집니다.')) return;
+      data[type] = data[type].filter(function(x){ return x.id !== cur.id; });
+      if(priv[type]) delete priv[type][cur.id];
+      saveData(); savePriv(); closeSheet(); renderAll(); toast('삭제했어요');
+    };
+  }
+}
+function closeSheet(){
+  document.getElementById('modal').classList.remove('on');
+  document.getElementById('sheet').innerHTML = '';
+}
+
+/* ================= 렌더 ================= */
+function renderAll(){
+  var keepScroll = window.scrollY;
+  document.getElementById('tab-home').innerHTML = renderHome();
+  document.getElementById('tab-gear').innerHTML = renderGear();
+  document.getElementById('tab-rec').innerHTML = renderRec();
+  document.getElementById('tab-film').innerHTML = renderFilm();
+  document.getElementById('tab-data').innerHTML = renderData();
+  var rollCount = (data.films || []).reduce(function(n,f){ return n + (Number(f.rolls) || 0); }, 0);
+  document.getElementById('subline').textContent = '바디 ' + data.bodies.length + ' · 렌즈 ' + data.lenses.length
+    + ' · 컨버터 ' + data.adapters.length + ' · 필름 ' + rollCount + '롤';
+  bindRec();
+  window.scrollTo(0, keepScroll);
+}
+function bindRec(){
+  var b = document.getElementById('recBody');
+  var l = document.getElementById('recLens');
+  var p = document.getElementById('recPurpose');
+  if(!b || !l || !p) return;
+  b.onchange = function(){ if(b.value) l.value = ''; if(recAuto) runRec(); };
+  l.onchange = function(){ if(l.value) b.value = ''; if(recAuto) runRec(); };
+  p.onchange = function(){ if(recAuto) runRec(); };
+}
+function showTab(name){
+  ['home','gear','rec','film','data'].forEach(function(n){
+    document.getElementById('tab-' + n).classList.toggle('hidden', n !== name);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('#nav button'), function(b){
+    b.classList.toggle('on', b.getAttribute('data-tab') === name);
+  });
+  window.scrollTo(0, 0);
+}
+function downloadJSON(obj, name){
+  var blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+
+/* ================= 이벤트 ================= */
+document.addEventListener('click', function(e){
+  var t = e.target;
+  if(!t || !t.getAttribute) return;
+
+  var tab = t.getAttribute('data-tab');
+  if(tab){ showTab(tab); return; }
+
+  var goto_ = t.getAttribute('data-goto');
+  if(goto_){ showTab(goto_); return; }
+
+  var filt = t.getAttribute('data-filter');
+  if(filt){ gearFilter = filt; document.getElementById('tab-gear').innerHTML = renderGear(); return; }
+
+  var add = t.getAttribute('data-add');
+  if(add){ openSheet(add, null); return; }
+
+  var ed = t.getAttribute('data-edit');
+  if(ed){ var parts = ed.split(':'); openSheet(parts[0], parts[1]); return; }
+
+  var roll = t.getAttribute('data-roll');
+  if(roll){
+    var dir = Number(t.getAttribute('data-dir') || 1);
+    var f = data.films.filter(function(x){ return x.id === roll; })[0];
+    if(f){
+      var n = Math.max(0, (Number(f.rolls) || 0) + dir);
+      f.rolls = n; saveData(); renderAll(); toast(f.stock + ' ' + n + '롤');
+    }
+    return;
+  }
+
+  if(t.id === 'recGo'){ runRec(); return; }
+
+  if(t.id === 'btnReveal' || t.id === 'btnReveal2'){
+    reveal = !reveal; renderAll(); toast(reveal ? '개인정보를 보여줘요' : '개인정보를 숨겼어요'); return;
+  }
+
+  if(t.id === 'btnExport'){
+    var out = clone(data);
+    downloadJSON({kind:'camera-collection', version:1, exportedAt:new Date().toISOString(), bodies:out.bodies,
+      lenses:out.lenses, adapters:out.adapters, films:out.films, filmCatalog:out.filmCatalog},
+      'camera-collection.json');
+    toast('장비 목록을 내보냈어요'); return;
+  }
+  if(t.id === 'btnCopy'){
+    var text = JSON.stringify(data, null, 2);
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ toast('복사했어요'); }, function(){ toast('복사가 막혔어요 — 내보내기를 써 주세요'); });
+    }else{ toast('이 브라우저에서는 복사를 지원하지 않아요'); }
+    return;
+  }
+  if(t.id === 'btnImport'){ document.getElementById('fileIn').click(); return; }
+  if(t.id === 'btnPrivExport'){
+    downloadJSON({kind:'camera-private', version:1, exportedAt:new Date().toISOString(), items:priv}, 'camera-private.json');
+    toast('개인 기록을 내보냈어요 — 공개 저장소에 올리지 마세요'); return;
+  }
+  if(t.id === 'btnPrivImport'){ document.getElementById('filePriv').click(); return; }
+  if(t.id === 'btnReset'){
+    if(!confirm('장비 목록을 초기값으로 되돌릴까요? 개인 기록은 그대로 남습니다.')) return;
+    data = normalize(clone(seed)); saveData(); renderAll(); toast('초기값으로 되돌렸어요'); return;
+  }
+  if(t.id === 'btnPrivClear'){
+    if(!confirm('시리얼·구입가·개인 메모를 모두 지울까요? 되돌릴 수 없습니다.')) return;
+    priv = {bodies:{}, lenses:{}, adapters:{}, films:{}}; savePriv(); renderAll(); toast('개인 기록을 지웠어요'); return;
+  }
+});
+document.addEventListener('change', function(e){
+  var t = e.target;
+  if(!t || !t.id) return;
+  if(t.id === 'fileIn'){
+    var file = t.files && t.files[0];
+    if(!file) return;
+    readJSON(file, function(d){
+      if(!d.bodies || !d.lenses) throw new Error('장비 목록 형식이 아니에요');
+      data = normalize(d); saveData(); renderAll(); toast('장비 목록을 가져왔어요');
+    });
+    t.value = '';
+  }
+  if(t.id === 'filePriv'){
+    var file2 = t.files && t.files[0];
+    if(!file2) return;
+    readJSON(file2, function(d){
+      var items = d && d.items ? d.items : d;
+      if(!items || typeof items !== 'object') throw new Error('개인 기록 형식이 아니에요');
+      ['bodies','lenses','adapters','films'].forEach(function(k){
+        priv[k] = priv[k] || {};
+        var src = items[k] || {};
+        Object.keys(src).forEach(function(id){ priv[k][id] = src[id]; });
+      });
+      savePriv(); renderAll(); toast('개인 기록을 가져왔어요');
+    });
+    t.value = '';
+  }
+});
+function readJSON(file, ok){
+  var reader = new FileReader();
+  reader.onload = function(){
+    try{ ok(JSON.parse(String(reader.result))); }
+    catch(err){ toast('가져오지 못했어요: ' + err.message); }
+  };
+  reader.readAsText(file);
+}
+
+renderAll();
+</script>
+</body>
+</html>
