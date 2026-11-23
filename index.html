@@ -148,6 +148,8 @@ button.danger{color:var(--red);border-color:var(--red-line);background:var(--red
 .pick-label{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:750;color:var(--ink2);margin:16px 0 8px}
 .step{width:22px;height:22px;flex:0 0 auto;border-radius:50%;background:var(--ink);color:#fdfbf5;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
 .pick-chips{display:flex;flex-wrap:wrap;gap:7px}
+.pick-chips.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.pick-chips.grid2 button{width:100%}
 .pick-chips button{flex:0 0 auto;background:var(--surface);border:1px solid var(--line2);color:var(--ink);border-radius:12px;padding:10px 13px;font-size:14px;font-weight:650;min-height:46px;line-height:1.25;text-align:left;cursor:pointer;letter-spacing:-.01em}
 .pick-chips button.reset{color:var(--ink3);border-style:dashed;font-weight:600;padding:10px 11px}
 .pick-chips button .m{display:block;font-size:11.5px;font-weight:600;color:var(--ink3);margin-top:2px}
@@ -221,6 +223,7 @@ footer b{color:var(--ink2)}
 
 @media(min-width:720px){
   h1{font-size:23px}
+  .pick-chips.grid2{grid-template-columns:repeat(auto-fill,minmax(215px,1fr))}
   header{padding:30px 24px 14px}
   main{padding:20px 22px 8px}
   .kpi{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
@@ -805,7 +808,7 @@ function renderHome(){
         + '<div class="fb-top"><div class="fb-name">' + esc(nameOf(b)) + '</div>'
         + '<div class="fb-format">' + esc(formatLabel(b.format)) + '</div></div>'
         + '<div class="fb-badge">' + loadedBadge(b) + '</div>'
-        + (loadedDetail(b) || (isLoaded ? '' : '<div class="dim">아직 필름이 들어 있지 않아요</div>'))
+        + loadedDetail(b)
         + '<div class="fb-bot"><button class="ghost sm" data-loaded="' + esc(b.id) + '">변경</button></div>'
         + '</div>';
     });
@@ -983,7 +986,7 @@ function renderRec(){
 
   h += '<div class="pick-block">'
     + '<div class="pick-label"><span class="step">1</span> 바디 고르기</div>'
-    + '<div class="pick-chips" id="pickBodyChips">'
+    + '<div class="pick-chips grid2" id="pickBodyChips">'
     + '<button type="button" class="reset" data-pick-body="">선택 안 함</button>';
   data.bodies.forEach(function(b){
     h += '<button type="button" data-pick-body="' + esc(b.id) + '">' + esc(nameOf(b))
@@ -993,7 +996,7 @@ function renderRec(){
 
   h += '<div class="pick-block">'
     + '<div class="pick-label"><span class="step">2</span> 또는 렌즈 고르기 <span class="dim" style="font-weight:600">바디를 고르면 이쪽은 비워져요</span></div>'
-    + '<div class="pick-chips" id="pickLensChips">'
+    + '<div class="pick-chips grid2" id="pickLensChips">'
     + '<button type="button" class="reset" data-pick-lens="">선택 안 함</button>';
   data.lenses.forEach(function(l){
     h += '<button type="button" data-pick-lens="' + esc(l.id) + '">' + esc(l.model)
