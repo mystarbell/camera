@@ -154,7 +154,8 @@ button.danger{color:var(--red);border-color:var(--red-line);background:var(--red
 .pick-chips.grid2 button{width:100%}
 .pick-chips button{flex:0 0 auto;background:var(--surface);border:1px solid var(--line2);color:var(--ink);border-radius:12px;padding:10px 13px;font-size:14px;font-weight:650;min-height:46px;line-height:1.25;text-align:left;cursor:pointer;letter-spacing:-.01em}
 .pick-chips button.reset{color:var(--ink3);border-style:dashed;font-weight:600;padding:10px 11px}
-.pick-chips button .m{display:block;font-size:11.5px;font-weight:600;color:var(--ink3);margin-top:2px}
+.pick-chips button .m{display:block;font-size:11.5px;font-weight:600;color:var(--ink3);margin-top:2px;pointer-events:none}
+.pick-chips button:active,.chips button:active,nav button:active{transform:translateY(1px)}
 .pick-chips button.on{background:var(--ink);border-color:var(--ink);color:#fdfbf5}
 .pick-chips button.on .m{color:#cfc8b8}
 select[hidden]{display:none}
