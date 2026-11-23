@@ -264,7 +264,7 @@ footer b{color:var(--ink2)}
 
 /* ---------- 장비·필름 썸네일 ---------- */
 .thumb{position:relative;display:inline-block;flex:0 0 auto;width:48px;height:48px;border-radius:11px;overflow:hidden;background:#fff;border:1px solid var(--line2);vertical-align:middle;box-shadow:0 1px 0 rgba(90,70,30,.05)}
-.thumb::after{content:attr(data-fb);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:19px;line-height:1;opacity:.45}
+.thumb .thumb-fb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:400;line-height:1;opacity:.45}
 .thumb img{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:cover;background:#fffdf8;display:block}
 .thumb img.gone{display:none}
 .thumb.sm{width:40px;height:40px;border-radius:9px}
@@ -1576,7 +1576,8 @@ function thumbHtml(kind, key, cls){
   if(kind === 'bodies') src = 'assets/thumbs/body-' + (THUMB_BODY[key] || key) + '.jpg';
   else if(kind === 'lenses') src = 'assets/thumbs/lens-' + (THUMB_LENS[key] || key) + '.jpg';
   else { src = filmThumbPath(key); alt = filmBrandPath(key); fb = '🎞️'; }
-  return '<span class="thumb' + (cls ? ' ' + cls : '') + '" data-fb="' + fb + '">'
+  return '<span class="thumb' + (cls ? ' ' + cls : '') + '">'
+    + '<b class="thumb-fb" aria-hidden="true">' + fb + '</b>'
     + '<img src="' + esc(src) + '" alt="" loading="lazy" decoding="async"'
     + (alt ? ' data-alt="' + esc(alt) + '"' : '')
     + ' onerror="thumbFallback(this)"></span>';
