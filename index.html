@@ -17,11 +17,13 @@
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",Roboto,sans-serif;letter-spacing:-.01em;padding-bottom:calc(28px + env(safe-area-inset-bottom))}
 header{padding:20px 16px 8px}
+header .w{max-width:940px;margin:0 auto}
 h1{font-size:18px;margin:0 0 4px;letter-spacing:.14em;font-weight:700}
 h1 span{letter-spacing:-.01em;color:var(--muted);font-weight:600;font-size:13px;margin-left:6px}
 .sub{font-size:12px;color:var(--muted)}
-nav{display:flex;gap:6px;padding:8px 12px;position:sticky;top:0;background:rgba(14,15,18,.94);backdrop-filter:blur(12px);z-index:20;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
-nav::-webkit-scrollbar{display:none}
+nav{position:sticky;top:0;background:rgba(14,15,18,.94);backdrop-filter:blur(12px);z-index:20;border-bottom:1px solid var(--line);padding:8px 12px}
+nav .w{display:flex;gap:6px;max-width:916px;margin:0 auto;overflow-x:auto;scrollbar-width:none}
+nav .w::-webkit-scrollbar{display:none}
 nav button{flex:0 0 auto;background:transparent;border:1px solid transparent;color:var(--muted);padding:8px 13px;border-radius:999px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer}
 nav button.on{background:var(--card2);color:var(--text);border-color:var(--line2)}
 main{padding:14px 12px 8px;max-width:940px;margin:0 auto}
@@ -48,15 +50,16 @@ button.btn{background:var(--accent);color:#241a0c;border:0;border-radius:10px;pa
 button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line2);border-radius:10px;padding:9px 12px;font-size:13px;font-family:inherit;cursor:pointer}
 button.sm{padding:5px 9px;font-size:12px;border-radius:8px}
 button.danger{color:var(--bad);border-color:rgba(233,139,139,.4)}
-.item{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-top:1px solid var(--line)}
+.item{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-top:1px solid var(--line);flex-wrap:wrap}
 .item:first-of-type{border-top:0}
-.item>div:first-child{min-width:0}
+.item>div:first-child{min-width:0;flex:1 1 160px}
 .item .t{font-size:14px;font-weight:600;line-height:1.35}
 .item .d{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}
-.item .ops{display:flex;gap:6px;flex-shrink:0;align-items:flex-start}
+.item .ops{display:flex;gap:6px;flex:0 0 auto;align-items:flex-start;flex-wrap:wrap;justify-content:flex-end}
 .rec{border-left:3px solid var(--accent2);padding:2px 0 2px 11px;margin:12px 0}
-.rec .h{font-size:14px;font-weight:700;line-height:1.4}
-.rec .h em{font-style:normal;color:var(--dim);font-weight:600;font-size:12px;margin-right:5px}
+.rec .h{font-size:14px;font-weight:700;line-height:1.4;display:flex;gap:7px;align-items:baseline}
+.rec .h i{display:inline-block;flex:0 0 auto;font-style:normal;font-size:11px;font-weight:700;color:#241a0c;background:var(--accent);border-radius:6px;padding:1px 6px;line-height:1.6}
+.rec .h span{min-width:0}
 .hidden{display:none}
 .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-bottom:8px}
 .chips::-webkit-scrollbar{display:none}
@@ -84,15 +87,19 @@ footer{max-width:940px;margin:0 auto;padding:4px 16px 20px;font-size:11px;color:
 </head>
 <body>
 <header>
-  <h1>CAMERA<span>카메라 컬렉션</span></h1>
-  <div class="sub" id="subline">바디 · 렌즈 · 이종교배 컨버터 · 필름 재고</div>
+  <div class="w">
+    <h1>CAMERA<span>카메라 컬렉션</span></h1>
+    <div class="sub" id="subline">바디 · 렌즈 · 이종교배 컨버터 · 필름 재고</div>
+  </div>
 </header>
 <nav id="nav">
-  <button data-tab="home" class="on">요약</button>
-  <button data-tab="gear">장비</button>
-  <button data-tab="rec">조합 추천</button>
-  <button data-tab="film">필름</button>
-  <button data-tab="data">데이터</button>
+  <div class="w">
+    <button data-tab="home" class="on">요약</button>
+    <button data-tab="gear">장비</button>
+    <button data-tab="rec">조합 추천</button>
+    <button data-tab="film">필름</button>
+    <button data-tab="data">데이터</button>
+  </div>
 </nav>
 <main>
   <section id="tab-home"></section>
@@ -159,7 +166,7 @@ var FORMATS = {
 var BODY_TYPE_LIST = ['필름 SLR','필름 레인지파인더','필름 TLR','필름 중형','필름 컴팩트','디지털','디지털 미러리스','디지털 DSLR','기타'];
 var MOUNTS = ['Nikon F','Canon EF','Canon RF','Sony E','Sony A','Fujifilm X','Leica M','Leica M39(LTM)','M42','Pentax K','Contax/Yashica','Olympus OM','Rollei QBM','Mamiya 645','Pentax 645','Hasselblad V','고정 렌즈'];
 var PURPOSES = {
-  '인물': {lo:70, hi:135, ideal:100, why:'얼굴이 왜곡 없이 커지고 배경을 정리하기 쉬운 화각'},
+  '인물': {lo:50, hi:135, ideal:85, why:'얼굴이 왜곡 없이 커지고 배경을 정리하기 쉬운 화각'},
   '풍경': {lo:20, hi:35,  ideal:28,  why:'넓게 담으면서 원근 왜곡이 과하지 않은 화각'},
   '여행': {lo:28, hi:50,  ideal:35,  why:'풍경과 인물을 한 렌즈로 오가기 좋은 화각'},
   '실내': {lo:35, hi:55,  ideal:40,  why:'좁은 실내에서 배경과 사람을 함께 담는 화각'},
@@ -241,8 +248,11 @@ function maskSerial(s){
   return '••••' + t.slice(-4);
 }
 function monthIndex(str){
-  var m = /^(\d{4})-(\d{2})/.exec(String(str || ''));
-  return m ? Number(m[1]) * 12 + Number(m[2]) - 1 : null;
+  var m = /^(\d{4})[-.\/\s]?(\d{1,2})?/.exec(String(str || ''));
+  if(!m) return null;
+  var mo = m[2] ? Number(m[2]) : 1;
+  if(mo < 1 || mo > 12) return null;
+  return Number(m[1]) * 12 + mo - 1;
 }
 function nowMonthIndex(){ var d = new Date(); return d.getFullYear() * 12 + d.getMonth(); }
 function expiryState(str){
@@ -347,6 +357,11 @@ function adapterText(path){
     return a.name + ' (' + a.from + '→' + a.to + ', ' + fTxt + ')';
   }).join(' + ');
   return '컨버터 ' + label;
+}
+function mountText(c){
+  var lm = c.lens.mount || '', bm = c.body.mount || '';
+  if(c.fixed || !lm || !bm || lm === bm) return '마운트 ' + (lm || bm || '미지정');
+  return '마운트 ' + lm + '→' + bm;
 }
 
 /* ---------- 필름 추천 + 재고 ---------- */
@@ -609,8 +624,8 @@ function runRec(){
     var sugg = digital ? [] : filmSuggestions(purpose, c.body, 2);
     var f = formatLabel(c.body.format);
     h += '<div class="card"><div class="rec" style="border-left-color:' + (i === 0 ? 'var(--accent)' : 'var(--accent2)') + '">'
-      + '<div class="h"><em>' + (i + 1) + '</em>' + esc((c.body.maker||'') + ' ' + (c.body.model||'')) + ' + ' + esc(c.lens.model) + '</div>'
-      + '<div class="d">' + esc(f) + ' · 마운트 ' + esc(c.lens.mount || '-') + '→' + esc(c.body.mount || '-') + ' · ' + esc(adapterText(c.path)) + '</div>'
+      + '<div class="h"><i>' + (i + 1) + '</i><span>' + esc((c.body.maker||'') + ' ' + (c.body.model||'')) + ' + ' + esc(c.lens.model) + '</span></div>'
+      + '<div class="d">' + esc(f) + ' · ' + esc(mountText(c)) + ' · ' + esc(adapterText(c.path)) + '</div>'
       + '<div class="d" style="margin-top:6px"><b style="font-size:18px;letter-spacing:-.02em">' + esc(c.eq) + 'mm</b>'
       + '<span class="dim"> · 35mm 환산 · 화각 ' + esc(aov(c.eq)) + '° · 최대 f/' + esc(c.lens.aperture || '-') + '</span></div>'
       + '<div class="d">적합도 ' + esc(c.score) + '점'
@@ -630,7 +645,7 @@ function runRec(){
         var invTxt, invCls;
         if(!s.inv.length){ invTxt = '재고 미등록'; invCls = 'bad'; }
         else if(s.rolls > 0){
-          var exp = s.inv.map(function(x){ return expiryState(x.expiry); }).filter(function(x){ return x && x.cls !== 'ok'; })[0];
+    var exp = s.inv.map(function(x){ return expiryState(x.expiry); }).filter(function(x){ return x && x.cls !== 'ok'; })[0];
           invTxt = '보유 ' + s.rolls + '롤' + (exp ? ' · ' + exp.text : '');
           invCls = exp && exp.cls === 'bad' ? 'bad' : (exp ? 'warn' : 'ok');
         }else{ invTxt = '재고 0롤'; invCls = 'bad'; }
@@ -654,8 +669,7 @@ function runRec(){
       held.forEach(function(f){
         var st = expiryState(f.expiry);
         h += '<div class="item"><div><div class="t">' + esc(f.stock) + '</div>'
-          + '<div class="d">ISO ' + esc(f.iso) + ' · ' + esc(Number(f.rolls) || 0) + '롤'
-          + (f.expiry ? ' · ' + esc(f.expiry) + ' 만료' : '') + '</div></div>'
+          + '<div class="d">ISO ' + esc(f.iso) + (f.expiry ? ' · ' + esc(f.expiry) + ' 만료' : '') + '</div></div>'
           + '<div class="ops">' + (st ? '<span class="pill ' + st.cls + '">' + esc(st.text) + '</span>' : '')
           + '<span class="pill ' + ((Number(f.rolls) || 0) > 0 ? 'ok' : 'bad') + '">' + esc(Number(f.rolls) || 0) + '롤</span></div></div>';
       });
@@ -773,7 +787,7 @@ var SCHEMA = {
     {k:'iso', l:'ISO (감도)', t:'number', ph:'400'},
     {k:'format', l:'포맷', t:'select', opts:['35mm','120','127','any'], blank:'포맷 선택'},
     {k:'rolls', l:'보유 롤 수', t:'number', ph:'3'},
-    {k:'expiry', l:'유효기간 (YYYY-MM)', t:'month'},
+    {k:'expiry', l:'유효기간 (YYYY-MM)', t:'text', ph:'2027-05'},
     {k:'notes', l:'공개 메모', t:'textarea', ph:'냉장 보관, 개봉 여부 등'}
   ]}
 };
