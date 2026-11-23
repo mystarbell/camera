@@ -2780,8 +2780,8 @@ function historyOf(){
 function archiveRoll(bodyId, opts){
   var o = opts || {};
   var b = bodyById(bodyId);
-  var r = peekRoll(bodyId);
-  if(!b || !r) return null;
+  if(!b) return null;
+  var r = peekRoll(bodyId) || {loadedAt: '', spots: [], note: ''};   /* 기록을 하나도 안 남긴 롤도 히스토리에는 남긴다 */
   var entry = {
     id: o.id || uid('roll'),
     bodyId: bodyId,
@@ -2812,9 +2812,12 @@ function clearRoll(bodyId){
 }
 /* 필름을 빼고(또는 바꾸고) 롤 기록을 정리한다. archive=false 면 기록을 버린다. */
 function closeRoll(bodyId, archive){
+  var b = bodyById(bodyId);
+  var hasFilm = !!(b && loadedStock(b));
   var n = spotCount(bodyId);
-  var entry = archive ? archiveRoll(bodyId) : null;
-  if(!archive) clearRoll(bodyId);
+  var entry = null;
+  if(archive && (hasFilm || n)) entry = archiveRoll(bodyId);
+  else clearRoll(bodyId);
   return {spots: n, entry: entry};
 }
 function histById(id){ return privHistory().filter(function(h){ return h && h.id === id; })[0] || null; }
