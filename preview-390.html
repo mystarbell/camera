@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<title>390px 미리보기 (임시)</title>
+<style>
+  html,body{margin:0;background:#e7e2d8;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif}
+  .row{display:flex;gap:28px;padding:20px;align-items:flex-start}
+  .col{display:flex;flex-direction:column;gap:8px}
+  .lbl{font-size:13px;font-weight:700;color:#4a453c}
+  .phone{width:390px;height:760px;border:0;border-radius:30px;background:#fff;box-shadow:0 0 0 8px #2b2b2b,0 16px 34px rgba(0,0,0,.3)}
+</style>
+</head>
+<body>
+<div class="row">
+  <div class="col">
+    <div class="lbl">공개판 · iPhone 390px</div>
+    <iframe class="phone" id="f1" src="index.html"></iframe>
+  </div>
+  <div class="col">
+    <div class="lbl">NAS판 헤더 구성(상태 배지 포함) · 390px</div>
+    <iframe class="phone" id="f2" src="index.html"></iframe>
+  </div>
+</div>
+<script>
+  /* 같은 출처라 iframe 안에 NAS판과 같은 상태 배지를 넣어 헤더 폭을 확인한다 */
+  document.getElementById('f2').addEventListener('load', function(){
+    var d = this.contentDocument;
+    var wrap = d.querySelector('.subwrap');
+    if(!wrap || d.getElementById('syncState')) return;
+    var s = d.createElement('span');
+    s.id = 'syncState'; s.className = 'pill ok sync';
+    s.setAttribute('data-sync', 'saved');
+    s.textContent = '서버에 저장됨';
+    wrap.appendChild(s);
+  });
+</script>
+</body>
+</html>
