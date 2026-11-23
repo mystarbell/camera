@@ -159,6 +159,13 @@ button.danger{color:var(--red);border-color:var(--red-line);background:var(--red
 .pick-chips button.on{background:var(--ink);border-color:var(--ink);color:#fdfbf5}
 .pick-chips button.on .m{color:#cfc8b8}
 select[hidden]{display:none}
+/* 상황·조건 칩: 항목 이름 + 한 줄 칩 */
+.sit-row{display:flex;gap:9px;align-items:flex-start;margin-bottom:7px}
+.sit-row:last-child{margin-bottom:0}
+.sit-lb{flex:0 0 34px;font-size:12px;font-weight:750;color:var(--ink3);padding-top:11px;letter-spacing:0}
+.sit-chips{flex:1;min-width:0;gap:6px}
+.sit-chips button{font-size:13px;padding:8px 11px;min-height:42px;border-radius:11px;letter-spacing:-.02em}
+.sit-sum{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
 
 /* ---------- 조합 결과 ---------- */
 .combo{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:11px;box-shadow:var(--shadow)}
@@ -170,9 +177,9 @@ select[hidden]{display:none}
 .combo-title .plus{color:var(--ink3);font-weight:600;margin:0 5px}
 .combo-meta{font-size:12.5px;color:var(--ink3);margin:5px 0 0 37px;line-height:1.6;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 .combo-mount{font-size:12.5px;color:var(--ink3);margin:9px 0 0 37px;line-height:1.5}
-.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0 0 37px}
-.metric{background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:8px 10px;min-width:0}
-.metric b{display:block;font-size:17px;font-weight:800;letter-spacing:-.03em;line-height:1.2;font-variant-numeric:tabular-nums}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:12px 0 0 37px}
+.metric{background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:8px 9px;min-width:0}
+.metric b{display:block;font-size:16px;font-weight:800;letter-spacing:-.03em;line-height:1.2;font-variant-numeric:tabular-nums;white-space:nowrap}
 .metric span{display:block;font-size:11.5px;font-weight:650;color:var(--ink3);margin-top:1px}
 .score{display:flex;align-items:center;gap:9px;margin:12px 0 0 37px}
 .score-lb{font-size:12px;font-weight:750;color:var(--ink3);white-space:nowrap}
@@ -186,6 +193,12 @@ select[hidden]{display:none}
 .fp-name{font-size:14px;font-weight:700;line-height:1.35}
 .fp-meta{font-size:12.5px;color:var(--ink3);margin-top:2px}
 .fp-line{margin:12px 0 0 37px;font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.combo-loaded{margin:9px 0 0 37px;font-size:12.5px;color:var(--ink2);line-height:1.5}
+.combo-loaded b{font-weight:750;color:var(--ink)}
+.combo-why{margin:8px 0 0 37px;display:flex;flex-direction:column;gap:3px}
+.why-line{font-size:12.5px;line-height:1.55;color:var(--ink2);word-break:keep-all}
+.why-line.warn{color:var(--orange)}
+.score-split{margin:6px 0 0 37px;font-size:12px;color:var(--ink3);font-weight:650}
 .empty{text-align:center;padding:28px 16px}
 .empty .e-ic{font-size:26px;line-height:1;margin-bottom:8px;display:block;opacity:.8}
 
@@ -239,8 +252,12 @@ footer b{color:var(--ink2)}
   footer{padding:10px 24px 34px}
 }
 @media(max-width:520px){
-  .combo-meta,.metrics,.score,.film-pick,.fp-line{margin-left:0}
+  .combo-meta,.metrics,.score,.film-pick,.fp-line,.combo-loaded,.combo-why,.score-split{margin-left:0}
   .combo-title{font-size:15px}
+}
+@media(max-width:400px){
+  .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sit-lb{flex-basis:30px;font-size:11.5px}
 }
 </style>
 </head>
@@ -350,6 +367,26 @@ var PURPOSES = {
   '실내': {lo:35, hi:55,  ideal:40,  why:'좁은 실내에서 배경과 사람을 함께 담는 화각'},
   '스냅': {lo:35, hi:70,  ideal:50,  why:'눈에 보이는 그대로, 거리 두고 자연스럽게 담는 화각'}
 };
+var PURPOSE_ORDER = ['스냅','인물','풍경','여행','실내'];
+/* 상황·조건 칩 — 값·표시 이름 */
+var SIT_GROUPS = {
+  company: {label:'동행',  options:[['any','상관없음'],['alone','혼자'],['kids','아이랑 같이']]},
+  place:   {label:'장소',  options:[['any','상관없음'],['city','도시 산책'],['nature','자연·외곽']]},
+  weight:  {label:'무게',  options:[['any','상관없음'],['pocket','가볍게 주머니에'],['quality','화질·감성 우선']]}
+};
+var SIT_SELECT = {company:'recCompany', place:'recPlace', weight:'recWeight'};
+/* 장비별 무게(추정, g) — 공개 스펙 기준, 모르는 기체는 종류별 기본값 */
+var BODY_WEIGHT = {
+  'nikon-f80':515, 'nikon-af600':195, 'rollei-35':370, 'rollei-35s':385,
+  'olympus-xa':225, 'olympus-xa4':235, 'yashica-44':780,
+  'rollei-baby':680, 'rollei-baby-brightscreen':680, 'rollei-baby-2':680
+};
+var LENS_WEIGHT = {'n300pf':755, 'n24':620, 'n50':280, 'n35ai':400};
+var BODY_WEIGHT_FALLBACK = {'필름 SLR':600,'필름 레인지파인더':400,'필름 TLR':760,'필름 중형':900,'필름 컴팩트':300,'디지털':600,'디지털 미러리스':500,'디지털 DSLR':700};
+/* 자동초점 · 자동노출 · 주머니에 들어가는 기체 */
+var AF_FIXED = {'nikon-af600':1,'olympus-xa4':1};
+var AE_BODIES = {'nikon-f80':1,'nikon-af600':1,'olympus-xa':1,'olympus-xa4':1};
+var POCKET_BODIES = {'nikon-af600':1,'rollei-35':1,'rollei-35s':1,'olympus-xa':1,'olympus-xa4':1};
 
 /* ================= 상태 ================= */
 var seed = JSON.parse(document.getElementById('seed-data').textContent);
@@ -612,7 +649,7 @@ function equivFocal(lens, body, factor){
   var crop = FORMATS[body.format] ? FORMATS[body.format].crop : 1;
   return Math.max(1, Math.round(Number(lens.focal) * (factor || 1) * crop));
 }
-function purposeScore(eq, aperture, purpose){
+function purposeRaw(eq, aperture, purpose){
   var t = PURPOSES[purpose] || PURPOSES['스냅'];
   var s;
   if(eq >= t.lo && eq <= t.hi){
@@ -626,7 +663,10 @@ function purposeScore(eq, aperture, purpose){
   if(ap){
     if(ap <= 1.8) s += 10; else if(ap <= 2.8) s += 6; else if(ap <= 4) s += 3; else if(ap >= 5.6) s -= 2;
   }
-  return Math.max(8, Math.min(100, Math.round(s)));
+  return Math.max(8, Math.min(110, Math.round(s)));
+}
+function purposeScore(eq, aperture, purpose){
+  return Math.max(8, Math.min(100, purposeRaw(eq, aperture, purpose)));
 }
 function buildCombos(bodyId, lensId, purpose){
   var out = [];
@@ -677,6 +717,181 @@ function mountText(c){
   return '마운트 ' + lm + '→' + bm;
 }
 
+/* ---------- 상황·조건 추천 ---------- */
+function isRepairing(body){ return /수리|오버홀|점검/.test((body && body.status) || ''); }
+function bodyWeightOf(body){
+  if(!body) return 0;
+  return Number(BODY_WEIGHT[body.id]) || Number(body.weight) || BODY_WEIGHT_FALLBACK[body.bodyType] || 600;
+}
+function lensWeightOf(lens){
+  if(!lens || lens.fixed) return 0;
+  var own = Number(String(lens.weight === undefined || lens.weight === null ? '' : lens.weight).replace(/[^0-9.]/g, ''));
+  return own || Number(LENS_WEIGHT[lens.id]) || 320;
+}
+function comboWeight(c){ return bodyWeightOf(c.body) + (c.fixed ? 0 : lensWeightOf(c.lens)); }
+function isAutofocus(c){
+  if(!c || !c.body) return false;
+  if(c.fixed) return !!AF_FIXED[c.body.id];
+  return c.body.id === 'nikon-f80' && /AF-S|AF NIKKOR|AF Zoom|AF Micro/i.test(c.lens.model || '');
+}
+function autoExposure(c){
+  if(!c || !c.body) return false;
+  if(c.fixed) return !!AE_BODIES[c.body.id];
+  return c.body.id === 'nikon-f80' && /AF-S|AF NIKKOR/i.test(c.lens.model || '');
+}
+function isPocketable(c){
+  if(!c || !c.fixed || !POCKET_BODIES[c.body.id]) return false;
+  return comboWeight(c) <= 450;
+}
+function hasSituation(sit){
+  if(!sit) return false;
+  return (sit.company && sit.company !== 'any') || (sit.place && sit.place !== 'any') || (sit.weight && sit.weight !== 'any');
+}
+function isMedium(c){
+  var f = (c.body && c.body.format) || '';
+  return /120|127/.test(f) || /TLR|중형/.test((c.body && c.body.bodyType) || '');
+}
+/* 상황 적합도 0~100과 근거 문장 */
+function situationFit(c, sit){
+  var s = 55, why = [], pen = [];
+  function up(p, t){ s += p; why.push({p:p, t:t}); }
+  function down(p, t){ s -= p; pen.push({p:p, t:t}); }
+  var w = comboWeight(c), af = isAutofocus(c), pk = isPocketable(c);
+  var eq = Number(c.eq) || 0, ap = Number(c.lens.aperture) || 0;
+  sit = sit || {};
+
+  if(sit.company === 'kids'){
+    if(af) up(30, 'AF라서 움직이는 아이를 놓치지 않고 잡아요');
+    else down(40, '수동 초점이라 뛰어다니는 아이를 따라가기 느려요');
+    if(autoExposure(c)) up(10, '자동 노출이라 실내·야외를 오가며 찍기 편해요');
+    if(ap && ap <= 2.8) up(8, 'f/' + ap + ' 밝은 렌즈라 실내에서도 셔터 속도가 나와요');
+    if(eq >= 85) down(15, eq + 'mm는 아이와 거리가 멀어져요');
+    if(w >= 900) down(10, '약 ' + w + 'g은 아이와 함께 들기 무거워요');
+  }else if(sit.company === 'alone'){
+    if(isMedium(c)) up(25, '중형 판형이라 큰 네거티브를 천천히 즐길 수 있어요');
+    else if(!af) up(12, '수동으로 구도를 다듬으며 천천히 찍기 좋아요');
+    if(eq >= 35 && eq <= 50) up(8, eq + 'mm 표준 화각으로 시선 그대로 담기 좋아요');
+    if(eq >= 120) down(8, eq + 'mm 망원은 혼자 천천히 걷기엔 부담스러워요');
+  }
+
+  if(sit.place === 'city'){
+    if(eq >= 28 && eq <= 50) up(25, eq + 'mm 표준·광각이 골목과 거리 스냅에 맞아요');
+    else if(eq > 85) down(25, eq + 'mm는 도시에서 너무 좁아요');
+    else if(eq < 28) down(12, eq + 'mm는 도시에서 담는 게 너무 많아요');
+    if(af) up(6, '빠른 AF로 지나가는 장면을 바로 잡아요');
+  }else if(sit.place === 'nature'){
+    if(eq <= 35) up(25, eq + 'mm 광각으로 풍경을 넓게 담아요');
+    if(eq >= 120) up(18, eq + 'mm 망원으로 먼 풍경과 동물을 당겨요');
+    if(isMedium(c)) up(8, '중형 판형의 계조가 자연 풍경에 잘 맞아요');
+    if(eq >= 55 && eq < 120) down(8, eq + 'mm는 풍경에 넓지도 길지도 않은 화각이에요');
+  }
+
+  if(sit.weight === 'pocket'){
+    if(pk) up(40, '약 ' + w + 'g, 주머니에 들어가는 크기예요');
+    else{
+      down(55, '가방 없이 주머니에 넣고 다니기엔 커요');
+      if(w >= 700) down(10, '약 ' + w + 'g이라 어깨에 부담돼요');
+    }
+    if(!pk && w <= 450) up(12, '약 ' + w + 'g으로 가벼운 편이에요');
+  }else if(sit.weight === 'quality'){
+    if(isMedium(c)) up(25, '중형 판형의 넓은 네거티브로 계조가 깊어요');
+    if(ap && ap <= 2) up(20, 'f/' + ap + ' 밝은 단렌즈로 화질과 배경 정리에 유리해요');
+    if(/Brightscreen/i.test((c.body && c.body.model) || '')) up(10, '브라이트스크린이라 초점 확인이 정확해요');
+    if(/Rollei 35 S/.test((c.body && c.body.model) || '')) up(8, 'Sonnar 40mm f/2.8의 광학 성능이 좋아요');
+    if(pk && ap >= 3.5) down(12, '편하지만 컴팩트 렌즈라 광학적 여유는 적어요');
+  }
+
+  why.sort(function(a,b){ return b.p - a.p; });
+  pen.sort(function(a,b){ return b.p - a.p; });
+  return {score: Math.max(5, Math.min(100, Math.round(s))), why: why, pen: pen};
+}
+function baseReason(c, purpose){
+  var t = PURPOSES[purpose] || PURPOSES['스냅'];
+  if(c.eq >= t.lo && c.eq <= t.hi) return c.eq + 'mm가 ' + purpose + ' 목표 화각(' + t.lo + '–' + t.hi + 'mm)에 들어요';
+  return c.eq + 'mm는 ' + purpose + ' 목표 화각(' + t.lo + '–' + t.hi + 'mm)보다 ' + (c.eq < t.lo ? '넓어요' : '좁아요');
+}
+function scoreCombo(c, purpose, sit){
+  var hops = c.path && c.path.hops ? c.path.hops : 0;
+  var base = Math.round(purposeRaw(c.eq, c.lens.aperture, purpose) * 100 / 110);
+  base = Math.max(5, Math.min(100, base - (hops === 1 ? 4 : (hops >= 2 ? 9 : 0))));
+  var fit = situationFit(c, sit);
+  var total = hasSituation(sit) ? Math.round(base * 0.5 + fit.score * 0.5) : base;
+  if(isRepairing(c.body)) total = Math.max(5, total - 25);
+  total = Math.max(5, Math.min(100, total));
+  return {base:base, fit:fit.score, total:total, why:fit.why, pen:fit.pen};
+}
+/* 같은 기종(베이비 롤라이 3대처럼)은 한 대만 남겨 목록이 한 기종으로 차지 않게 */
+function familyKey(body){
+  return String((body && body.model) || '').replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+}
+/* 바디·렌즈를 비워 두면 보유 장비 전체에서, 고르면 그 안에서 상황까지 반영해 순위를 매김 */
+function buildPlan(bodyId, lensId, purpose, sit){
+  if(!PURPOSES[purpose]) purpose = '스냅';
+  sit = sit || {};
+  var cands = [];
+  function add(body, lens, path, fixed){
+    var c = {body:body, lens:lens, eq:equivFocal(lens, body, path && path.factor ? path.factor : 1),
+             path:path || {hops:0, chain:[], factor:1}, fixed:!!fixed};
+    var r = scoreCombo(c, purpose, sit);
+    c.base = r.base; c.fit = r.fit; c.score = r.total;
+    c.repair = isRepairing(body);
+    var why = r.why.map(function(x){ return x.t; });
+    var pen = r.pen.map(function(x){ return x.t; });
+    if(why.length < 2) why.push(baseReason(c, purpose));
+    c.reasons = why.slice(0, 2);
+    c.cautions = pen.slice(0, 1);
+    cands.push(c);
+    return c;
+  }
+  if(bodyId){
+    var body = bodyById(bodyId);
+    if(!body) return {list:[], repair:[], purpose:purpose};
+    var fl = fixedLens(body);
+    if(fl) add(body, fl, null, true);
+    else data.lenses.forEach(function(lens){
+      var p = mountPath(lens.mount, body.mount);
+      if(p) add(body, lens, p, false);
+    });
+  }else if(lensId){
+    var lens = lensById(lensId);
+    if(!lens) return {list:[], repair:[], purpose:purpose};
+    data.bodies.forEach(function(b){
+      if(fixedLens(b)) return;                 /* 고정 렌즈 바디는 렌즈 교환 불가 */
+      var p = mountPath(lens.mount, b.mount);
+      if(p) add(b, lens, p, false);
+    });
+  }else{
+    data.bodies.forEach(function(b){
+      var fl = fixedLens(b);
+      if(fl){ add(b, fl, null, true); return; }
+      var best = null;
+      data.lenses.forEach(function(lens){
+        var p = mountPath(lens.mount, b.mount);
+        if(!p) return;
+        var c = add(b, lens, p, false);
+        if(!best || c.score > best.score || (c.score === best.score && c.base > best.base)) best = c;
+      });
+      if(best) cands = cands.filter(function(c){ return c.body.id !== b.id || c === best; });
+    });
+  }
+  var sorter = function(a, b){ return b.score - a.score || b.base - a.base || comboWeight(a) - comboWeight(b); };
+  var pool = cands.slice().sort(sorter);
+  var considered = 0, seenBody = {};
+  pool.forEach(function(c){ if(!seenBody[c.body.id]){ seenBody[c.body.id] = 1; considered++; } });
+  var list = pool, repair = [];
+  if(!bodyId){
+    list = pool.filter(function(c){ return !c.repair; });
+    repair = pool.filter(function(c){ return c.repair; });
+    var seenFamily = {};
+    list = list.filter(function(c){
+      var k = familyKey(c.body);
+      if(seenFamily[k]) return false;
+      seenFamily[k] = 1; return true;
+    });
+  }
+  return {list:list, repair:repair, purpose:purpose, considered:considered};
+}
+
 /* ---------- 필름 추천 + 재고 ---------- */
 function inventoryFor(stock, filmFmt){
   var key = maskStock(stock);
@@ -694,7 +909,7 @@ function invSummary(s){
   }
   return {txt:'재고 0롤', cls:'bad'};
 }
-function filmSuggestions(purpose, body, count){
+function filmSuggestions(purpose, body, count, sit){
   var want = filmFormatOf(body);
   if(!want) return [];
   var pool = (data.filmCatalog || []).filter(function(f){
@@ -709,6 +924,9 @@ function filmSuggestions(purpose, body, count){
     if(purpose === '풍경'){ if(f.iso <= 100) s += 14; else if(f.iso >= 400) s -= 10; }
     if(purpose === '인물'){ if(f.iso >= 200 && f.iso <= 400) s += 8; if(/흑백/.test(f.type || '')) s -= 12; }
     if(purpose === '여행'){ if(f.iso >= 200 && f.iso <= 400) s += 10; }
+    if(sit && sit.company === 'kids'){ if(f.iso >= 400) s += 12; else if(f.iso <= 100) s -= 10; }
+    var already = loadedStock(body);
+    if(already && maskStock(already) === maskStock(f.stock)) s += 10;
     var inv = inventoryFor(f.stock, want);
     var rolls = inv.reduce(function(n,x){ return n + (Number(x.rolls) || 0); }, 0);
     if(rolls > 0) s += 12;
@@ -984,13 +1202,28 @@ function recLensOptions(){
   });
   return h;
 }
+function sitGroupHtml(key){
+  var g = SIT_GROUPS[key];
+  var h = '<div class="sit-row"><span class="sit-lb">' + esc(g.label) + '</span><div class="pick-chips sit-chips">';
+  g.options.forEach(function(o){
+    h += '<button type="button" data-pick-sit="' + esc(key) + '" data-sit-value="' + esc(o[0]) + '">' + esc(o[1]) + '</button>';
+  });
+  h += '</div></div>';
+  var id = SIT_SELECT[key];
+  h += '<select id="' + esc(id) + '" hidden aria-label="' + esc(g.label) + '">';
+  g.options.forEach(function(o){
+    h += '<option value="' + esc(o[0]) + '"' + (o[0] === 'any' ? ' selected' : '') + '>' + esc(o[1]) + '</option>';
+  });
+  h += '</select>';
+  return h;
+}
 function renderRec(){
   var h = '';
-  h += '<div class="card"><div class="panel-head"><h3>조합 추천</h3><span class="count">직결 · 이종교배</span></div>'
-    + '<p class="muted intro">바디를 고르면 그 바디에 물릴 렌즈를, 렌즈를 고르면 그 렌즈를 물릴 바디를 찾아요. 직결과 컨버터 경유를 한 번에 비교합니다.</p>';
+  h += '<div class="card"><div class="panel-head"><h3>조합 추천</h3><span class="count">직결 · 이종교배 · 상황별</span></div>'
+    + '<p class="muted intro">바디·렌즈를 비워 두고 <b>목적과 상황만</b> 골라도 보유 장비 전체에서 가장 맞는 바디+렌즈를 찾아요. 특정 바디나 렌즈를 고르면 그 안에서 상황에 맞춰 비교합니다.</p>';
 
   h += '<div class="pick-block">'
-    + '<div class="pick-label"><span class="step">1</span> 바디 고르기</div>'
+    + '<div class="pick-label"><span class="step">1</span> 바디 고르기 <span class="dim" style="font-weight:600">비워 두면 전체에서 골라요</span></div>'
     + '<div class="pick-chips grid2" id="pickBodyChips">'
     + '<button type="button" class="reset" data-pick-body="">선택 안 함</button>';
   data.bodies.forEach(function(b){
@@ -1012,20 +1245,25 @@ function renderRec(){
   h += '<div class="pick-block">'
     + '<div class="pick-label"><span class="step">3</span> 촬영 목적</div>'
     + '<div class="pick-chips" id="pickPurposeChips">';
-  Object.keys(PURPOSES).forEach(function(p, i){
+  PURPOSE_ORDER.forEach(function(p){
     h += '<button type="button" data-pick-purpose="' + esc(p) + '">' + esc(p)
       + '<span class="m">' + esc(PURPOSES[p].lo) + '–' + esc(PURPOSES[p].hi) + 'mm</span></button>';
   });
   h += '</div><select id="recPurpose" hidden aria-label="촬영 목적">';
-  Object.keys(PURPOSES).forEach(function(p){
-    h += '<option value="' + esc(p) + '">' + esc(p) + ' · ' + esc(PURPOSES[p].lo) + '–' + esc(PURPOSES[p].hi) + 'mm</option>';
+  PURPOSE_ORDER.forEach(function(p){
+    h += '<option value="' + esc(p) + '"' + (p === '스냅' ? ' selected' : '') + '>' + esc(p) + ' · ' + esc(PURPOSES[p].lo) + '–' + esc(PURPOSES[p].hi) + 'mm</option>';
   });
   h += '</select></div>';
 
+  h += '<div class="pick-block">'
+    + '<div class="pick-label"><span class="step">4</span> 상황 · 조건 <span class="dim" style="font-weight:600">항목마다 하나씩</span></div>'
+    + sitGroupHtml('company') + sitGroupHtml('place') + sitGroupHtml('weight')
+    + '</div>';
+
   h += '<div class="btns"><button class="btn" id="recGo">추천 받기</button></div>'
-    + '<div class="dim" style="margin-top:9px">바디나 렌즈를 고르면 바로 계산돼요.</div></div>';
+    + '<div class="dim" style="margin-top:9px">바디·렌즈를 비워 두면 보유 장비 전체에서, 칩을 고르면 바로 다시 계산해요.</div></div>';
   h += '<div id="recOut"><div class="card empty"><span class="e-ic">🔍</span>'
-    + '<div class="muted">바디나 렌즈 중 하나를 고르면 추천 조합이 여기에 나와요.</div></div></div>';
+    + '<div class="muted">목적과 상황을 고르고 추천 받기를 누르면 바디·렌즈·필름까지 한 번에 골라 드려요.</div></div></div>';
   return h;
 }
 
@@ -1046,6 +1284,51 @@ function syncRecChips(){
   mark(b, 'data-pick-body');
   mark(l, 'data-pick-lens');
   mark(p, 'data-pick-purpose');
+  Object.keys(SIT_GROUPS).forEach(function(key){
+    var el = document.getElementById(SIT_SELECT[key]);
+    var cur = el && el.value ? el.value : 'any';
+    var nodes = document.querySelectorAll('[data-pick-sit="' + key + '"]');
+    for(var i = 0; i < nodes.length; i++){
+      var hit = (nodes[i].getAttribute('data-sit-value') || 'any') === cur;
+      nodes[i].classList.toggle('on', hit);
+      if(nodes[i].setAttribute) nodes[i].setAttribute('aria-pressed', hit ? 'true' : 'false');
+    }
+  });
+}
+
+function situationOf(){
+  function pick(key){
+    var el = document.getElementById(SIT_SELECT[key]);
+    return el && el.value ? el.value : 'any';
+  }
+  return {company:pick('company'), place:pick('place'), weight:pick('weight')};
+}
+function sitTagHtml(sit){
+  var out = [];
+  function label(group, key){
+    var g = SIT_GROUPS[group];
+    for(var i = 0; i < g.options.length; i++){ if(g.options[i][0] === key) return g.options[i][1]; }
+    return '';
+  }
+  if(sit.company !== 'any') out.push(label('company', sit.company));
+  if(sit.place !== 'any') out.push(label('place', sit.place));
+  if(sit.weight !== 'any') out.push(label('weight', sit.weight));
+  return out.map(function(t){ return '<span class="tag">' + esc(t) + '</span>'; }).join('');
+}
+function loadedLineHtml(body){
+  if(isDigital(body) || !isFilmBody(body)) return '';
+  var s = loadedStock(body);
+  if(!s) return '<div class="combo-loaded">🎞️ 미삽입 — 원하는 필름을 바로 장전할 수 있어요</div>';
+  var iso = loadedIsoText(body);
+  var note = String(body.loadedFilmNote || '').trim();
+  return '<div class="combo-loaded">🎞️ 현재 장전: <b>' + esc(s) + '</b>'
+    + (iso !== null ? ' · ISO ' + esc(iso) : '') + (note ? ' · ' + esc(note) : '') + '</div>';
+}
+function whyHtml(c){
+  var h = '';
+  (c.reasons || []).forEach(function(t){ h += '<div class="why-line">✔ ' + esc(t) + '</div>'; });
+  (c.cautions || []).forEach(function(t){ h += '<div class="why-line warn">⚠ ' + esc(t) + '</div>'; });
+  return h ? '<div class="combo-why">' + h + '</div>' : '';
 }
 
 function runRec(){
@@ -1054,32 +1337,34 @@ function runRec(){
   var purEl = document.getElementById('recPurpose');
   var out = document.getElementById('recOut');
   if(!bodyEl || !lensEl || !out) return;
-  var bodyId = bodyEl.value, lensId = lensEl.value, purpose = (purEl && purEl.value) ? purEl.value : '스냅';
+  var bodyId = bodyEl.value || '', lensId = lensEl.value || '';
+  var purpose = (purEl && purEl.value) ? purEl.value : '스냅';
   if(!PURPOSES[purpose]) purpose = '스냅';
-  if(!bodyId && !lensId){
-    out.innerHTML = '<div class="card empty"><span class="e-ic">🔍</span>'
-      + '<div class="muted">바디나 렌즈 중 하나를 골라 주세요.</div></div>';
-    return;
-  }
-  var combos = buildCombos(bodyId, lensId, purpose).slice(0, 6);
-  if(!combos.length){
+  var sit = situationOf();
+  var plan = buildPlan(bodyId, lensId, purpose, sit);
+  if(!plan.list.length){
     var extra = data.adapters.length ? '' : ' 컨버터가 아직 하나도 없어서 이종교배 조합은 나오지 않아요 — 장비 탭에서 컨버터를 추가하면 계산돼요.';
     out.innerHTML = '<div class="card empty"><span class="e-ic">🔍</span>'
       + '<div class="muted">이 조건에 맞는 조합이 없어요.' + esc(extra) + '</div></div>';
     return;
   }
+  var combos = plan.list.slice(0, (bodyId || lensId) ? 5 : 4);
   var p = PURPOSES[purpose];
+  var tags = sitTagHtml(sit);
   var h = '<div class="card"><div class="panel-head"><h3>' + esc(purpose) + ' 추천 조합</h3>'
     + '<span class="count">' + esc(combos.length) + '건</span></div>'
-    + '<div class="muted">목표 화각 ' + esc(p.lo) + '–' + esc(p.hi) + 'mm (35mm 환산) · ' + esc(p.why) + '</div></div>';
+    + '<div class="muted">목표 화각 ' + esc(p.lo) + '–' + esc(p.hi) + 'mm (35mm 환산) · ' + esc(p.why) + '</div>'
+    + (tags ? '<div class="sit-sum">' + tags + '</div>' : '')
+    + '<div class="dim" style="margin-top:7px">' + esc(buildPlanNote(bodyId, lensId, plan)) + '</div></div>';
 
   combos.forEach(function(c, i){
     var digital = isDigital(c.body);
-    var sugg = digital ? [] : filmSuggestions(purpose, c.body, 2);
+    var sugg = digital ? [] : filmSuggestions(purpose, c.body, 2, sit);
     var f = formatLabel(c.body.format);
     var hops = c.path && c.path.hops;
     var tone = c.score >= 80 ? 'ok' : c.score >= 60 ? 'gold' : 'bad';
     var gauge = c.score >= 80 ? 'var(--green)' : c.score >= 60 ? 'var(--amber)' : 'var(--red)';
+    var af = isAutofocus(c);
     h += '<article class="combo' + (i === 0 ? ' top' : '') + '">'
       + '<div class="combo-head"><span class="rank">' + (i + 1) + '</span><div style="min-width:0">'
       +   '<div class="combo-title">' + esc(nameOf(c.body))
@@ -1087,17 +1372,23 @@ function runRec(){
       +   '<div class="combo-meta">' + esc(f)
       +     '<span class="pill ' + (hops ? 'warn' : 'ok') + '">' + (hops ? '이종교배 ' + esc(hops) + '단' : '직결') + '</span>'
       +     (c.fixed ? '<span class="pill">고정 렌즈</span>' : '')
+      +     '<span class="pill' + (af ? ' ok' : '') + '">' + (af ? 'AF' : 'MF') + '</span>'
+      +     (c.repair ? '<span class="pill warn">수리 중</span>' : '')
       +   '</div>'
       + '</div></div>'
       + '<div class="metrics">'
       +   '<div class="metric"><b>' + esc(c.eq) + 'mm</b><span>35mm 환산</span></div>'
       +   '<div class="metric"><b>' + esc(aov(c.eq)) + '°</b><span>화각</span></div>'
       +   '<div class="metric"><b>f/' + esc(c.lens.aperture || '-') + '</b><span>최대 조리개</span></div>'
+      +   '<div class="metric"><b>약 ' + esc(comboWeight(c)) + 'g</b><span>무게(추정)</span></div>'
       + '</div>'
       + '<div class="score"><span class="score-lb">적합도</span>'
       +   '<div class="bar"><i style="width:' + Math.max(6, Math.min(100, c.score)) + '%;background:' + gauge + '"></i></div>'
       +   '<b class="num">' + esc(c.score) + '</b></div>'
-      + '<div class="combo-mount">' + esc(mountText(c)) + ' · ' + esc(adapterText(c.path)) + '</div>';
+      + (hasSituation(sit) ? '<div class="score-split">목적 화각 ' + esc(c.base) + ' · 상황 적합 ' + esc(c.fit) + '</div>' : '')
+      + '<div class="combo-mount">' + esc(mountText(c)) + ' · ' + esc(adapterText(c.path)) + '</div>'
+      + loadedLineHtml(c.body)
+      + whyHtml(c);
 
     if(digital){
       h += '<div class="muted" style="margin-top:9px">디지털 바디 — 필름 추천은 건너뜁니다.</div>';
@@ -1123,6 +1414,15 @@ function runRec(){
     h += '</article>';
   });
 
+  if(plan.repair.length){
+    h += '<div class="card"><div class="dim">🔧 수리 중이라 이번 추천에서 뺐어요 — '
+      + plan.repair.map(function(c){
+          var st = String(c.body.status || '수리 중');
+          return esc(nameOf(c.body)) + (/수리/.test((c.body.model || '') + ' ' + (c.body.notes || '')) ? '' : ' — ' + esc(st));
+        }).join(', ')
+      + '</div></div>';
+  }
+
   /* 이 바디/포맷에 쓸 수 있는 보유 필름 전체 */
   var fmtUsed = null;
   if(bodyId){ fmtUsed = filmFormatOf(bodyById(bodyId)); }
@@ -1145,6 +1445,18 @@ function runRec(){
     }
   }
   out.innerHTML = h;
+}
+function buildPlanNote(bodyId, lensId, plan){
+  if(bodyId){
+    var b = bodyById(bodyId);
+    return nameOf(b) + '에 물릴 렌즈 ' + plan.list.length + '종을 상황에 맞춰 비교했어요';
+  }
+  if(lensId){
+    var l = lensById(lensId);
+    return (l ? l.model : '선택한 렌즈') + '를 물릴 수 있는 바디 ' + plan.list.length + '대를 비교했어요';
+  }
+  var total = plan.considered || (plan.list.length + plan.repair.length);
+  return '보유 바디 ' + total + '대를 한 대씩 비교했어요' + (plan.repair.length ? ' · 수리 중 ' + plan.repair.length + '대는 제외' : '') + (total > plan.list.length + plan.repair.length ? ' · 같은 기종은 한 대만' : '');
 }
 
 /* ================= 필름 ================= */
@@ -1529,6 +1841,10 @@ function bindRec(){
   b.onchange = function(){ if(b.value) l.value = ''; syncRecChips(); if(recAuto) runRec(); };
   l.onchange = function(){ if(l.value) b.value = ''; syncRecChips(); if(recAuto) runRec(); };
   p.onchange = function(){ syncRecChips(); if(recAuto) runRec(); };
+  Object.keys(SIT_SELECT).forEach(function(key){
+    var el = document.getElementById(SIT_SELECT[key]);
+    if(el) el.onchange = function(){ syncRecChips(); if(recAuto) runRec(); };
+  });
 }
 function showTab(name){
   ['home','gear','rec','film','data'].forEach(function(n){
@@ -1578,6 +1894,12 @@ document.addEventListener('click', function(e){
     var pbEl2 = document.getElementById('recBody');
     if(plEl2) plEl2.value = t.getAttribute('data-pick-lens') || '';
     if(pbEl2 && plEl2 && plEl2.value) pbEl2.value = '';
+    syncRecChips(); if(recAuto) runRec(); return;
+  }
+  if(t.hasAttribute && t.hasAttribute('data-pick-sit')){
+    var sitKey = t.getAttribute('data-pick-sit');
+    var sitEl = document.getElementById(SIT_SELECT[sitKey] || '');
+    if(sitEl) sitEl.value = t.getAttribute('data-sit-value') || 'any';
     syncRecChips(); if(recAuto) runRec(); return;
   }
   if(t.hasAttribute && t.hasAttribute('data-pick-purpose')){
