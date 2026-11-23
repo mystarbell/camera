@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>preview 390</title>
+<style>
+  html,body{margin:0;background:#d9d5cc;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+  #wrap{width:390px;margin:0;background:#fff}
+  iframe{display:block;width:390px;height:844px;border:0;background:#f4f1e9}
+</style>
+</head>
+<body>
+<div id="wrap"><iframe id="phone" src="./index.html" title="camera 390"></iframe></div>
+<script>
+  var f = document.getElementById('phone');
+  f.addEventListener('load', function(){
+    try{
+      var w = f.contentWindow;
+      w.openLoadedSheet('nikon-f80');
+      var s = w.document.getElementById('lfSearch');
+      if(s) s.value = '200';
+      w.onFilmSearch('200');
+      var m = w.document.getElementById('sheet');
+      if(m) m.scrollTop = 0;
+    }catch(e){ document.title = 'preview error: ' + e.message; }
+  });
+</script>
+</body>
+</html>
