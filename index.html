@@ -723,13 +723,13 @@ function applyFilmChoice(id, stock, iso, exp, minus){
   var isoVal = (iso === undefined || iso === null || String(iso).trim() === '') ? row.iso : Number(iso);
   var expVal = (exp === undefined || exp === null || String(exp).trim() === '') ? row.exp : Number(exp);
   setLoaded(id, name, isoVal, expVal ? expVal + '컷' : '');
-  if(!minus) return;
+  if(!minus){ toast(name + ' 장전'); return; }
   var key = maskStock(name), target = null;
   (data.films || []).forEach(function(f){
     if(target) return;
     if(maskStock(f.stock) === key && (Number(f.rolls) || 0) > 0) target = f;
   });
-  if(!target) return;
+  if(!target){ toast(name + ' 장전'); return; }
   target.rolls = (Number(target.rolls) || 0) - 1;
   saveData(); renderAll();
   toast(name + ' 장전 · 재고 1롤 차감해 ' + target.rolls + '롤');
@@ -2463,7 +2463,6 @@ document.addEventListener('click', function(e){
     var minusEl = document.getElementById('lfMinus');
     applyFilmChoice(setBody, stk, t.getAttribute('data-set-iso'), exp, !!(minusEl && minusEl.checked));
     closeSheet();
-    toast(stk + ' 장전');
     return;
   }
 
