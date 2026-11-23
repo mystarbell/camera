@@ -323,7 +323,7 @@ footer b{color:var(--ink2)}
     {"id":"rollei-35s","bodyType":"필름 컴팩트","maker":"Rollei","model":"Rollei 35 S","mount":"고정 렌즈","format":"35mm","fixedFocal":40,"fixedAperture":2.8,"status":"보유","loadedFilm":"Kodak Portra 160","loadedIso":160,"loadedFilmNote":"36컷","notes":"실버. 고정 Rollei-HFT Sonnar 40mm f/2.8."},
     {"id":"olympus-xa","bodyType":"필름 레인지파인더","maker":"Olympus","model":"Olympus XA","mount":"고정 렌즈","format":"35mm","fixedFocal":35,"fixedAperture":2.8,"status":"보유","loadedFilm":"미삽입","loadedIso":null,"loadedFilmNote":"","notes":"클램셸형 레인지파인더. 고정 F.Zuiko 35mm f/2.8."},
     {"id":"olympus-xa4","bodyType":"필름 컴팩트","maker":"Olympus","model":"Olympus XA4 MACRO","mount":"고정 렌즈","format":"35mm","fixedFocal":28,"fixedAperture":3.5,"status":"보유","loadedFilm":"Kodak UltraMax 400","loadedIso":400,"loadedFilmNote":"36컷","notes":"클로즈업 대응 컴팩트. 고정 Zuiko 28mm f/3.5 Macro."},
-    {"id":"yashica-44","bodyType":"필름 TLR","maker":"Yashica","model":"Yashica-44","mount":"고정 렌즈","format":"127-44","fixedFocal":60,"fixedAperture":3.5,"status":"보유","loadedFilm":"미삽입","loadedIso":null,"loadedFilmNote":"","notes":"필름 장전 여부 확인 필요. 투톤 그레이/블랙 · 고정 Yashikor 60mm f/3.5 · 127 필름."},
+    {"id":"yashica-44","bodyType":"필름 TLR","maker":"Yashica","model":"Yashica-44","mount":"고정 렌즈","format":"127-44","fixedFocal":60,"fixedAperture":3.5,"status":"보유","loadedFilm":"Rera RG200 (127)","loadedIso":200,"loadedFilmNote":"12컷","notes":"Rera RG200 (127) 장전(카와우소 상점 베스트). 투톤 그레이/블랙 · 고정 Yashikor 60mm f/3.5 · 127 필름."},
     {"id":"rollei-baby","bodyType":"필름 TLR","maker":"Rollei","model":"Rolleiflex Baby Grey 4×4 (수리 중)","mount":"고정 렌즈","format":"127-44","fixedFocal":60,"fixedAperture":3.5,"status":"수리 중 (오버홀, 12월 초순 예상)","loadedFilm":"미삽입","loadedIso":null,"loadedFilmNote":"","notes":"그레이/블랙. 고정 Xenar 60mm f/3.5 · 127 필름. 리핸즈에 오버홀 접수."},
     {"id":"rollei-baby-brightscreen","bodyType":"필름 TLR","maker":"Rollei","model":"Rolleiflex Baby Grey 4×4 (Brightscreen 4408)","mount":"고정 렌즈","format":"127-44","fixedFocal":60,"fixedAperture":3.5,"status":"보유","loadedFilm":"Kodak 200 (127)","loadedIso":200,"loadedFilmNote":"","notes":"Brightscreen Pattern 4408 포커싱 스크린 장착. 그레이/블랙 · 고정 Xenar 60mm f/3.5 · 127 필름. 수리 중인 기체와 별개."},
     {"id":"rollei-baby-2","bodyType":"필름 TLR","maker":"Rollei","model":"Rolleiflex Baby Grey 4×4","mount":"고정 렌즈","format":"127-44","fixedFocal":60,"fixedAperture":3.5,"status":"보유","loadedFilm":"Kodak 200 (127)","loadedIso":200,"loadedFilmNote":"","notes":"그레이/블랙. 고정 Xenar 60mm f/3.5 · 127 필름."}
@@ -372,7 +372,7 @@ var FORMATS = {
 };
 
 /* ================= 필름 카탈로그 ================= */
-/* 35mm·120·127(4×4) 대표 스톡 42종. keywords에 한글 별칭을 넣어 '포트라'·'골드'·'흑백'·'127'로도 찾는다.
+/* 35mm·120·127(4×4) 대표 스톡 43종. keywords에 한글 별칭을 넣어 '포트라'·'골드'·'흑백'·'127'로도 찾는다.
    필름 장전과 재고 추가 화면의 검색 추천은 이 목록 + 사용자가 등록한 보유 필름(data.films)을 함께 쓴다. */
 var DEFAULT_FILMS = [
   {stock:"Kodak Gold 200",name:"Kodak Gold 200",brand:"Kodak",iso:200,format:"35mm",formats:["35mm"],type:"컬러 네거티브",defaultExp:36,popular:100,keywords:["코닥", "골드", "kodak", "gold", "200", "가성비", "따뜻한"],bestFor:["여행", "스냅"],character:"따뜻한 색, 가성비 좋은 데일리"},
@@ -416,6 +416,7 @@ var DEFAULT_FILMS = [
   {stock:"ReraPan 100 (127)",name:"ReraPan 100 (127)",brand:"ReraPan",iso:100,format:"127",formats:["127"],type:"흑백",defaultExp:12,popular:72,keywords:["레라판", "rerapan", "127", "100", "흑백", "4x4", "4×4", "베이비"],bestFor:["풍경", "인물"],character:"현존하는 127 흑백"},
   {stock:"ReraPan 400 (127)",name:"ReraPan 400 (127)",brand:"ReraPan",iso:400,format:"127",formats:["127"],type:"흑백",defaultExp:12,popular:66,keywords:["레라판", "rerapan", "127", "400", "흑백", "4x4", "4×4"],bestFor:["인물", "스냅"],character:"127 고감도 흑백"},
   {stock:"ReraChrome 100 (127)",name:"ReraChrome 100 (127)",brand:"ReraChrome",iso:100,format:"127",formats:["127"],type:"슬라이드",defaultExp:12,popular:50,keywords:["레라크롬", "rerachrome", "127", "100", "슬라이드", "4x4", "4×4"],bestFor:["풍경"],character:"127 슬라이드"},
+  {stock:"Rera RG200 (127)",name:"Rera RG200 (127)",brand:"Rera (Kawauso)",iso:200,format:"127",formats:["127"],type:"컬러 네거티브",defaultExp:12,popular:74,keywords:["레라", "rera", "rg200", "카와우소", "kawauso", "127", "4x4", "4×4", "200", "컬러"],bestFor:["스냅", "인물"],character:"카와우소 상점 베스트 127 컬러"},
   {stock:"Shanghai GP3 100 (127)",name:"Shanghai GP3 100 (127)",brand:"Shanghai",iso:100,format:"127",formats:["127"],type:"흑백",defaultExp:12,popular:68,keywords:["상하이", "shanghai", "gp3", "127", "100", "흑백", "4x4", "4×4"],bestFor:["풍경", "인물"],character:"저렴한 127 흑백"},
 ];
 
@@ -766,8 +767,10 @@ var AE_BODIES = {'nikon-f80':1,'nikon-af600':1,'olympus-xa':1,'olympus-xa4':1};
 var POCKET_BODIES = {'nikon-af600':1,'rollei-35':1,'rollei-35s':1,'olympus-xa':1,'olympus-xa4':1};
 
 /* ================= 상태 ================= */
+var ONCE_FIXES = [];                     /* 이번 불러오기에서 한 번 보정이 적용됐는지 */
 var seed = JSON.parse(document.getElementById('seed-data').textContent);
 var data = loadData();
+if(ONCE_FIXES.length){ saveData(); ONCE_FIXES = []; }   /* 새로 채운 보정은 바로 이 기기에 저장 */
 var priv = loadPriv();
 var reveal = false;
 var gearFilter = 'all';
@@ -787,6 +790,24 @@ function normalize(d){
     if(b.loadedFilmNote === undefined) b.loadedFilmNote = '';
   });
   fillSpecs(d);
+  applyOnceFixes(d);
+  return d;
+}
+/* 한 번만 적용하는 시드 보정 — 이미 저장된 기기에서도 새로 확인된 사실을 채운다.
+   사용자가 직접 고른 값은 절대 덮지 않고, 적용 여부를 data.appliedFixes 에 남겨 두 번 채우지 않는다. */
+function applyOnceFixes(d){
+  d.appliedFixes = (d.appliedFixes instanceof Array) ? d.appliedFixes : [];
+  /* 2026-11-23: 야시카-44에 Rera RG200 (127) 12컷이 장전된 것을 사진으로 확인 */
+  if(d.appliedFixes.indexOf('yashica-44-rg200') < 0){
+    var y = (d.bodies || []).filter(function(b){ return b && b.id === 'yashica-44'; })[0];
+    if(y && !loadedStock(y)){
+      y.loadedFilm = 'Rera RG200 (127)';
+      y.loadedIso = 200;
+      y.loadedFilmNote = '12컷';
+    }
+    d.appliedFixes.push('yashica-44-rg200');
+    if(ONCE_FIXES.indexOf('yashica-44-rg200') < 0) ONCE_FIXES.push('yashica-44-rg200');
+  }
   return d;
 }
 /* 예전에 저장된 목록에도 공개 스펙(필터·후드 등)이 채워지게 — 사용자가 고친 값은 건드리지 않음 */
