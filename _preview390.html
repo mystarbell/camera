@@ -11,7 +11,7 @@
 </style>
 </head>
 <body>
-<div id="wrap"><iframe id="phone" src="./index.html" title="camera 390"></iframe></div>
+<div id="wrap"><iframe id="phone" title="camera 390"></iframe></div>
 <script>
   var f = document.getElementById('phone');
   f.addEventListener('load', function(){
@@ -25,6 +25,7 @@
       if(m) m.scrollTop = 0;
     }catch(e){ document.title = 'preview error: ' + e.message; }
   });
+  f.src = './index.html?ts=' + Date.now();
 </script>
 </body>
 </html>
