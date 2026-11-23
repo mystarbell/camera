@@ -259,6 +259,49 @@ select[hidden]{display:none}
 .priv.off{color:var(--ink3);background:transparent;border:1px dashed var(--line2)}
 .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(4px);background:var(--ink);border:1px solid #000;color:#fdfbf5;padding:11px 18px;border-radius:999px;font-size:13.5px;font-weight:650;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:90;max-width:88vw;text-align:center;box-shadow:0 14px 34px -12px rgba(0,0,0,.55)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+/* ---------- 촬영 기록 · 히스토리 ---------- */
+.spots{margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}
+.spots-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.pill.spot{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-line)}
+.spot-list{margin-top:9px;display:flex;flex-direction:column;gap:8px}
+.spot{display:flex;gap:10px;align-items:flex-start;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:9px 10px;min-width:0}
+.spot-shot{flex:0 0 auto;width:54px;height:54px;border-radius:9px;overflow:hidden;background:#fff;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--ink3)}
+.spot-shot img{width:100%;height:100%;object-fit:cover;display:block}
+.spot-main{flex:1 1 auto;min-width:0}
+.spot-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.spot-top b{font-size:14px;font-weight:750;letter-spacing:-.02em;word-break:keep-all}
+.spot-meta{font-size:12.5px;color:var(--ink2);margin-top:2px;word-break:keep-all}
+.spot-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
+.spot-ops{flex:0 0 auto}
+.lnk{font-size:12.5px;font-weight:750;color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-line);white-space:nowrap;cursor:pointer}
+.lnk:hover{color:var(--ink)}
+.lnk.hidden{display:none}
+.route{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:10px}
+.map-embed{margin-top:9px;border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--surface2)}
+.map-embed.hidden{display:none}
+.map-embed iframe{display:block;width:100%;height:230px;border:0}
+.spots-empty{margin-top:8px;line-height:1.55}
+.photo-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.photo-btns button{flex:1 1 140px}
+.spot-prev{margin-top:10px}
+.spot-prev img{width:100%;max-width:260px;border-radius:12px;border:1px solid var(--line2);display:block}
+button.ghost.xs{min-height:34px;padding:6px 10px;font-size:12.5px;border-radius:9px}
+/* 히스토리 카드 */
+.hcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden}
+.hcard>summary{display:flex;gap:11px;align-items:center;padding:13px 15px;cursor:pointer;list-style:none;min-height:56px}
+.hcard>summary::-webkit-details-marker{display:none}
+.hcard>summary:before{content:"\25B8";color:var(--ink3);font-size:11px;flex:0 0 auto}
+.hcard[open]>summary:before{content:"\25BE"}
+.h-thumb{flex:0 0 auto;width:46px;height:46px;border-radius:10px;overflow:hidden;background:var(--surface2);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--ink3)}
+.h-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.h-main{flex:1 1 auto;min-width:0;display:block}
+.h-top{display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
+.h-top b{font-size:14.5px;font-weight:750;letter-spacing:-.02em;word-break:keep-all}
+.h-film{display:block;font-size:12.5px;color:var(--ink2);margin-top:2px}
+.h-meta{display:block;font-size:12px;color:var(--ink3);margin-top:2px;font-weight:650}
+.h-body{padding:0 15px 15px;border-top:1px solid var(--line)}
+.h-body label{margin-top:12px}
+
 footer{max-width:1000px;margin:0 auto;padding:10px 18px 30px;font-size:12px;color:var(--ink3);line-height:1.75}
 footer b{color:var(--ink2)}
 
@@ -331,6 +374,7 @@ footer b{color:var(--ink2)}
     <button data-tab="gear">장비</button>
     <button data-tab="rec">조합 추천</button>
     <button data-tab="film">필름</button>
+    <button data-tab="hist">히스토리</button>
     <button data-tab="data">데이터</button>
   </div>
 </nav>
@@ -339,6 +383,7 @@ footer b{color:var(--ink2)}
   <section id="tab-gear" class="hidden"></section>
   <section id="tab-rec" class="hidden"></section>
   <section id="tab-film" class="hidden"></section>
+  <section id="tab-hist" class="hidden"></section>
   <section id="tab-data" class="hidden"></section>
 </main>
 <footer>
@@ -918,11 +963,13 @@ function loadPriv(){
       var p = JSON.parse(raw);
       if(p && typeof p === 'object'){
         p.bodies = p.bodies || {}; p.lenses = p.lenses || {}; p.adapters = p.adapters || {}; p.films = p.films || {};
+        p.rolls = (p.rolls && typeof p.rolls === 'object' && !(p.rolls instanceof Array)) ? p.rolls : {};
+        p.rollHistory = (p.rollHistory instanceof Array) ? p.rollHistory : [];
         return p;
       }
     }
   }catch(e){}
-  return {bodies:{}, lenses:{}, adapters:{}, films:{}};
+  return {bodies:{}, lenses:{}, adapters:{}, films:{}, rolls:{}, rollHistory:[]};
 }
 function savePriv(){
   try{ localStorage.setItem(PKEY, JSON.stringify(priv)); }
@@ -1050,10 +1097,12 @@ function setLoaded(id, stock, iso, note){
   var b = bodyById(id); if(!b) return;
   var s = String(stock === undefined || stock === null ? '' : stock).trim();
   var none = NO_FILM_LIST.indexOf(s) >= 0;
+  var prev = loadedStock(b);
   b.loadedFilm = none ? NO_FILM : s;
   b.loadedIso = (none || iso === undefined || iso === null || String(iso).trim() === '') ? null : Number(iso);
   if(none) b.loadedFilmNote = '';
   else if(note !== undefined && note !== null) b.loadedFilmNote = String(note).trim();
+  if(!none && !prev){ var r0 = ensureRoll(id); if(!r0.loadedAt) r0.loadedAt = todayStr(); savePriv(); }   /* 새 롤 시작일 */
   saveData(); renderAll();
 }
 function aov(eq){ return Math.round(2 * Math.atan(43.2666 / (2 * eq)) * 180 / Math.PI); }
@@ -1686,6 +1735,7 @@ function renderHome(){
           + '<div class="fb-format">' + esc(formatLabel(b.format)) + '</div></div>'
           + '<div class="fb-badge">' + loadedBadge(b) + '</div>'
           + loadedDetail(b)
+          + spotPanelHtml(b, true)
           + '<div class="fb-advice"><div class="fb-tags">'
           +   adv.tags.map(function(t){ return '<span class="tag">' + esc(t) + '</span>'; }).join('')
           + '</div><div class="fb-why">' + esc(adv.reason) + '</div></div>'
@@ -1739,6 +1789,7 @@ function gearBodyCard(b, withAdvice){
     + '<div class="gear-name">' + esc(nameOf(b)) + '</div></div>' + statusPill + '</div>'
     + '<div class="tags">' + tags + '</div>'
     + (film ? '<div class="film-row">' + loadedBadge(b) + '</div>' + loadedDetail(b) : '')
+    + (film ? spotPanelHtml(b, !!adv) : '')
     + (adv ? '<div class="fb-advice"><div class="fb-tags">'
         + adv.tags.map(function(t){ return '<span class="tag">' + esc(t) + '</span>'; }).join('')
         + '</div><div class="fb-why">' + esc(adv.reason) + '</div></div>' : '')
@@ -2225,6 +2276,9 @@ function renderData(){
     + '<button class="ghost" id="btnPrivImport">🔒 개인 기록 가져오기</button>'
     + '</div>'
     + '<input type="file" id="filePriv" accept="application/json,.json" class="hidden">'
+    + '<div class="sect">촬영 기록</div>'
+    + '<div class="dim" style="margin-top:2px">' + esc(spotsSummary()) + '</div>'
+    + '<div class="note">사진·GPS 좌표·장소 메모는 위 <b>개인 기록 내보내기</b>에 함께 담겨요. 사진은 긴 변 ' + esc(SPOT_MAX_PX) + 'px JPEG로 줄여 저장하고, 남에게 보내거나 공개할 때는 꼭 빼 주세요.</div>'
     + '<div class="sect">초기화</div>'
     + '<div class="btns"><button class="ghost danger" id="btnReset">장비 목록을 초기값으로</button>'
     + '<button class="ghost danger" id="btnPrivClear">개인 기록 모두 지우기</button></div>'
@@ -2399,6 +2453,7 @@ function openSheet(type, id){
           : String(pickEl.value || '').trim();
       }
       if(NO_FILM_LIST.indexOf(stockName) >= 0) stockName = '';
+      if(loadedStock(obj) && loadedStock(obj) !== stockName && spotCount(obj.id)) closeRoll(obj.id, true);
       var isoRaw = isoIn ? String(isoIn.value).trim() : '';
       var isoVal = isoRaw === '' ? null : Number(isoRaw);
       if(stockName && (isoVal === null || isNaN(isoVal))){
@@ -2458,6 +2513,7 @@ function openLoadedSheet(id){
     + '<label>스톡명</label><input id="lfStock" value="' + esc(cur) + '" placeholder="예: Kodak Portra 400" />'
     + '<div class="btns"><button class="btn" id="lfSave">이 필름으로 장전</button>'
     + '<button class="ghost" id="lfNone">미삽입으로</button></div>'
+    + unloadSectionHtml(id)
     + '<div class="dim" style="margin-top:8px">ISO는 목록에 있으면 자동으로 채우고, 없으면 비워 둡니다.</div>';
 
   var sheet = document.getElementById('sheet');
@@ -2470,19 +2526,750 @@ function openLoadedSheet(id){
     if(!v){ toast('스톡명을 입력해 주세요'); return; }
     var hit = findFilmChoice(v, fmt);
     var exp = filmExpFor(hit || {defaultExp: null}, fmt);
+    var prev = loadedStock(b);
+    var moved = 0;
+    if(prev && prev !== v && spotCount(id)) moved = closeRoll(id, true).spots;   /* 필름을 바꾸면 이전 롤은 히스토리로 */
     setLoaded(id, v, hit ? hit.iso : isoFromStock(v), exp ? exp + '컷' : '');
     closeSheet();
-    toast(v + ' 장전');
+    toast(v + ' 장전' + (moved ? ' · 이전 롤 기록 ' + moved + '곳을 히스토리에 남겼어요' : ''));
   };
   document.getElementById('lfNone').onclick = function(){
+    var moved = spotCount(id) ? closeRoll(id, true).spots : 0;   /* 기록이 있으면 버리지 않고 히스토리로 */
     setLoaded(id, '', null);
     closeSheet();
-    toast('미삽입으로 바꿨어요');
+    toast('미삽입으로 바꿨어요' + (moved ? ' · 촬영 기록 ' + moved + '곳을 히스토리에 남겼어요' : ''));
+  };
+  var unloadBtn = document.getElementById('lfUnload');
+  if(unloadBtn) unloadBtn.onclick = function(){
+    var keep = document.getElementById('lfArch');
+    var archive = !(keep && keep.checked === false);
+    var n = spotCount(id);
+    if(!confirm('필름을 빼고 ' + (archive ? '이 롤의 촬영 기록 ' + n + '곳을 히스토리로 옮길까요?' : '촬영 기록을 남기지 않고 뺄까요?'))) return;
+    closeRoll(id, archive);
+    setLoaded(id, '', null);
+    closeSheet();
+    toast('필름을 뺐어요' + (archive ? ' · 히스토리에 남았어요' : ''));
+    if(archive) showTab('hist');
   };
 }
 function closeSheet(){
   document.getElementById('modal').classList.remove('on');
   document.getElementById('sheet').innerHTML = '';
+}
+
+var SPOT_STORE_NOTE = '이 브라우저(localStorage)';
+
+/* ================= 촬영 기록 · 이동 경로 · 촬영 히스토리 =================
+   사진(dataURL 축소본)·GPS 좌표·장소 메모는 개인정보라 priv 에만 담는다.
+   공개판은 이 브라우저(localStorage), NAS 판은 data/camera-state.php 안에만 남는다.
+   업로드 사진은 <canvas> 에서 긴 변 560px · JPEG 0.72 로 줄여 30~60KB 로 보관한다. */
+
+var DEV_STATES = ['미현상', '현상 맡김', '스캔 완료'];
+var SPOT_MAX_PX = 560;      /* 줄일 긴 변(px) */
+var SPOT_QUALITY = 0.72;    /* JPEG 품질 */
+var spotDraft = {bodyId:'', spotId:'', lat:null, lng:null, shot:''};
+
+function pad2(n){ return n < 10 ? '0' + n : String(n); }
+function todayStr(){ var d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+function nowInput(){ var d = new Date(); return todayStr() + 'T' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
+function dayLabel(v){
+  var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v === undefined || v === null ? '' : v));
+  return m ? m[1] + '.' + m[2] + '.' + m[3] : '';
+}
+function timeLabel(v){
+  var m = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/.exec(String(v === undefined || v === null ? '' : v));
+  return m ? m[1] + '.' + m[2] + '.' + m[3] + ' ' + m[4] + ':' + m[5] : dayLabel(v);
+}
+function dayDiff(from, to){
+  var a = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(from === undefined || from === null ? '' : from));
+  var b = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(to === undefined || to === null ? '' : to));
+  if(!a || !b) return null;
+  var t1 = Date.UTC(Number(a[1]), Number(a[2]) - 1, Number(a[3]));
+  var t2 = Date.UTC(Number(b[1]), Number(b[2]) - 1, Number(b[3]));
+  return Math.round((t2 - t1) / 86400000);
+}
+function agoText(v){
+  var d = dayDiff(v, todayStr());
+  if(d === null) return '';
+  if(d === 0) return '오늘';
+  if(d === 1) return '어제';
+  if(d < 0) return (-d) + '일 뒤';
+  if(d < 31) return d + '일 전';
+  if(d < 365) return Math.round(d / 30) + '개월 전';
+  return Math.round(d / 365) + '년 전';
+}
+function coordText(lat, lng){
+  if(lat === null || lat === undefined || lat === '' || lng === null || lng === undefined || lng === '') return '';
+  var la = Number(lat), ln = Number(lng);
+  if(!isFinite(la) || !isFinite(ln)) return '';
+  return la.toFixed(5) + ', ' + ln.toFixed(5);
+}
+function spotHasCoords(s){
+  if(!s) return false;
+  var la = Number(s.lat), ln = Number(s.lng);
+  return s.lat !== null && s.lat !== undefined && s.lat !== '' && s.lng !== null && s.lng !== undefined && s.lng !== ''
+    && isFinite(la) && isFinite(ln);
+}
+/* 좌표가 있으면 좌표로, 없으면 장소명 검색으로 구글 지도를 연다 */
+function spotMapsUrl(s){
+  var place = String((s && s.place) || '').replace(/^\s+|\s+$/g, '');
+  if(spotHasCoords(s)) return 'https://www.google.com/maps?q=' + encodeURIComponent(coordText(s.lat, s.lng));
+  if(place) return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(place);
+  return '';
+}
+function spotQuery(s){
+  if(spotHasCoords(s)) return coordText(s.lat, s.lng);
+  return String((s && s.place) || '').replace(/^\s+|\s+$/g, '');
+}
+/* 롤의 스팟을 시간순으로 훑어 구글 지도 길찾기 URL 을 만든다 (2곳 이상일 때만) */
+function rollRouteUrl(spots){
+  var pts = [];
+  orderSpots(spots).forEach(function(s){
+    var q = spotQuery(s);
+    if(q && pts.indexOf(q) < 0) pts.push(q);
+  });
+  if(pts.length < 2) return '';
+  var enc = pts.map(function(p){ return encodeURIComponent(p); });
+  var url = 'https://www.google.com/maps/dir/?api=1&origin=' + enc[0] + '&destination=' + enc[enc.length - 1];
+  var mid = enc.slice(1, enc.length - 1);
+  if(mid.length) url += '&waypoints=' + mid.join('%7C');
+  return url + '&travelmode=driving';
+}
+/* 인라인 미리보기 — 구글 지도 embed(키 없이 쓰는 output=embed 형식) */
+function rollEmbedUrl(spots){
+  var pts = [];
+  orderSpots(spots).forEach(function(s){
+    var q = spotQuery(s);
+    if(q && pts.indexOf(q) < 0) pts.push(q);
+  });
+  if(!pts.length) return '';
+  if(pts.length === 1) return 'https://maps.google.com/maps?q=' + encodeURIComponent(pts[0]) + '&z=15&output=embed';
+  var enc = pts.map(function(p){ return encodeURIComponent(p); });
+  return 'https://maps.google.com/maps?saddr=' + enc[0]
+    + '&daddr=' + enc.slice(1).join('+to:')
+    + '&output=embed';
+}
+
+/* ---------- 개인 저장(priv) 안의 롤 ---------- */
+function privRolls(){
+  if(!priv.rolls || typeof priv.rolls !== 'object' || (priv.rolls instanceof Array)) priv.rolls = {};
+  return priv.rolls;
+}
+function privHistory(){
+  if(!(priv.rollHistory instanceof Array)) priv.rollHistory = [];
+  return priv.rollHistory;
+}
+function emptyPrivAll(){ return {bodies:{}, lenses:{}, adapters:{}, films:{}, rolls:{}, rollHistory:[]}; }
+function peekRoll(bodyId){
+  var r = privRolls()[bodyId];
+  if(!r || typeof r !== 'object' || r instanceof Array) return null;
+  if(!(r.spots instanceof Array)) r.spots = [];
+  if(r.loadedAt === undefined || r.loadedAt === null) r.loadedAt = '';
+  if(r.note === undefined || r.note === null) r.note = '';
+  return r;
+}
+function ensureRoll(bodyId){
+  var r = peekRoll(bodyId);
+  if(!r){
+    r = {loadedAt:'', spots:[], note:''};
+    privRolls()[bodyId] = r;
+  }
+  if(!r.loadedAt){
+    var b = bodyById(bodyId);
+    if(b && loadedStock(b)) r.loadedAt = todayStr();
+  }
+  return r;
+}
+function spotTime(s){ return String((s && (s.at || s.addedAt)) || ''); }
+function orderSpots(list){
+  var arr = (list instanceof Array) ? list.slice() : [];
+  arr.sort(function(a, b){
+    var x = spotTime(a), y = spotTime(b);
+    if(x === y) return 0;
+    return x < y ? -1 : 1;
+  });
+  return arr;
+}
+function spotsOf(bodyId){ var r = peekRoll(bodyId); return r ? orderSpots(r.spots) : []; }
+function spotCount(bodyId){ var r = peekRoll(bodyId); return r ? r.spots.length : 0; }
+
+function addSpot(bodyId, spot){
+  var b = bodyById(bodyId);
+  if(!b) return null;
+  var r = ensureRoll(bodyId);
+  var s = spot || {};
+  var o = {
+    id: s.id || uid('spot'),
+    at: String(s.at || nowInput()),
+    place: String(s.place === undefined || s.place === null ? '' : s.place).replace(/^\s+|\s+$/g, ''),
+    lat: (s.lat === null || s.lat === undefined || s.lat === '') ? null : Number(s.lat),
+    lng: (s.lng === null || s.lng === undefined || s.lng === '') ? null : Number(s.lng),
+    cuts: String(s.cuts === undefined || s.cuts === null ? '' : s.cuts),
+    note: String(s.note === undefined || s.note === null ? '' : s.note),
+    shot: String(s.shot || ''),
+    addedAt: s.addedAt || new Date().toISOString()
+  };
+  r.spots.push(o);
+  savePriv(); renderAll();
+  return o;
+}
+function updateSpot(bodyId, spotId, patch){
+  var r = peekRoll(bodyId);
+  if(!r) return null;
+  var s = r.spots.filter(function(x){ return x.id === spotId; })[0];
+  if(!s) return null;
+  var p = patch || {};
+  ['at', 'place', 'cuts', 'note', 'shot'].forEach(function(k){
+    if(p[k] !== undefined) s[k] = String(p[k] === null ? '' : p[k]);
+  });
+  if(p.lat !== undefined) s.lat = (p.lat === null || p.lat === '') ? null : Number(p.lat);
+  if(p.lng !== undefined) s.lng = (p.lng === null || p.lng === '') ? null : Number(p.lng);
+  savePriv(); renderAll();
+  return s;
+}
+function removeSpot(bodyId, spotId){
+  var r = peekRoll(bodyId);
+  if(!r) return false;
+  var before = r.spots.length;
+  r.spots = r.spots.filter(function(x){ return x.id !== spotId; });
+  if(r.spots.length === before) return false;
+  savePriv(); renderAll();
+  return true;
+}
+
+/* ---------- 필름 제거 → 히스토리 ---------- */
+function historyOf(){
+  var list = privHistory().slice();
+  list.sort(function(a, b){
+    var x = String((a && (a.unloadedAt || a.archivedAt)) || '');
+    var y = String((b && (b.unloadedAt || b.archivedAt)) || '');
+    if(x === y) return 0;
+    return x < y ? 1 : -1;                 /* 최근에 뺀 롤부터 */
+  });
+  return list;
+}
+function archiveRoll(bodyId, opts){
+  var o = opts || {};
+  var b = bodyById(bodyId);
+  var r = peekRoll(bodyId);
+  if(!b || !r) return null;
+  var entry = {
+    id: o.id || uid('roll'),
+    bodyId: bodyId,
+    bodyName: nameOf(b),
+    serial: (privFor('bodies', bodyId) || {}).serial || '',
+    film: loadedStock(b) || '',
+    iso: loadedIsoOf(b),
+    loadedAt: r.loadedAt || '',
+    unloadedAt: o.unloadedAt || todayStr(),
+    note: r.note || '',
+    dev: '미현상',
+    spots: orderSpots(r.spots).map(function(s){ return clone(s); }),
+    archivedAt: new Date().toISOString()
+  };
+  privHistory().unshift(entry);
+  delete privRolls()[bodyId];
+  savePriv();
+  return entry;
+}
+function clearRoll(bodyId){
+  var rolls = privRolls();
+  if(!rolls[bodyId]) return false;
+  delete rolls[bodyId];
+  savePriv();
+  return true;
+}
+/* 필름을 빼고(또는 바꾸고) 롤 기록을 정리한다. archive=false 면 기록을 버린다. */
+function closeRoll(bodyId, archive){
+  var n = spotCount(bodyId);
+  var entry = archive ? archiveRoll(bodyId) : null;
+  if(!archive) clearRoll(bodyId);
+  return {spots: n, entry: entry};
+}
+function histById(id){ return privHistory().filter(function(h){ return h && h.id === id; })[0] || null; }
+function setHistDev(id, dev){
+  var h = histById(id);
+  if(!h) return null;
+  h.dev = DEV_STATES.indexOf(dev) >= 0 ? dev : '미현상';
+  savePriv(); renderAll();
+  return h;
+}
+function setHistNote(id, note){
+  var h = histById(id);
+  if(!h) return null;
+  h.note = String(note === undefined || note === null ? '' : note);
+  savePriv();
+  return h;
+}
+function removeHist(id){
+  var list = privHistory();
+  var before = list.length;
+  priv.rollHistory = list.filter(function(h){ return !h || h.id !== id; });
+  if(priv.rollHistory.length === before) return false;
+  savePriv(); renderAll();
+  return true;
+}
+function histSpotCount(){
+  var n = 0;
+  historyOf().forEach(function(h){ n += ((h && h.spots) || []).length; });
+  return n;
+}
+
+/* ---------- 렌더 조각 ---------- */
+function devCls(dev){
+  if(dev === '스캔 완료') return 'ok';
+  if(dev === '현상 맡김') return 'gold';
+  return 'warn';
+}
+function spotRowHtml(s, bodyId){
+  var where = String((s && s.place) || '');
+  var coords = coordText(s && s.lat, s && s.lng);
+  var map = spotMapsUrl(s);
+  var meta = [];
+  if(s && s.cuts) meta.push(esc(s.cuts));
+  if(s && s.note) meta.push(esc(s.note));
+  var h = '<div class="spot">'
+    + '<div class="spot-shot">' + (s && s.shot ? '<img src="' + esc(s.shot) + '" alt="" loading="lazy" />' : '<span aria-hidden="true">📷</span>') + '</div>'
+    + '<div class="spot-main">'
+    +   '<div class="spot-top"><b>' + esc(where || (coords ? '위치 기록' : '장소 미입력')) + '</b>'
+    +     '<span class="dim">' + esc(timeLabel(s && s.at)) + '</span></div>'
+    +   (meta.length ? '<div class="spot-meta">' + meta.join(' · ') + '</div>' : '')
+    +   '<div class="spot-links">'
+    +     (map ? '<a class="lnk" href="' + esc(map) + '" target="_blank" rel="noopener">🗺️ 구글 지도</a>' : '')
+    +     (coords ? '<span class="dim">' + esc(coords) + '</span>' : '')
+    +   '</div>'
+    + '</div>'
+    + (bodyId && s && s.id ? '<div class="spot-ops"><button class="ghost xs" data-spot-edit="' + esc(bodyId) + ':' + esc(s.id) + '">수정</button></div>' : '')
+    + '</div>';
+  return h;
+}
+function spotPanelHtml(b, full){
+  if(!b || !isFilmBody(b)) return '';
+  var spots = spotsOf(b.id);
+  var r = peekRoll(b.id);
+  var h = '<div class="spots">'
+    + '<div class="spots-head"><span class="pill spot">📍 기록 ' + esc(spots.length ? spots.length + '곳' : '없음') + '</span>'
+    + '<button class="ghost sm" data-spot-add="' + esc(b.id) + '">+ 촬영 기록</button></div>';
+  if(r && r.loadedAt) h += '<div class="dim">필름 장전 ' + esc(dayLabel(r.loadedAt)) + (r.loadedAt ? ' · ' + esc(agoText(r.loadedAt)) : '') + '</div>';
+  if(!spots.length){
+    h += '<div class="dim spots-empty">첫 롤을 시작한 곳을 사진으로 남겨 두면, 몇 달 뒤에도 언제 어디서 찍었는지 그대로 보여요.</div>';
+  }else if(full){
+    h += '<div class="spot-list">' + spots.map(function(s){ return spotRowHtml(s, b.id); }).join('') + '</div>';
+    var route = rollRouteUrl(spots);
+    if(route){
+      h += '<div class="route"><a class="lnk" href="' + esc(route) + '" target="_blank" rel="noopener">🗺️ 이 롤 이동 경로 지도</a>'
+        + '<button class="ghost xs" data-embed="' + esc(b.id) + '">지도 미리보기</button></div>'
+        + '<div class="map-embed hidden" id="embed-' + esc(b.id) + '"></div>';
+    }
+  }else{
+    var last = spots[spots.length - 1];
+    var where = String((last && last.place) || '');
+    h += '<div class="dim">마지막 ' + esc(where || '위치 기록') + ' · ' + esc(agoText(last && last.at)) + '</div>';
+  }
+  h += '</div>';
+  return h;
+}
+function unloadSectionHtml(bodyId){
+  var n = spotCount(bodyId);
+  return '<div class="sect">필름 빼기 · 다 찍음</div>'
+    + '<div class="dim">' + (n ? '지금 롤에 촬영 기록 ' + esc(n) + '곳이 있어요. ' : '아직 촬영 기록은 없어요. ')
+    + '빼면 이 롤은 <b>히스토리</b>로 옮겨지고 이 바디는 미삽입이 됩니다.</div>'
+    + '<label style="display:flex;align-items:center;gap:9px;margin-top:10px;font-size:13px">'
+    + '<input type="checkbox" id="lfArch" checked style="width:auto;min-height:0;margin:0" />'
+    + '<span>촬영 기록(사진·위치)을 히스토리에 남기기</span></label>'
+    + '<div class="btns"><button class="ghost" id="lfUnload">🎞️ 필름 빼기 / 다 찍음</button></div>';
+}
+function periodText(roll){
+  var a = dayLabel(roll && roll.loadedAt), b = dayLabel(roll && roll.unloadedAt);
+  if(a && b) return a + ' → ' + b;
+  if(b) return '제거 ' + b;
+  if(a) return '장전 ' + a;
+  return '';
+}
+function histCardHtml(roll){
+  var shots = (roll.spots instanceof Array) ? roll.spots : [];
+  var first = shots.filter(function(s){ return s && s.shot; })[0];
+  var map = shots.length >= 2 ? rollRouteUrl(shots) : (shots.length ? spotMapsUrl(shots[0]) : '');
+  var h = '<details class="hcard">'
+    + '<summary>'
+    + '<span class="h-thumb">' + (first ? '<img src="' + esc(first.shot) + '" alt="" loading="lazy" />' : '<span aria-hidden="true">🎞️</span>') + '</span>'
+    + '<span class="h-main">'
+    +   '<span class="h-top"><b>' + esc(roll.bodyName || roll.bodyId || '기체') + '</b>'
+    +     '<span class="pill ' + devCls(roll.dev) + '">' + esc(roll.dev || '미현상') + '</span></span>'
+    +   '<span class="h-film">' + esc(roll.film || '필름 미기록') + (roll.iso ? ' · ISO ' + esc(roll.iso) : '') + '</span>'
+    +   '<span class="h-meta">' + esc(periodText(roll)) + ' · 📍 ' + esc(shots.length) + '곳</span>'
+    + '</span></summary>'
+    + '<div class="h-body">';
+  h += shots.length
+    ? '<div class="spot-list">' + shots.map(function(s){ return spotRowHtml(s, ''); }).join('') + '</div>'
+    : '<div class="dim" style="margin-top:10px">이 롤에는 장소 기록이 없어요.</div>';
+  if(map) h += '<div class="route"><a class="lnk" href="' + esc(map) + '" target="_blank" rel="noopener">🗺️ '
+    + (shots.length >= 2 ? '그때 이동 경로 지도' : '그때 장소 지도') + '</a></div>';
+  h += '<label for="hn-' + esc(roll.id) + '">롤 메모</label>'
+    + '<input id="hn-' + esc(roll.id) + '" data-histnote="' + esc(roll.id) + '" value="' + esc(roll.note || '') + '" placeholder="예: 아이들 생일, 비 오는 날" />'
+    + '<label for="hd-' + esc(roll.id) + '">현상 상태</label>'
+    + '<select id="hd-' + esc(roll.id) + '" data-histdev="' + esc(roll.id) + '">'
+    + DEV_STATES.map(function(d){ return '<option value="' + esc(d) + '"' + (String(roll.dev || '미현상') === d ? ' selected' : '') + '>' + esc(d) + '</option>'; }).join('')
+    + '</select>'
+    + '<div class="btns"><button class="ghost sm danger" data-histdel="' + esc(roll.id) + '">히스토리에서 지우기</button></div>'
+    + '</div></details>';
+  return h;
+}
+function renderHist(){
+  var list = historyOf();
+  var spots = histSpotCount();
+  var waiting = list.filter(function(h){ return (h.dev || '미현상') !== '스캔 완료'; }).length;
+  var h = '<div class="kpi">'
+    + kpi('촬영 롤', list.length, list.length ? '히스토리에 남은 롤' : '아직 없음', '', '롤')
+    + kpi('기록 장소', spots, spots ? '사진·위치 기록 합계' : '기록 없음', 'amber', '곳')
+    + kpi('현상 대기', waiting, waiting ? '현상·스캔 전' : '모두 스캔 완료', waiting ? 'amber' : 'green', '롤')
+    + '</div>';
+  h += '<div class="card"><div class="panel-head"><h3>촬영 히스토리</h3><span class="count">' + esc(list.length) + '롤</span></div>'
+    + '<div class="note"><b>필름을 빼면 이곳에 자동으로 남아요.</b> 롤마다 언제·어디서 찍었는지, 사진과 구글 지도 링크, 현상 상태를 볼 수 있어요. 사진·위치 기록은 개인정보라 ' + esc(SPOT_STORE_NOTE) + '에만 저장됩니다.</div>';
+  if(!list.length){
+    h += '<div class="empty"><span class="e-ic" aria-hidden="true">📚</span>'
+      + '<div class="muted">아직 촬영 히스토리가 없어요.</div>'
+      + '<div class="dim">요약 탭의 장전 중인 기체에서 <b>+ 촬영 기록</b>으로 첫 장소를 남기고, 필름을 뺄 때 <b>🎞️ 필름 빼기</b>를 누르면 이곳에 남아요.</div></div>';
+  }
+  list.forEach(function(roll){ h += histCardHtml(roll); });
+  h += '</div>';
+  return h;
+}
+function spotsSummary(){
+  var n = 0, shots = 0, bytes = 0;
+  function count(s){
+    if(!s) return;
+    n += 1;
+    if(s.shot){ shots += 1; bytes += String(s.shot).length; }
+  }
+  var rolls = privRolls();
+  Object.keys(rolls).forEach(function(k){
+    var r = rolls[k];
+    ((r && r.spots) || []).forEach(count);
+  });
+  var hist = privHistory();
+  hist.forEach(function(h){ ((h && h.spots) || []).forEach(count); });
+  var kb = Math.round(bytes * 0.75 / 1024);
+  return '촬영 기록 ' + n + '곳 · 사진 ' + shots + '장 (약 ' + kb + 'KB) · 히스토리 ' + hist.length + '롤';
+}
+
+/* ---------- 구글 지도 미리보기 토글 ---------- */
+function toggleEmbed(bodyId){
+  var box = document.getElementById('embed-' + bodyId);
+  if(!box) return;
+  if(box.classList.contains('on')){
+    box.classList.remove('on'); box.classList.add('hidden'); box.innerHTML = '';
+    return;
+  }
+  var url = rollEmbedUrl(spotsOf(bodyId));
+  if(!url){ toast('지도로 보여 줄 위치가 없어요'); return; }
+  box.innerHTML = '<iframe src="' + esc(url) + '" loading="lazy" title="이 롤 이동 경로 지도" referrerpolicy="no-referrer-when-downgrade"></iframe>';
+  box.classList.remove('hidden'); box.classList.add('on');
+}
+
+/* ---------- EXIF(JPEG) 파서 — 외부 라이브러리 없이 ---------- */
+function exifU16(u8, o, le){
+  if(o < 0 || o + 1 >= u8.length) return 0;
+  return le ? (u8[o] | (u8[o + 1] << 8)) : ((u8[o] << 8) | u8[o + 1]);
+}
+function exifU32(u8, o, le){
+  if(o < 0 || o + 3 >= u8.length) return 0;
+  var v = le
+    ? (u8[o] | (u8[o + 1] << 8) | (u8[o + 2] << 16) | (u8[o + 3] << 24))
+    : ((u8[o] << 24) | (u8[o + 1] << 16) | (u8[o + 2] << 8) | u8[o + 3]);
+  return v < 0 ? v + 4294967296 : v;
+}
+function exifAscii(u8, off, len){
+  var s = '', n = Math.min(len || 0, 64);
+  for(var i = 0; i < n; i++){
+    var c = u8[off + i];
+    if(c === undefined || c === 0) break;
+    s += String.fromCharCode(c);
+  }
+  return s.replace(/^\s+|\s+$/g, '');
+}
+function exifTypeSize(type){
+  if(type === 3) return 2;
+  if(type === 4 || type === 9) return 4;
+  if(type === 5 || type === 10) return 8;
+  return 1;
+}
+function exifIfd(u8, tiff, off, le){
+  var map = {};
+  if(!off || off <= 0 || off + 2 > u8.length) return map;
+  var n = exifU16(u8, off, le);
+  if(n > 512) return map;
+  for(var i = 0; i < n; i++){
+    var e = off + 2 + i * 12;
+    if(e + 12 > u8.length) break;
+    var tag = exifU16(u8, e, le);
+    var type = exifU16(u8, e + 2, le);
+    var count = exifU32(u8, e + 4, le);
+    var size = exifTypeSize(type) * (count || 1);
+    var val = size <= 4 ? e + 8 : tiff + exifU32(u8, e + 8, le);
+    map[tag] = {type:type, count:count, off:val, size:size};
+  }
+  return map;
+}
+function exifRational(u8, off, le){
+  var num = exifU32(u8, off, le), den = exifU32(u8, off + 4, le);
+  if(!den) return 0;
+  return num / den;
+}
+function exifDegrees(u8, ent, le){
+  if(!ent) return null;
+  var o = ent.off;
+  var d = exifRational(u8, o, le), m = exifRational(u8, o + 8, le), s = exifRational(u8, o + 16, le);
+  var v = d + m / 60 + s / 3600;
+  if(!isFinite(v)) return null;
+  return Math.round(v * 1e6) / 1e6;
+}
+function exifDateToInput(v){
+  var m = /^(\d{4})[:\-](\d{2})[:\-](\d{2})[ T](\d{2}):(\d{2})/.exec(String(v === undefined || v === null ? '' : v));
+  return m ? m[1] + '-' + m[2] + '-' + m[3] + 'T' + m[4] + ':' + m[5] : '';
+}
+/* TIFF 영역(base)부터 IFD0 · Exif IFD · GPS IFD 를 읽는다 */
+function parseExifTiff(u8, base){
+  var out = {takenAt:'', lat:null, lng:null, make:'', model:'', hasGps:false};
+  if(!u8 || base + 8 > u8.length) return out;
+  var bo = (u8[base] << 8) | u8[base + 1];
+  var le;
+  if(bo === 0x4949) le = true;
+  else if(bo === 0x4D4D) le = false;
+  else return out;
+  if(exifU16(u8, base + 2, le) !== 42) return out;
+  var ifd0 = exifIfd(u8, base, base + exifU32(u8, base + 4, le), le);
+  if(ifd0[0x010F]) out.make = exifAscii(u8, ifd0[0x010F].off, ifd0[0x010F].count);
+  if(ifd0[0x0110]) out.model = exifAscii(u8, ifd0[0x0110].off, ifd0[0x0110].count);
+  var dateRaw = ifd0[0x0132] ? exifAscii(u8, ifd0[0x0132].off, ifd0[0x0132].count) : '';
+  var subDate = '';
+  if(ifd0[0x8769]){
+    var sub = exifIfd(u8, base, base + exifU32(u8, ifd0[0x8769].off, le), le);
+    var d1 = sub[0x9003] ? exifAscii(u8, sub[0x9003].off, sub[0x9003].count) : '';
+    var d2 = sub[0x9004] ? exifAscii(u8, sub[0x9004].off, sub[0x9004].count) : '';
+    subDate = d1 || d2;
+  }
+  out.takenAt = exifDateToInput(subDate || dateRaw);
+  if(ifd0[0x8825]){
+    var gps = exifIfd(u8, base, base + exifU32(u8, ifd0[0x8825].off, le), le);
+    var latRef = gps[1] ? exifAscii(u8, gps[1].off, gps[1].count) : '';
+    var lngRef = gps[3] ? exifAscii(u8, gps[3].off, gps[3].count) : '';
+    var lat = gps[2] ? exifDegrees(u8, gps[2], le) : null;
+    var lng = gps[4] ? exifDegrees(u8, gps[4], le) : null;
+    if(lat !== null && /S/i.test(latRef)) lat = -lat;
+    if(lng !== null && /W/i.test(lngRef)) lng = -lng;
+    if(lat !== null && lng !== null){
+      out.lat = lat; out.lng = lng; out.hasGps = true;
+    }
+  }
+  return out;
+}
+/* JPEG(SOI … APP1 Exif)에서 위 영역을 찾아 넘긴다. HEIC 등은 null */
+function parseExifJpeg(u8){
+  if(!u8 || u8.length < 8) return null;
+  if(u8[0] !== 0xFF || u8[1] !== 0xD8) return null;
+  var i = 2;
+  while(i + 4 <= u8.length){
+    if(u8[i] !== 0xFF){ i += 1; continue; }
+    var marker = u8[i + 1];
+    if(marker === 0xFF){ i += 1; continue; }
+    if(marker === 0xD8 || marker === 0x01 || (marker >= 0xD0 && marker <= 0xD7)){ i += 2; continue; }
+    if(marker === 0xDA || marker === 0xD9) break;
+    var len = (u8[i + 2] << 8) | u8[i + 3];
+    if(len < 2) break;
+    if(marker === 0xE1 && i + 10 <= u8.length && exifAscii(u8, i + 4, 4) === 'Exif' && u8[i + 8] === 0 && u8[i + 9] === 0){
+      return parseExifTiff(u8, i + 10);
+    }
+    i += 2 + len;
+  }
+  return null;
+}
+
+/* ---------- 사진 업로드 → 축소 → 촬영 기록 채우기 ---------- */
+function shrinkImage(buf, cb){
+  cb = cb || function(){};
+  if(typeof Image !== 'function' || typeof document.createElement !== 'function'){ cb(''); return; }
+  var url = '';
+  try{ url = URL.createObjectURL(new Blob([buf], {type:'image/jpeg'})); }catch(e){ url = ''; }
+  var img;
+  try{ img = new Image(); }catch(e){ cb(''); return; }
+  img.onload = function(){
+    try{
+      var w = img.naturalWidth || img.width, hh = img.naturalHeight || img.height;
+      if(!w || !hh){ cb(''); return; }
+      var scale = Math.min(1, SPOT_MAX_PX / Math.max(w, hh));
+      var cw = Math.max(1, Math.round(w * scale)), ch = Math.max(1, Math.round(hh * scale));
+      var cv = document.createElement('canvas');
+      cv.width = cw; cv.height = ch;
+      var g = cv.getContext('2d');
+      g.drawImage(img, 0, 0, cw, ch);
+      cb(String(cv.toDataURL('image/jpeg', SPOT_QUALITY) || ''));
+    }catch(e){ cb(''); }
+    try{ URL.revokeObjectURL(url); }catch(e){}
+  };
+  img.onerror = function(){ cb(''); try{ URL.revokeObjectURL(url); }catch(e){} };
+  try{ img.src = url; }catch(e){ cb(''); }
+}
+function paintSpotPreview(){
+  var box = document.getElementById('spotPrev');
+  if(!box) return;
+  box.innerHTML = spotDraft.shot
+    ? '<img src="' + esc(spotDraft.shot) + '" alt="촬영 기록 사진 미리보기" />'
+      + '<div class="btns" style="margin-top:8px"><button class="ghost xs" id="spotShotDel">사진 빼기</button></div>'
+    : '';
+  var del = document.getElementById('spotShotDel');
+  if(del) del.onclick = function(){ spotDraft.shot = ''; paintSpotPreview(); };
+}
+function paintSpotCoords(){
+  var c = document.getElementById('spotCoord');
+  var a = document.getElementById('spotMap');
+  var txt = coordText(spotDraft.lat, spotDraft.lng);
+  if(c) c.textContent = txt || '위치 좌표 없음 — 사진 EXIF에 GPS가 없으면 아래 버튼으로 받아 오세요';
+  if(a){
+    var placeEl = document.getElementById('spotPlace');
+    var url = spotMapsUrl({lat:spotDraft.lat, lng:spotDraft.lng, place: placeEl ? placeEl.value : ''});
+    a.setAttribute('href', url || '#');
+    a.classList.toggle('hidden', !url);
+  }
+}
+function onSpotPhoto(file){
+  if(!file){ return; }
+  var note = document.getElementById('spotExif');
+  if(typeof FileReader !== 'function'){ if(note) note.textContent = '이 브라우저에서는 사진을 읽을 수 없어요.'; return; }
+  var rd = new FileReader();
+  rd.onload = function(){
+    var buf = rd.result;
+    var exif = null;
+    try{ exif = parseExifJpeg(new Uint8Array(buf)); }catch(e){ exif = null; }
+    var got = [];
+    if(exif){
+      if(exif.takenAt){
+        var atEl = document.getElementById('spotAt');
+        if(atEl) atEl.value = exif.takenAt;
+        got.push('촬영 일시');
+      }
+      if(exif.hasGps && exif.lat !== null && exif.lng !== null){
+        spotDraft.lat = exif.lat; spotDraft.lng = exif.lng;
+        paintSpotCoords();
+        got.push('GPS 위치');
+      }
+    }
+    if(note){
+      note.textContent = got.length
+        ? '사진에서 ' + got.join(' · ') + '를 채웠어요. 장소 이름을 적어 두면 나중에 찾기 쉬워요.'
+        : '이 사진에는 촬영 정보(EXIF)가 없거나 HEIC 형식이에요 — 날짜를 직접 넣고, 아래 📍 현재 위치 가져오기로 좌표를 받아 오세요.';
+    }
+    shrinkImage(buf, function(shot){
+      if(shot){ spotDraft.shot = shot; paintSpotPreview(); }
+    });
+  };
+  rd.onerror = function(){ toast('사진을 읽지 못했어요'); };
+  try{
+    if(rd.readAsArrayBuffer) rd.readAsArrayBuffer(file);
+    else toast('이 브라우저에서는 사진을 읽을 수 없어요');
+  }catch(e){ toast('사진을 읽지 못했어요'); }
+}
+function useCurrentLocation(){
+  if(!navigator || !navigator.geolocation || !navigator.geolocation.getCurrentPosition){
+    toast('이 브라우저에서는 위치를 받을 수 없어요'); return;
+  }
+  toast('현재 위치를 확인하는 중…');
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var c = (pos && pos.coords) || {};
+    if(typeof c.latitude !== 'number' || typeof c.longitude !== 'number'){ toast('위치를 받지 못했어요'); return; }
+    spotDraft.lat = Math.round(c.latitude * 1e6) / 1e6;
+    spotDraft.lng = Math.round(c.longitude * 1e6) / 1e6;
+    paintSpotCoords();
+    toast('현재 위치를 넣었어요 · 장소 이름도 적어 주세요');
+  }, function(err){
+    toast(err && err.code === 1 ? '위치 권한이 꺼져 있어요 — 사파리 설정에서 위치를 허용해 주세요' : '위치를 받지 못했어요');
+  }, {enableHighAccuracy:true, timeout:12000, maximumAge:60000});
+}
+function saveSpotForm(){
+  var bodyId = spotDraft.bodyId;
+  if(!bodyId) return;
+  var atEl = document.getElementById('spotAt');
+  var placeEl = document.getElementById('spotPlace');
+  var cutsEl = document.getElementById('spotCuts');
+  var noteEl = document.getElementById('spotNote');
+  var at = atEl ? String(atEl.value || '').replace(/^\s+|\s+$/g, '') : '';
+  if(!at) at = nowInput();
+  var patch = {
+    at: at,
+    place: placeEl ? String(placeEl.value || '') : '',
+    cuts: cutsEl ? String(cutsEl.value || '') : '',
+    note: noteEl ? String(noteEl.value || '') : '',
+    lat: spotDraft.lat, lng: spotDraft.lng, shot: spotDraft.shot
+  };
+  var isEdit = !!spotDraft.spotId;
+  var saved = isEdit ? updateSpot(bodyId, spotDraft.spotId, patch) : addSpot(bodyId, patch);
+  closeSheet();
+  if(saved) toast(isEdit ? '촬영 기록을 고쳤어요' : '촬영 기록을 남겼어요');
+}
+function openSpotSheet(bodyId, spotId){
+  var b = bodyById(bodyId);
+  if(!b) return;
+  if(!isFilmBody(b)){ toast('필름 바디가 아니에요'); return; }
+  var roll = peekRoll(bodyId);
+  var cur = (spotId && roll) ? (roll.spots.filter(function(s){ return s.id === spotId; })[0] || null) : null;
+  spotDraft = {
+    bodyId: bodyId,
+    spotId: cur ? cur.id : '',
+    lat: cur && cur.lat !== undefined ? cur.lat : null,
+    lng: cur && cur.lng !== undefined ? cur.lng : null,
+    shot: (cur && cur.shot) ? cur.shot : ''
+  };
+  var film = loadedStock(b);
+  var mapUrl = cur ? spotMapsUrl(cur) : '';
+  var h = '<div class="grab"></div>'
+    + '<div class="row"><h3>' + (cur ? '촬영 기록 수정' : '촬영 기록') + '</h3>'
+    + '<button class="ghost sm" id="sheetClose">닫기</button></div>'
+    + '<div class="muted">' + esc(nameOf(b)) + ' · ' + esc(film || '필름 미삽입') + (film ? '' : ' — 먼저 필름을 장전해 주세요') + '</div>'
+    + '<div class="sect">사진으로 위치·날짜 남기기</div>'
+    + '<div class="photo-btns">'
+    + '<button class="ghost" id="spotCam">📷 사진 찍기</button>'
+    + '<button class="ghost" id="spotPick">🖼️ 앨범에서</button>'
+    + '</div>'
+    + '<input type="file" id="spotFile" accept="image/*" class="hidden" />'
+    + '<input type="file" id="spotFileCam" accept="image/*" capture="environment" class="hidden" />'
+    + '<div class="dim" id="spotExif" style="margin-top:7px">아이폰 사진을 고르면 촬영 일시와 GPS가 있으면 자동으로 채워요. 없으면 아래에서 직접 넣거나 현재 위치를 받아 오세요.</div>'
+    + '<div class="spot-prev" id="spotPrev">' + (spotDraft.shot ? '<img src="' + esc(spotDraft.shot) + '" alt="촬영 기록 사진 미리보기" />' : '') + '</div>'
+    + '<label for="spotAt">촬영 일시</label><input type="datetime-local" id="spotAt" value="' + esc(cur ? cur.at : nowInput()) + '" />'
+    + '<label for="spotPlace">장소</label><input id="spotPlace" value="' + esc(cur ? cur.place : '') + '" placeholder="예: 송도 센트럴파크, 집 앞" />'
+    + '<div class="btns" style="margin-top:9px"><button class="ghost sm" id="spotGeo">📍 현재 위치 가져오기</button>'
+    + '<a class="lnk' + (mapUrl ? '' : ' hidden') + '" id="spotMap" href="' + esc(mapUrl || '#') + '" target="_blank" rel="noopener">지도에서 보기</a></div>'
+    + '<div class="dim" id="spotCoord">' + esc(coordText(spotDraft.lat, spotDraft.lng) || '위치 좌표 없음 — 사진 EXIF에 GPS가 없으면 아래 버튼으로 받아 오세요') + '</div>'
+    + '<label for="spotCuts">컷 구간 (선택)</label><input id="spotCuts" value="' + esc(cur ? cur.cuts : '') + '" placeholder="예: 1–12컷" />'
+    + '<label for="spotNote">메모 (선택)</label><textarea id="spotNote" placeholder="날씨·빛·함께 간 사람 등">' + esc(cur ? cur.note : '') + '</textarea>'
+    + '<div class="btns" style="margin-top:16px"><button class="btn" id="spotSave">저장</button>'
+    + (cur ? '<button class="ghost danger" id="spotDel">기록 지우기</button>' : '')
+    + '</div>';
+  document.getElementById('sheet').innerHTML = h;
+  document.getElementById('modal').classList.add('on');
+  document.getElementById('sheetClose').onclick = closeSheet;
+  var camBtn = document.getElementById('spotCam');
+  var pickBtn = document.getElementById('spotPick');
+  var fileEl = document.getElementById('spotFile');
+  var fileCam = document.getElementById('spotFileCam');
+  if(camBtn) camBtn.onclick = function(){ if(fileCam) fileCam.click(); };
+  if(pickBtn) pickBtn.onclick = function(){ if(fileEl) fileEl.click(); };
+  if(fileEl) fileEl.onchange = function(e){ onSpotPhoto(e && e.target && e.target.files ? e.target.files[0] : null); };
+  if(fileCam) fileCam.onchange = function(e){ onSpotPhoto(e && e.target && e.target.files ? e.target.files[0] : null); };
+  var geo = document.getElementById('spotGeo');
+  if(geo) geo.onclick = function(){ useCurrentLocation(); };
+  var saveBtn = document.getElementById('spotSave');
+  if(saveBtn) saveBtn.onclick = function(){ saveSpotForm(); };
+  var placeIn = document.getElementById('spotPlace');
+  if(placeIn) placeIn.onchange = function(){ paintSpotCoords(); };
+  if(cur){
+    var delBtn = document.getElementById('spotDel');
+    if(delBtn) delBtn.onclick = function(){
+      if(!confirm('이 촬영 기록을 지울까요? 사진과 위치도 함께 지워집니다.')) return;
+      removeSpot(bodyId, cur.id);
+      closeSheet();
+      toast('촬영 기록을 지웠어요');
+    };
+  }
 }
 
 /* ================= 렌더 ================= */
@@ -2492,6 +3279,7 @@ function renderAll(){
   document.getElementById('tab-gear').innerHTML = renderGear();
   document.getElementById('tab-rec').innerHTML = renderRec();
   document.getElementById('tab-film').innerHTML = renderFilm();
+  document.getElementById('tab-hist').innerHTML = renderHist();
   document.getElementById('tab-data').innerHTML = renderData();
   var rollCount = (data.films || []).reduce(function(n,f){ return n + (Number(f.rolls) || 0); }, 0);
   var loadedN = data.bodies.filter(function(b){ return isFilmBody(b) && !!loadedStock(b); }).length;
@@ -2515,7 +3303,7 @@ function bindRec(){
   });
 }
 function showTab(name){
-  ['home','gear','rec','film','data'].forEach(function(n){
+  ['home','gear','rec','film','hist','data'].forEach(function(n){
     document.getElementById('tab-' + n).classList.toggle('hidden', n !== name);
   });
   Array.prototype.forEach.call(document.querySelectorAll('#nav button'), function(b){
@@ -2606,6 +3394,18 @@ document.addEventListener('click', function(e){
     return;
   }
 
+  var spotAdd = t.getAttribute('data-spot-add');
+  if(spotAdd){ openSpotSheet(spotAdd); return; }
+  var spotEdit = t.getAttribute('data-spot-edit');
+  if(spotEdit){ var spIds = String(spotEdit).split(':'); openSpotSheet(spIds[0], spIds[1]); return; }
+  var embId = t.getAttribute('data-embed');
+  if(embId){ toggleEmbed(embId); return; }
+  var histDel = t.getAttribute('data-histdel');
+  if(histDel){
+    if(!confirm('이 롤의 촬영 기록을 히스토리에서 지울까요? 사진과 위치도 함께 지워집니다.')) return;
+    removeHist(histDel); toast('히스토리에서 지웠어요'); return;
+  }
+
   if(t.id === 'recGo'){ runRec(); return; }
 
   if(t.id === 'btnReveal' || t.id === 'btnReveal2'){
@@ -2639,13 +3439,21 @@ document.addEventListener('click', function(e){
     saveData(); renderAll(); toast('초기값으로 되돌렸어요'); return;
   }
   if(t.id === 'btnPrivClear'){
-    if(!confirm('시리얼·구입가·개인 메모를 모두 지울까요? 되돌릴 수 없습니다.')) return;
-    priv = {bodies:{}, lenses:{}, adapters:{}, films:{}}; savePriv(); renderAll(); toast('개인 기록을 지웠어요'); return;
+    if(!confirm('시리얼·구입가·개인 메모와 촬영 기록(사진·위치)까지 모두 지울까요? 되돌릴 수 없습니다.')) return;
+    priv = emptyPrivAll(); savePriv(); renderAll(); toast('개인 기록을 지웠어요'); return;
   }
 });
 document.addEventListener('change', function(e){
   var t = e.target;
   if(!t || !t.id) return;
+  if(t.hasAttribute && t.hasAttribute('data-histdev')){
+    if(setHistDev(t.getAttribute('data-histdev'), t.value)) toast('현상 상태 · ' + t.value);
+    return;
+  }
+  if(t.hasAttribute && t.hasAttribute('data-histnote')){
+    if(setHistNote(t.getAttribute('data-histnote'), t.value)) toast('롤 메모를 저장했어요');
+    return;
+  }
   if(t.id === 'fileIn'){
     var file = t.files && t.files[0];
     if(!file) return;
@@ -2666,6 +3474,15 @@ document.addEventListener('change', function(e){
         var src = items[k] || {};
         Object.keys(src).forEach(function(id){ priv[k][id] = src[id]; });
       });
+      if(items.rolls && typeof items.rolls === 'object' && !(items.rolls instanceof Array)){
+        privRolls();
+        Object.keys(items.rolls).forEach(function(id){ priv.rolls[id] = items.rolls[id]; });
+      }
+      if(items.rollHistory instanceof Array){
+        var have = {};
+        privHistory().forEach(function(h){ if(h && h.id) have[h.id] = 1; });
+        items.rollHistory.forEach(function(h){ if(h && h.id && !have[h.id]) priv.rollHistory.push(h); });
+      }
       savePriv(); renderAll(); toast('개인 기록을 가져왔어요');
     });
     t.value = '';
