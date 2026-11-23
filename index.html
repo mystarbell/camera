@@ -3,94 +3,250 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#0e0f12" />
+<meta name="theme-color" content="#f4f1e9" />
 <meta name="description" content="카메라·렌즈·이종교배 컨버터·필름 재고 관리 대시보드" />
 <title>CAMERA · 카메라 컬렉션</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%B7%3C/text%3E%3C/svg%3E" />
 <style>
 :root{
-  --bg:#0e0f12; --card:#171a1f; --card2:#1e2229; --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.18);
-  --text:#eef1f4; --muted:#9aa3ad; --dim:#6f7883; --accent:#e0a95f; --accent2:#6fc2b4; --warn:#f0b866; --bad:#e98b8b; --ok:#79d0a6;
-  --r:16px;
+  --bg:#f4f1e9;
+  --surface:#fffdf8;
+  --surface2:#f8f4ea;
+  --ink:#1a1915;
+  --ink2:#474439;
+  --ink3:#6f6960;
+  --line:#e5ddcd;
+  --line2:#d5c9b3;
+  --amber:#8f5606; --amber-bg:#fdf1dc; --amber-line:#ebcd98; --amber-solid:#c98a2e;
+  --green:#0d6a4d; --green-bg:#e8f5ee; --green-line:#b9e1cf;
+  --orange:#a24619; --orange-bg:#fdeee3; --orange-line:#f1c3a4;
+  --red:#9f2f2e; --red-bg:#fbeaea; --red-line:#eec1bf;
+  --r:18px;
+  --shadow:0 1px 0 rgba(90,70,30,.04), 0 12px 30px -24px rgba(70,52,20,.55);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",Roboto,sans-serif;letter-spacing:-.01em;padding-bottom:calc(28px + env(safe-area-inset-bottom))}
-header{padding:20px 16px 8px}
-header .w{max-width:916px;margin:0 auto}
-h1{font-size:18px;margin:0 0 4px;letter-spacing:.14em;font-weight:700}
-h1 span{letter-spacing:-.01em;color:var(--muted);font-weight:600;font-size:13px;margin-left:6px}
-.sub{font-size:12px;color:var(--muted)}
-nav{position:sticky;top:0;background:rgba(14,15,18,.94);backdrop-filter:blur(12px);z-index:20;border-bottom:1px solid var(--line);padding:8px 12px}
-nav .w{display:flex;gap:6px;max-width:916px;margin:0 auto;overflow-x:auto;scrollbar-width:none}
-nav .w::-webkit-scrollbar{display:none}
-nav button{flex:0 0 auto;background:transparent;border:1px solid transparent;color:var(--muted);padding:8px 13px;border-radius:999px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer}
-nav button.on{background:var(--card2);color:var(--text);border-color:var(--line2)}
-main{padding:14px 12px 8px;max-width:940px;margin:0 auto}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:10px}
-.card h3{margin:0 0 8px;font-size:14px;letter-spacing:-.01em}
-.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.muted{color:var(--muted);font-size:12px;line-height:1.5}
-.dim{color:var(--dim);font-size:11px;line-height:1.5}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(76px,1fr));gap:8px;margin-bottom:10px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:11px 12px;min-width:0}
-.stat span{font-size:11px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stat b{display:block;font-size:20px;margin-top:2px;letter-spacing:-.02em}
-.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line2);color:var(--muted);margin:2px 4px 2px 0;white-space:nowrap}
-.pill.warn{color:var(--warn);border-color:rgba(240,184,102,.4)}
-.pill.ok{color:var(--ok);border-color:rgba(121,208,166,.4)}
-.pill.bad{color:var(--bad);border-color:rgba(233,139,139,.4)}
-.pill.gold{color:var(--accent);border-color:rgba(224,169,95,.45)}
-.pill.film{color:var(--accent2);border-color:rgba(111,194,180,.5)}
-.pill.film.none{color:var(--dim);border-color:var(--line2);border-style:dashed}
-select,input,textarea{width:100%;background:var(--card2);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:10px;font-size:15px;font-family:inherit;appearance:none}
-select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 17px) 52%,calc(100% - 12px) 52%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:32px}
-input[type=date]{min-height:42px}
-textarea{min-height:64px;resize:vertical}
-label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
-button.btn{background:var(--accent);color:#241a0c;border:0;border-radius:10px;padding:11px 16px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer}
-button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line2);border-radius:10px;padding:9px 12px;font-size:13px;font-family:inherit;cursor:pointer}
-button.sm{padding:5px 9px;font-size:12px;border-radius:8px}
-button.danger{color:var(--bad);border-color:rgba(233,139,139,.4)}
-.item{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-top:1px solid var(--line);flex-wrap:wrap}
-.item:first-of-type{border-top:0}
-.item>div:first-child{min-width:0;flex:1 1 160px}
-.item .t{font-size:14px;font-weight:600;line-height:1.35}
-.item .d{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}
-.item .ops{display:flex;gap:6px;flex:0 0 auto;align-items:flex-start;flex-wrap:wrap;justify-content:flex-end}
-.rec{border-left:3px solid var(--accent2);padding:2px 0 2px 11px;margin:12px 0}
-.rec .h{font-size:14px;font-weight:700;line-height:1.4;display:flex;gap:7px;align-items:baseline}
-.rec .h i{display:inline-block;flex:0 0 auto;font-style:normal;font-size:11px;font-weight:700;color:#241a0c;background:var(--accent);border-radius:6px;padding:1px 6px;line-height:1.6}
-.rec .h span{min-width:0}
+html{-webkit-text-size-adjust:100%;color-scheme:light}
+body{
+  margin:0;color:var(--ink);
+  background:radial-gradient(1100px 420px at 50% -160px,#fffbf1 0%,rgba(255,251,241,0) 72%),var(--bg);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR",Roboto,sans-serif;
+  font-size:15px;line-height:1.55;letter-spacing:-.012em;
+  padding-bottom:calc(30px + env(safe-area-inset-bottom));
+}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 .hidden{display:none}
-.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-bottom:8px}
+
+/* ---------- 머리글 ---------- */
+header{padding:24px 18px 12px}
+header .w{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.mark{width:36px;height:36px;flex:0 0 auto;color:var(--ink);opacity:.9}
+h1{margin:0;font-size:20px;font-weight:800;letter-spacing:.2em;line-height:1;text-transform:uppercase}
+h1 span{display:block;margin-top:7px;font-size:12.5px;font-weight:650;letter-spacing:.01em;color:var(--ink3);text-transform:none}
+.sub{font-size:12.5px;font-weight:650;color:var(--ink2);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 13px;letter-spacing:0;box-shadow:var(--shadow)}
+
+/* ---------- 탭 ---------- */
+nav{position:sticky;top:0;z-index:30;padding:8px 12px;background:rgba(244,241,233,.9);backdrop-filter:blur(14px) saturate(1.15);-webkit-backdrop-filter:blur(14px) saturate(1.15);border-bottom:1px solid var(--line)}
+nav .w{display:flex;gap:4px;max-width:1000px;margin:0 auto;overflow-x:auto;scrollbar-width:none;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:4px}
+nav .w::-webkit-scrollbar{display:none}
+nav button{flex:0 0 auto;background:transparent;border:0;color:var(--ink3);padding:9px 16px;border-radius:999px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;min-height:40px;white-space:nowrap;transition:background .15s,color .15s}
+nav button.on{background:var(--ink);color:#fdfbf5;box-shadow:0 8px 16px -10px rgba(26,25,21,.75)}
+
+main{padding:16px 14px 6px;max-width:1000px;margin:0 auto}
+
+/* ---------- 판(카드) ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card h3{margin:0;font-size:15.5px;font-weight:750;letter-spacing:-.02em;line-height:1.35}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px;flex-wrap:wrap}
+.head-ops{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.count{font-size:12px;font-weight:750;color:var(--ink3);background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap;letter-spacing:0}
+
+/* ---------- KPI ---------- */
+.kpi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.kpi-item{position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 15px 13px;box-shadow:var(--shadow)}
+.kpi-item:before{content:"";position:absolute;left:0;top:0;width:100%;height:3px;background:var(--line2)}
+.kpi-item.amber:before{background:var(--amber-solid)}
+.kpi-item.green:before{background:#2f9c77}
+.kpi-item .lb{display:block;font-size:12px;font-weight:750;color:var(--ink3);letter-spacing:.01em}
+.kpi-item .v{display:block;margin-top:3px;font-size:27px;font-weight:800;letter-spacing:-.035em;line-height:1.15;font-variant-numeric:tabular-nums}
+.kpi-item.amber .v{color:var(--amber)}
+.kpi-item.green .v{color:var(--green)}
+.kpi-item .note{display:block;margin-top:2px;font-size:12px;color:var(--ink3);font-weight:600}
+
+/* ---------- 구성 ---------- */
+.krow{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.krow:first-of-type{border-top:0;padding-top:0}
+.krow:last-of-type{padding-bottom:0}
+.klb{flex:0 0 66px;font-size:12.5px;font-weight:750;color:var(--ink3);padding-top:3px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:650;color:var(--ink2);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:3px 9px;white-space:nowrap;letter-spacing:0}
+.tag b{font-weight:800;color:var(--ink)}
+
+/* ---------- 배지 ---------- */
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid var(--line2);color:var(--ink2);background:var(--surface2);white-space:nowrap;line-height:1.5;letter-spacing:0}
+.pill.warn{color:var(--orange);background:var(--orange-bg);border-color:var(--orange-line)}
+.pill.ok{color:var(--green);background:var(--green-bg);border-color:var(--green-line)}
+.pill.bad{color:var(--red);background:var(--red-bg);border-color:var(--red-line)}
+.pill.gold{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-line)}
+.pill.film{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-line);font-weight:750}
+.pill.film.none{color:var(--ink3);background:transparent;border:1px dashed var(--line2);font-weight:650}
+
+/* ---------- 글자 ---------- */
+.muted{color:var(--ink2);font-size:13.5px;line-height:1.6}
+.dim{color:var(--ink3);font-size:12.5px;line-height:1.55}
+
+/* ---------- 폼 ---------- */
+select,input,textarea{width:100%;background:var(--surface);border:1.5px solid var(--line2);color:var(--ink);border-radius:12px;padding:12px;font-size:16px;font-family:inherit;appearance:none;-webkit-appearance:none;min-height:48px}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--ink3) 50%),linear-gradient(135deg,var(--ink3) 50%,transparent 50%);background-position:calc(100% - 19px) 52%,calc(100% - 14px) 52%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:36px}
+input[type=date]{min-height:48px}
+textarea{min-height:76px;resize:vertical;line-height:1.55}
+label{display:block;font-size:12.5px;font-weight:700;color:var(--ink2);margin:13px 0 5px}
+
+/* ---------- 버튼 ---------- */
+button{font-family:inherit}
+button.btn{background:var(--ink);color:#fdfbf5;border:0;border-radius:12px;padding:13px 18px;font-size:15.5px;font-weight:750;min-height:50px;cursor:pointer;letter-spacing:-.01em}
+button.btn:active{transform:translateY(1px)}
+button.ghost{background:var(--surface);color:var(--ink2);border:1px solid var(--line2);border-radius:11px;padding:10px 14px;font-size:13.5px;font-weight:650;min-height:42px;cursor:pointer}
+button.ghost:active{background:var(--surface2)}
+button.sm{padding:7px 11px;font-size:13px;border-radius:10px;min-height:38px}
+button.danger{color:var(--red);border-color:var(--red-line);background:var(--red-bg)}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+/* ---------- 목록 줄 ---------- */
+.item{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.item:first-of-type{border-top:0;padding-top:0}
+.item .t{font-size:15px;font-weight:700;line-height:1.4}
+.item .d{font-size:13px;color:var(--ink2);margin-top:3px;line-height:1.5}
+.item .ops{display:flex;gap:6px;flex:0 0 auto;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+
+/* ---------- 장비 카드 ---------- */
+.gear-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.gear{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px}
+.gear.is-loaded{border-left:4px solid var(--amber-solid);background:linear-gradient(180deg,#fffcf4 0%,var(--surface) 60%)}
+.gear.is-repair{border-left:4px solid #d98551}
+.gear-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.gear-name{font-size:16px;font-weight:750;letter-spacing:-.025em;line-height:1.35;min-width:0;word-break:keep-all}
+.gear .tags{margin-top:9px}
+.gear .film-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:11px}
+.gear-notes{margin-top:8px}
+.gear-ops{display:flex;gap:7px;justify-content:flex-end;align-items:center;flex-wrap:wrap;margin-top:12px;padding-top:11px;border-top:1px solid var(--line)}
+
+/* ---------- 장전 필름 카드 ---------- */
+.film-grid{display:grid;grid-template-columns:1fr;gap:9px}
+.fb{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:12px 13px 11px;display:flex;flex-direction:column;gap:8px}
+.fb.loaded{background:linear-gradient(180deg,#fffaf0 0%,var(--surface) 70%);border-color:var(--amber-line)}
+.fb-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.fb-name{font-size:14.5px;font-weight:700;line-height:1.4;min-width:0;word-break:keep-all}
+.fb-format{flex:0 0 auto;font-size:12px;font-weight:650;color:var(--ink3);padding-top:2px}
+.fb-badge{display:flex;flex-wrap:wrap;gap:6px}
+.fb-bot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:auto}
+
+/* ---------- 조합 추천 선택 ---------- */
+.intro{margin:0 0 12px}
+.pick-block{margin-bottom:6px}
+.pick-label{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:750;color:var(--ink2);margin:16px 0 8px}
+.step{width:22px;height:22px;flex:0 0 auto;border-radius:50%;background:var(--ink);color:#fdfbf5;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+.pick-chips{display:flex;flex-wrap:wrap;gap:7px}
+.pick-chips button{background:var(--surface);border:1px solid var(--line2);color:var(--ink);border-radius:12px;padding:10px 13px;font-size:14px;font-weight:650;min-height:46px;line-height:1.25;text-align:left;cursor:pointer;letter-spacing:-.01em}
+.pick-chips button .m{display:block;font-size:11.5px;font-weight:600;color:var(--ink3);margin-top:2px}
+.pick-chips button.on{background:var(--ink);border-color:var(--ink);color:#fdfbf5}
+.pick-chips button.on .m{color:#cfc8b8}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ---------- 조합 결과 ---------- */
+.combo{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:11px;box-shadow:var(--shadow)}
+.combo.top{border-color:var(--amber-line);box-shadow:0 1px 0 rgba(143,86,6,.06),0 16px 34px -26px rgba(143,86,6,.7)}
+.combo-head{display:flex;gap:10px;align-items:flex-start}
+.rank{flex:0 0 auto;width:27px;height:27px;border-radius:9px;background:var(--surface2);border:1px solid var(--line2);color:var(--ink2);font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.combo.top .rank{background:var(--amber);border-color:var(--amber);color:#fff8ec}
+.combo-title{font-size:15.5px;font-weight:750;line-height:1.4;letter-spacing:-.025em;word-break:keep-all;min-width:0}
+.combo-title .plus{color:var(--ink3);font-weight:600;margin:0 5px}
+.combo-meta{font-size:12.5px;color:var(--ink3);margin:5px 0 0 37px;line-height:1.6;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0 0 37px}
+.metric{background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:8px 10px;min-width:0}
+.metric b{display:block;font-size:17px;font-weight:800;letter-spacing:-.03em;line-height:1.2;font-variant-numeric:tabular-nums}
+.metric span{display:block;font-size:11.5px;font-weight:650;color:var(--ink3);margin-top:1px}
+.score{display:flex;align-items:center;gap:9px;margin:12px 0 0 37px}
+.score-lb{font-size:12px;font-weight:750;color:var(--ink3);white-space:nowrap}
+.score .num{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;min-width:30px;text-align:right}
+.bar{flex:1;height:8px;background:#ece6d8;border-radius:99px;overflow:hidden;min-width:40px}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--green)}
+.film-pick{margin:13px 0 0 37px;padding-top:11px;border-top:1px solid var(--line)}
+.fp-head{font-size:12px;font-weight:800;color:var(--ink3);letter-spacing:.04em;margin-bottom:6px}
+.fp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0;flex-wrap:wrap}
+.fp-name{font-size:14px;font-weight:700;line-height:1.35}
+.fp-meta{font-size:12.5px;color:var(--ink3);margin-top:2px}
+.fp-line{margin:12px 0 0 37px;font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.empty{text-align:center;padding:28px 16px}
+.empty .e-ic{font-size:26px;line-height:1;margin-bottom:8px;display:block;opacity:.8}
+
+/* ---------- 필름 재고 ---------- */
+.fcard{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:14px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.fcard:first-of-type{border-top:0;padding-top:2px}
+.fcard-main{flex:1 1 180px;min-width:0}
+.fcard-name{font-size:15.5px;font-weight:750;letter-spacing:-.02em;line-height:1.35}
+.fcard-meta{font-size:13px;color:var(--ink2);margin-top:4px;line-height:1.5}
+.fcard-side{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.rolls{display:flex;align-items:baseline;gap:3px;color:var(--green);font-weight:800;line-height:1}
+.rolls b{font-size:21px;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.rolls span{font-size:11.5px;font-weight:750}
+.rolls.zero{color:var(--red)}
+
+/* ---------- 필터 칩 ---------- */
+.chips{display:flex;gap:7px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none;margin-bottom:4px}
 .chips::-webkit-scrollbar{display:none}
-.chips button{flex:0 0 auto;background:transparent;border:1px solid var(--line2);color:var(--muted);border-radius:999px;padding:6px 11px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer}
-.chips button.on{background:var(--card2);color:var(--text);border-color:rgba(255,255,255,.3)}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:flex-end;z-index:50}
+.chips button{flex:0 0 auto;background:var(--surface);border:1px solid var(--line2);color:var(--ink2);border-radius:999px;padding:9px 15px;font-size:13.5px;font-weight:700;min-height:42px;cursor:pointer}
+.chips button.on{background:var(--ink);border-color:var(--ink);color:#fdfbf5}
+
+/* ---------- 시트 ---------- */
+.modal{position:fixed;inset:0;background:rgba(30,26,18,.42);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:none;align-items:flex-end;z-index:60}
 .modal.on{display:flex}
-.sheet{background:var(--card);width:100%;max-height:90vh;overflow:auto;-webkit-overflow-scrolling:touch;border-radius:18px 18px 0 0;padding:10px 16px calc(20px + env(safe-area-inset-bottom));border-top:1px solid var(--line2)}
-.sheet .grab{width:38px;height:4px;background:var(--line2);border-radius:99px;margin:2px auto 12px}
-.sheet h3{margin:0;font-size:16px}
-.sect{font-size:11px;letter-spacing:.08em;color:var(--dim);margin:18px 0 2px;padding-top:12px;border-top:1px solid var(--line)}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#252a32;border:1px solid var(--line2);color:var(--text);padding:9px 16px;border-radius:999px;font-size:13px;opacity:0;transition:.2s;pointer-events:none;z-index:80;max-width:86vw;text-align:center}
-.toast.on{opacity:1}
-.lock{font-size:11px;color:var(--accent);border:1px solid rgba(224,169,95,.45);border-radius:6px;padding:0 5px;margin-left:5px}
-.priv{font-size:12px;color:var(--warn);margin-top:4px;line-height:1.5;word-break:break-all}
-.priv.off{color:var(--dim)}
-.bar{height:4px;background:var(--card2);border-radius:99px;overflow:hidden;margin-top:5px}
-.bar i{display:block;height:100%;background:var(--accent2)}
-.note{border:1px dashed var(--line2);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:10px}
-.note b{color:var(--text)}
-.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-footer{max-width:940px;margin:0 auto;padding:4px 16px 20px;font-size:11px;color:var(--dim);line-height:1.6}
-@media(min-width:720px){ h1{font-size:20px} main{padding:18px 16px} }
+.sheet{background:var(--surface);width:100%;max-height:92vh;overflow:auto;-webkit-overflow-scrolling:touch;border-radius:22px 22px 0 0;padding:10px 18px calc(24px + env(safe-area-inset-bottom));border-top:1px solid var(--line2);box-shadow:0 -24px 60px -24px rgba(30,24,12,.45)}
+.sheet .grab{width:40px;height:4px;background:var(--line2);border-radius:99px;margin:3px auto 14px}
+.sheet h3{margin:0;font-size:17px;font-weight:750;letter-spacing:-.02em}
+.sect{font-size:12px;font-weight:800;letter-spacing:.04em;color:var(--ink3);margin:20px 0 4px;padding-top:14px;border-top:1px solid var(--line)}
+
+/* ---------- 기타 ---------- */
+.note{border:1px solid var(--amber-line);background:var(--amber-bg);border-radius:14px;padding:12px 14px;font-size:13px;color:#5b4a2d;line-height:1.6;margin-bottom:12px}
+.note b{color:var(--ink)}
+.lock{font-size:11px;font-weight:750;color:var(--amber);background:#fff8ea;border:1px solid var(--amber-line);border-radius:6px;padding:0 5px;margin-left:3px;white-space:nowrap}
+.priv{display:inline-block;margin-top:8px;font-size:12.5px;color:var(--amber);background:var(--amber-bg);border-radius:8px;padding:5px 9px;line-height:1.5;word-break:break-all}
+.priv.off{color:var(--ink3);background:transparent;border:1px dashed var(--line2)}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(4px);background:var(--ink);border:1px solid #000;color:#fdfbf5;padding:11px 18px;border-radius:999px;font-size:13.5px;font-weight:650;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:90;max-width:88vw;text-align:center;box-shadow:0 14px 34px -12px rgba(0,0,0,.55)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{max-width:1000px;margin:0 auto;padding:10px 18px 30px;font-size:12px;color:var(--ink3);line-height:1.75}
+footer b{color:var(--ink2)}
+
+@media(min-width:720px){
+  h1{font-size:23px}
+  header{padding:30px 24px 14px}
+  main{padding:20px 22px 8px}
+  .kpi{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  .kpi-item .v{font-size:30px}
+  .film-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .gear-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .card{padding:18px}
+  footer{padding:10px 24px 34px}
+}
+@media(max-width:520px){
+  .combo-meta,.metrics,.score,.film-pick,.fp-line{margin-left:0}
+  .combo-title{font-size:15px}
+}
 </style>
 </head>
 <body>
 <header>
   <div class="w">
-    <h1>CAMERA<span>카메라 컬렉션</span></h1>
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+        <circle cx="16" cy="16" r="12.4" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="16" cy="16" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M16 3.6v5.4M28.4 16H23M16 28.4V23M3.6 16h5.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <h1>CAMERA<span>카메라 컬렉션</span></h1>
+      </div>
+    </div>
     <div class="sub" id="subline">바디 · 렌즈 · 이종교배 컨버터 · 필름 재고</div>
   </div>
 </header>
@@ -552,15 +708,24 @@ function filmSuggestions(purpose, body, count){
 }
 
 /* ================= 요약 ================= */
+function kpi(label, value, note, tone){
+  return '<div class="kpi-item' + (tone ? ' ' + tone : '') + '">'
+    + '<span class="lb">' + esc(label) + '</span>'
+    + '<span class="v">' + esc(value) + '</span>'
+    + (note ? '<span class="note">' + esc(note) + '</span>' : '')
+    + '</div>';
+}
+function stat(label, value){ return kpi(label, value, '', ''); }
+
 function renderHome(){
   var bodies = data.bodies.length, lenses = data.lenses.length, adapters = data.adapters.length;
   var rolls = (data.films || []).reduce(function(n,f){ return n + (Number(f.rolls) || 0); }, 0);
   var mounts = {};
   data.lenses.forEach(function(l){ var m = l.mount || '미지정'; mounts[m] = (mounts[m] || 0) + 1; });
-  var mountStr = Object.keys(mounts).map(function(m){ return m + ' ' + mounts[m]; }).join(' · ') || '없음';
+  var mountTags = Object.keys(mounts).map(function(m){ return '<span class="tag">' + esc(m) + ' <b>' + esc(mounts[m]) + '</b></span>'; }).join('');
   var types = {};
   data.bodies.forEach(function(b){ var t = b.bodyType || '종류 미지정'; types[t] = (types[t] || 0) + 1; });
-  var typeStr = Object.keys(types).map(function(t){ return t + ' ' + types[t]; }).join(' · ') || '없음';
+  var typeTags = Object.keys(types).map(function(t){ return '<span class="tag">' + esc(t) + ' <b>' + esc(types[t]) + '</b></span>'; }).join('');
   var repair = data.bodies.filter(function(b){ return /수리|점검|오버홀/.test(b.status || ''); });
   var unknown = data.bodies.concat(data.lenses).filter(function(x){
     return /확인 필요/.test((x.status || '') + ' ' + (x.model || '') + ' ' + (x.mount || '') + ' ' + (x.bodyType || ''));
@@ -575,31 +740,36 @@ function renderHome(){
   ['bodies','lenses','adapters','films'].forEach(function(t){
     privCount += Object.keys(priv[t] || {}).filter(function(id){ return hasPriv(t, id); }).length;
   });
+  var filmBodies = data.bodies.filter(function(b){ return isFilmBody(b); });
+  var loadedCount = filmBodies.filter(function(b){ return !!loadedStock(b); }).length;
 
   var h = '';
-  h += '<div class="grid">';
-  h += stat('바디', bodies) + stat('렌즈', lenses) + stat('컨버터', adapters) + stat('필름 재고', rolls + '롤');
-  h += '</div>';
 
-  h += '<div class="card"><h3>구성</h3>'
-    + '<div class="muted">바디 종류 · ' + esc(typeStr) + '</div>'
-    + '<div class="muted" style="margin-top:6px">렌즈 마운트 · ' + esc(mountStr) + '</div>'
+  h += '<div class="kpi">'
+    + kpi('바디', bodies + '대', filmBodies.length ? '필름 바디 ' + filmBodies.length + '대' : '필름 바디 없음', '')
+    + kpi('렌즈', lenses + '개', adapters ? '컨버터 ' + adapters + '개' : '컨버터 없음', '')
+    + kpi('장전 중', loadedCount + '대', filmBodies.length ? '필름 바디 ' + filmBodies.length + '대 중' : '필름 바디 없음', 'amber')
+    + kpi('필름 재고', rolls + '롤', rolls ? (data.films || []).length + '종 등록' : '등록 없음', 'green')
+    + '</div>';
+
+  h += '<div class="card"><div class="panel-head"><h3>구성</h3>'
+    + '<span class="count">' + esc(bodies + lenses + adapters) + '점</span></div>'
+    + '<div class="krow"><span class="klb">바디 종류</span><div class="tags">' + (typeTags || '<span class="dim">없음</span>') + '</div></div>'
+    + '<div class="krow"><span class="klb">렌즈 마운트</span><div class="tags">' + (mountTags || '<span class="dim">없음</span>') + '</div></div>'
     + '</div>';
 
   if(repair.length){
-    h += '<div class="card"><h3>수리·점검 중</h3>';
+    h += '<div class="card"><div class="panel-head"><h3>수리·점검 중</h3><span class="count">' + esc(repair.length) + '대</span></div>';
     repair.forEach(function(b){
       h += '<div class="item"><div><div class="t">' + esc(nameOf(b)) + '</div>'
         + '<div class="d">' + esc(b.status) + '</div></div>'
         + '<div class="ops"><span class="pill warn">진행 중</span></div></div>';
     });
     h += '</div>';
-  }else{
-    h += '<div class="card"><h3>수리·점검 중</h3><div class="muted">지금은 없어요.</div></div>';
   }
 
   if(unknown.length){
-    h += '<div class="card"><h3>확인해서 채울 것</h3>';
+    h += '<div class="card"><div class="panel-head"><h3>확인해서 채울 것</h3><span class="count">' + esc(unknown.length) + '건</span></div>';
     unknown.forEach(function(x){
       h += '<div class="item"><div><div class="t">' + esc(nameOf(x)) + '</div>'
         + '<div class="d">' + esc(x.notes || x.status || '') + '</div></div>'
@@ -609,7 +779,7 @@ function renderHome(){
   }
 
   if(lowFilm.length || expFilm.length){
-    h += '<div class="card"><h3>필름 알림</h3>';
+    h += '<div class="card"><div class="panel-head"><h3>필름 알림</h3><span class="count">' + esc(lowFilm.length + expFilm.length) + '건</span></div>';
     lowFilm.forEach(function(f){
       h += '<div class="item"><div><div class="t">' + esc(f.stock) + '</div>'
         + '<div class="d">' + esc(f.format || '') + ' · ' + esc((Number(f.rolls)||0) + '롤 남음') + '</div></div>'
@@ -623,37 +793,37 @@ function renderHome(){
     h += '</div>';
   }
 
-  var filmBodies = data.bodies.filter(function(b){ return isFilmBody(b); });
   if(filmBodies.length){
-    var loadedCount = filmBodies.filter(function(b){ return !!loadedStock(b); }).length;
-    h += '<div class="card"><div class="row"><h3>장전 중인 필름</h3>'
-      + '<span class="dim">' + esc(loadedCount) + '대 장전 · 총 ' + esc(filmBodies.length) + '대</span></div>';
+    h += '<div class="card"><div class="panel-head"><h3>장전 중인 필름</h3>'
+      + '<span class="count">' + esc(loadedCount) + '대 장전 · 총 ' + esc(filmBodies.length) + '대</span></div>'
+      + '<div class="film-grid">';
     filmBodies.forEach(function(b){
       var isLoaded = !!loadedStock(b);
-      h += '<div class="item"><div><div class="t">' + esc(nameOf(b)) + '</div>'
-        + '<div class="d">' + esc(formatLabel(b.format)) + (isLoaded ? '' : ' · 필름 없음') + '</div>'
-        + loadedDetail(b)
-        + '</div><div class="ops">' + loadedBadge(b)
-        + '<button class="ghost sm" data-loaded="' + esc(b.id) + '">변경</button></div></div>';
+      h += '<div class="fb' + (isLoaded ? ' loaded' : '') + '">'
+        + '<div class="fb-top"><div class="fb-name">' + esc(nameOf(b)) + '</div>'
+        + '<div class="fb-format">' + esc(formatLabel(b.format)) + '</div></div>'
+        + '<div class="fb-badge">' + loadedBadge(b) + '</div>'
+        + (loadedDetail(b) || (isLoaded ? '' : '<div class="dim">아직 필름이 들어 있지 않아요</div>'))
+        + '<div class="fb-bot"><span class="dim">' + (isLoaded ? '촬영 중' : '비어 있음') + '</span>'
+        + '<button class="ghost sm" data-loaded="' + esc(b.id) + '">변경</button></div>'
+        + '</div>';
     });
-    h += '</div>';
+    h += '</div></div>';
   }
 
-  h += '<div class="card"><h3>바로 가기</h3><div class="btns">'
+  h += '<div class="card"><div class="panel-head"><h3>바로 가기</h3><span class="count">개인 기록 ' + esc(privCount) + '건</span></div>'
+    + '<div class="btns" style="margin-top:0">'
     + '<button class="ghost" data-goto="rec">조합 추천 받기</button>'
     + '<button class="ghost" data-add="bodies">바디 추가</button>'
+    + '<button class="ghost" data-add="lenses">렌즈 추가</button>'
     + '<button class="ghost" data-add="adapters">컨버터 추가</button>'
     + '<button class="ghost" data-add="films">필름 추가</button>'
     + '</div>'
-    + '<div class="dim" style="margin-top:10px">개인 기록(시리얼·구입가·메모)이 있는 장비 ' + esc(privCount) + '개 · 이 기기에만 저장</div>'
+    + '<div class="dim" style="margin-top:12px">개인 기록(시리얼·구입가·메모)이 있는 장비 ' + esc(privCount) + '개 · 이 기기에만 저장</div>'
     + (privCount ? '<div class="btns"><button class="ghost sm" id="btnReveal2">' + (reveal ? '개인정보 숨기기' : '개인정보 보기') + '</button></div>' : '')
     + '</div>';
   return h;
 }
-function stat(label, value){
-  return '<div class="stat"><span>' + esc(label) + '</span><b>' + esc(value) + '</b></div>';
-}
-
 /* ================= 장비 ================= */
 function privLine(type, id){
   if(!hasPriv(type, id)) return '';
@@ -674,73 +844,104 @@ function renderGear(){
     + '</div>';
 
   if(gearFilter === 'all' || gearFilter === 'bodies'){
-    h += '<div class="card"><div class="row"><h3>바디</h3><button class="ghost sm" data-add="bodies">+ 추가</button></div>';
+    h += '<div class="card"><div class="panel-head"><h3>바디</h3><div class="head-ops">'
+      + '<span class="count">' + esc(data.bodies.length) + '대</span>'
+      + '<button class="ghost sm" data-add="bodies">+ 추가</button></div></div>';
     if(!data.bodies.length) h += '<div class="muted">없어요. 필름 SLR·RF·TLR·중형·컴팩트, 디지털까지 모두 추가할 수 있어요.</div>';
+    h += '<div class="gear-grid">';
     data.bodies.forEach(function(b){
       var film = isFilmBody(b);
-      h += '<div class="item"><div>'
-        + '<div class="t">' + esc(nameOf(b)) + '</div>'
-        + '<div class="d">' + esc(b.bodyType || '종류 미지정') + ' · ' + esc(formatLabel(b.format)) + ' · 마운트 ' + esc(b.mount || '미지정')
-        + (b.fixedFocal ? ' · 고정 ' + esc(b.fixedFocal + 'mm' + (b.fixedAperture ? ' f/' + b.fixedAperture : '')) : '')
-        + '</div>'
-        + (b.status ? '<div class="d"><span class="pill ' + (/수리|점검|오버홀/.test(b.status) ? 'warn' : '') + '">' + esc(b.status) + '</span></div>' : '')
-        + (film ? '<div class="d" style="margin-top:6px">' + loadedBadge(b) + '</div>' + loadedDetail(b) : '')
-        + (b.notes ? '<div class="dim">' + esc(b.notes) + '</div>' : '')
+      var isLoaded = film && !!loadedStock(b);
+      var repair = /수리|점검|오버홀/.test(b.status || '');
+      var statusPill = (b.status && b.status !== '보유') ? ' <span class="pill ' + (repair ? 'warn' : '') + '">' + esc(b.status) + '</span>' : '';
+      var tags = '<span class="tag">' + esc(b.bodyType || '종류 미지정') + '</span>'
+        + '<span class="tag">' + esc(formatLabel(b.format)) + '</span>'
+        + '<span class="tag">마운트 ' + esc(b.mount || '미지정') + '</span>'
+        + (b.fixedFocal ? '<span class="tag">고정 ' + esc(b.fixedFocal + 'mm' + (b.fixedAperture ? ' f/' + b.fixedAperture : '')) + '</span>' : '');
+      h += '<article class="gear' + (repair ? ' is-repair' : (isLoaded ? ' is-loaded' : '')) + '">'
+        + '<div class="gear-top"><div class="gear-name">' + esc(nameOf(b)) + '</div>' + statusPill + '</div>'
+        + '<div class="tags">' + tags + '</div>'
+        + (film ? '<div class="film-row">' + loadedBadge(b) + '</div>' + loadedDetail(b) : '')
+        + (b.notes ? '<div class="dim gear-notes">' + esc(b.notes) + '</div>' : '')
         + privLine('bodies', b.id)
-        + '</div><div class="ops">'
+        + '<div class="gear-ops">'
         + (film ? '<button class="ghost sm" data-loaded="' + esc(b.id) + '">🎞️ 필름</button>' : '')
-        + '<button class="ghost sm" data-edit="bodies:' + esc(b.id) + '">수정</button></div></div>';
+        + '<button class="ghost sm" data-edit="bodies:' + esc(b.id) + '">수정</button>'
+        + '</div></article>';
     });
-    h += '</div>';
+    h += '</div></div>';
   }
 
   if(gearFilter === 'all' || gearFilter === 'lenses'){
-    h += '<div class="card"><div class="row"><h3>렌즈</h3><button class="ghost sm" data-add="lenses">+ 추가</button></div>';
+    h += '<div class="card"><div class="panel-head"><h3>렌즈</h3><div class="head-ops">'
+      + '<span class="count">' + esc(data.lenses.length) + '개</span>'
+      + '<button class="ghost sm" data-add="lenses">+ 추가</button></div></div>';
     if(!data.lenses.length) h += '<div class="muted">아직 없어요.</div>';
+    h += '<div class="gear-grid">';
     data.lenses.forEach(function(l){
       var spec = lensSpecText(l);
-      h += '<div class="item"><div>'
-        + '<div class="t">' + esc(l.model) + '</div>'
-        + '<div class="d">' + esc(l.mount || '미지정') + ' · ' + esc(l.focal + 'mm') + (l.aperture ? ' · f/' + esc(l.aperture) : '')
-        + ' · ' + esc(formatLabel(l.format)) + '</div>'
-        + (spec ? '<div class="d">' + spec + '</div>' : '')
-        + (l.notes ? '<div class="dim">' + esc(l.notes) + '</div>' : '')
+      h += '<article class="gear">'
+        + '<div class="gear-top"><div class="gear-name">' + esc(l.model) + '</div></div>'
+        + '<div class="tags">'
+        +   '<span class="tag">' + esc(l.mount || '미지정') + '</span>'
+        +   '<span class="tag">' + esc(l.focal + 'mm') + '</span>'
+        +   (l.aperture ? '<span class="tag">f/' + esc(l.aperture) + '</span>' : '')
+        +   '<span class="tag">' + esc(formatLabel(l.format)) + '</span>'
+        + '</div>'
+        + (spec ? '<div class="dim gear-notes">' + spec + '</div>' : '')
+        + (l.notes ? '<div class="dim gear-notes">' + esc(l.notes) + '</div>' : '')
         + privLine('lenses', l.id)
-        + '</div><div class="ops"><button class="ghost sm" data-edit="lenses:' + esc(l.id) + '">수정</button></div></div>';
+        + '<div class="gear-ops"><button class="ghost sm" data-edit="lenses:' + esc(l.id) + '">수정</button></div>'
+        + '</article>';
     });
-    h += '</div>';
+    h += '</div></div>';
   }
 
   if(gearFilter === 'all' || gearFilter === 'adapters'){
-    h += '<div class="card"><div class="row"><h3>이종교배 컨버터</h3><button class="ghost sm" data-add="adapters">+ 추가</button></div>';
+    h += '<div class="card"><div class="panel-head"><h3>이종교배 컨버터</h3><div class="head-ops">'
+      + '<span class="count">' + esc(data.adapters.length) + '개</span>'
+      + '<button class="ghost sm" data-add="adapters">+ 추가</button></div></div>';
     if(!data.adapters.length){
-      h += '<div class="muted">컨버터를 등록하면 조합 추천이 이종교배까지 계산해요.<br>'
-        + '예: M42 → Nikon F (유리 없음, 1×), Nikon F → Sony E (0.71× 스피드부스터)</div>';
+      h += '<div class="muted">컨버터를 등록하면 조합 추천이 이종교배까지 계산해요. 예: M42 → Nikon F (유리 없음, 1×), Nikon F → Sony E (0.71× 스피드부스터)</div>';
     }
+    h += '<div class="gear-grid">';
     data.adapters.forEach(function(a){
       var f = Number(a.factor) || 1;
       var fTxt = f === 1 ? '유리 없음' : (f < 1 ? f + '× 스피드부스터' : f + '× 텔레컨버터');
-      h += '<div class="item"><div>'
-        + '<div class="t">' + esc(a.name) + '</div>'
-        + '<div class="d">' + esc(a.from) + ' → ' + esc(a.to) + ' · ' + esc(fTxt) + '</div>'
-        + (a.notes ? '<div class="dim">' + esc(a.notes) + '</div>' : '')
+      h += '<article class="gear">'
+        + '<div class="gear-top"><div class="gear-name">' + esc(a.name) + '</div></div>'
+        + '<div class="tags"><span class="tag">' + esc(a.from) + ' → ' + esc(a.to) + '</span>'
+        + '<span class="tag">' + esc(fTxt) + '</span></div>'
+        + (a.notes ? '<div class="dim gear-notes">' + esc(a.notes) + '</div>' : '')
         + privLine('adapters', a.id)
-        + '</div><div class="ops"><button class="ghost sm" data-edit="adapters:' + esc(a.id) + '">수정</button></div></div>';
+        + '<div class="gear-ops"><button class="ghost sm" data-edit="adapters:' + esc(a.id) + '">수정</button></div>'
+        + '</article>';
     });
-    h += '</div>';
+    h += '</div></div>';
   }
 
   if(gearFilter === 'all' || gearFilter === 'films'){
-    h += '<div class="card"><div class="row"><h3>필름 재고</h3><button class="ghost sm" data-add="films">+ 추가</button></div>';
+    h += '<div class="card"><div class="panel-head"><h3>필름 재고</h3><div class="head-ops">'
+      + '<span class="count">' + esc(data.films.length) + '종</span>'
+      + '<button class="ghost sm" data-add="films">+ 추가</button></div></div>';
     if(!data.films.length) h += '<div class="muted">아직 없어요. 필름 탭에서 스톡·ISO·롤 수·유효기간을 넣어 두면 조합 추천에 재고가 붙어요.</div>';
+    h += '<div class="gear-grid">';
     data.films.forEach(function(f){
-      h += '<div class="item"><div><div class="t">' + esc(f.stock) + '</div>'
-        + '<div class="d">' + esc(f.format || '') + ' · ISO ' + esc(f.iso) + ' · ' + esc(Number(f.rolls) || 0) + '롤'
-        + (f.expiry ? ' · ' + esc(f.expiry) + ' 만료' : '') + '</div>'
+      var st = expiryState(f.expiry);
+      var rolls = Number(f.rolls) || 0;
+      h += '<article class="gear">'
+        + '<div class="gear-top"><div class="gear-name">' + esc(f.stock) + '</div>'
+        + '<span class="pill ' + (rolls > 1 ? 'ok' : 'bad') + '">' + esc(rolls) + '롤</span></div>'
+        + '<div class="tags"><span class="tag">' + esc(f.format || '포맷 미지정') + '</span>'
+        + '<span class="tag">ISO ' + esc(f.iso) + '</span>'
+        + (f.expiry ? '<span class="tag">' + esc(f.expiry) + ' 만료</span>' : '')
+        + (st ? '<span class="pill ' + st.cls + '">' + esc(st.text) + '</span>' : '')
+        + '</div>'
         + privLine('films', f.id)
-        + '</div><div class="ops"><button class="ghost sm" data-edit="films:' + esc(f.id) + '">수정</button></div></div>';
+        + '<div class="gear-ops"><button class="ghost sm" data-edit="films:' + esc(f.id) + '">수정</button></div>'
+        + '</article>';
     });
-    h += '</div>';
+    h += '</div></div>';
   }
 
   h += '<div class="btns"><button class="ghost" id="btnReveal">' + (reveal ? '🔓 개인정보 숨기기' : '🔒 개인정보 보기') + '</button></div>';
@@ -760,28 +961,80 @@ function lensSpecText(l){
 }
 
 /* ================= 조합 추천 ================= */
-function renderRec(){
-  var h = '';
-  h += '<div class="card"><h3>조합 추천</h3>'
-    + '<div class="muted">바디를 고르면 그 바디에 물릴 렌즈를, 렌즈를 고르면 그 렌즈를 물릴 바디를 찾아요. 직결과 컨버터 경유를 한 번에 비교합니다.</div>'
-    + '<label>1) 바디 고르기</label><select id="recBody"><option value="">— 선택 안 함 —</option>';
+function recBodyOptions(){
+  var h = '<option value="">— 선택 안 함 —</option>';
   data.bodies.forEach(function(b){
     h += '<option value="' + esc(b.id) + '">' + esc(nameOf(b) + (b.bodyType ? ' · ' + b.bodyType : '')) + '</option>';
   });
-  h += '</select>'
-    + '<label>또는 2) 렌즈 고르기 <span class="dim">(바디를 고르면 이쪽은 비워져요)</span></label><select id="recLens"><option value="">— 선택 안 함 —</option>';
+  return h;
+}
+function recLensOptions(){
+  var h = '<option value="">— 선택 안 함 —</option>';
   data.lenses.forEach(function(l){
     h += '<option value="' + esc(l.id) + '">' + esc(l.model) + ' · ' + esc(l.mount) + ' ' + esc(l.focal) + 'mm</option>';
   });
-  h += '</select>'
-    + '<label>3) 촬영 목적</label><select id="recPurpose">';
+  return h;
+}
+function renderRec(){
+  var h = '';
+  h += '<div class="card"><div class="panel-head"><h3>조합 추천</h3><span class="count">직결 · 이종교배</span></div>'
+    + '<p class="muted intro">바디를 고르면 그 바디에 물릴 렌즈를, 렌즈를 고르면 그 렌즈를 물릴 바디를 찾아요. 직결과 컨버터 경유를 한 번에 비교합니다.</p>';
+
+  h += '<div class="pick-block">'
+    + '<div class="pick-label"><span class="step">1</span> 바디 고르기</div>'
+    + '<div class="pick-chips" id="pickBodyChips">'
+    + '<button type="button" data-pick-body="">선택 안 함</button>';
+  data.bodies.forEach(function(b){
+    h += '<button type="button" data-pick-body="' + esc(b.id) + '">' + esc(nameOf(b))
+      + '<span class="m">' + esc(b.bodyType || '종류 미지정') + (b.fixedFocal ? ' · 고정 ' + esc(b.fixedFocal) + 'mm' : '') + '</span></button>';
+  });
+  h += '</div><select id="recBody" class="sr-only" aria-label="바디 선택">' + recBodyOptions() + '</select></div>';
+
+  h += '<div class="pick-block">'
+    + '<div class="pick-label"><span class="step">2</span> 또는 렌즈 고르기 <span class="dim" style="font-weight:600">바디를 고르면 이쪽은 비워져요</span></div>'
+    + '<div class="pick-chips" id="pickLensChips">'
+    + '<button type="button" data-pick-lens="">선택 안 함</button>';
+  data.lenses.forEach(function(l){
+    h += '<button type="button" data-pick-lens="' + esc(l.id) + '">' + esc(l.model)
+      + '<span class="m">' + esc(l.mount) + ' · ' + esc(l.focal) + 'mm f/' + esc(l.aperture) + '</span></button>';
+  });
+  h += '</div><select id="recLens" class="sr-only" aria-label="렌즈 선택">' + recLensOptions() + '</select></div>';
+
+  h += '<div class="pick-block">'
+    + '<div class="pick-label"><span class="step">3</span> 촬영 목적</div>'
+    + '<div class="pick-chips" id="pickPurposeChips">';
+  Object.keys(PURPOSES).forEach(function(p, i){
+    h += '<button type="button" data-pick-purpose="' + esc(p) + '">' + esc(p)
+      + '<span class="m">' + esc(PURPOSES[p].lo) + '–' + esc(PURPOSES[p].hi) + 'mm</span></button>';
+  });
+  h += '</div><select id="recPurpose" class="sr-only" aria-label="촬영 목적">';
   Object.keys(PURPOSES).forEach(function(p){
     h += '<option value="' + esc(p) + '">' + esc(p) + ' · ' + esc(PURPOSES[p].lo) + '–' + esc(PURPOSES[p].hi) + 'mm</option>';
   });
-  h += '</select>'
-    + '<div class="btns"><button class="btn" id="recGo">추천 받기</button></div></div>';
-  h += '<div id="recOut"><div class="card"><div class="muted">바디나 렌즈 중 하나를 고르면 바로 계산돼요.</div></div></div>';
+  h += '</select></div>';
+
+  h += '<div class="btns"><button class="btn" id="recGo">추천 받기</button></div>'
+    + '<div class="dim" style="margin-top:9px">바디나 렌즈를 고르면 바로 계산돼요.</div></div>';
+  h += '<div id="recOut"><div class="card empty"><span class="e-ic">🔍</span>'
+    + '<div class="muted">바디나 렌즈 중 하나를 고르면 추천 조합이 여기에 나와요.</div></div></div>';
   return h;
+}
+
+function syncRecChips(){
+  var b = document.getElementById('recBody');
+  var l = document.getElementById('recLens');
+  var p = document.getElementById('recPurpose');
+  function mark(sel, attr){
+    var nodes = document.querySelectorAll('[' + attr + ']');
+    for(var i = 0; i < nodes.length; i++){
+      var v = nodes[i].getAttribute(attr) || '';
+      var cur = sel && sel.value ? sel.value : '';
+      nodes[i].classList.toggle('on', cur === v);
+    }
+  }
+  mark(b, 'data-pick-body');
+  mark(l, 'data-pick-lens');
+  mark(p, 'data-pick-purpose');
 }
 
 function runRec(){
@@ -790,58 +1043,73 @@ function runRec(){
   var purEl = document.getElementById('recPurpose');
   var out = document.getElementById('recOut');
   if(!bodyEl || !lensEl || !out) return;
-  var bodyId = bodyEl.value, lensId = lensEl.value, purpose = purEl.value;
+  var bodyId = bodyEl.value, lensId = lensEl.value, purpose = (purEl && purEl.value) ? purEl.value : '스냅';
+  if(!PURPOSES[purpose]) purpose = '스냅';
   if(!bodyId && !lensId){
-    out.innerHTML = '<div class="card"><div class="muted">바디나 렌즈 중 하나를 골라 주세요.</div></div>';
+    out.innerHTML = '<div class="card empty"><span class="e-ic">🔍</span>'
+      + '<div class="muted">바디나 렌즈 중 하나를 골라 주세요.</div></div>';
     return;
   }
   var combos = buildCombos(bodyId, lensId, purpose).slice(0, 6);
   if(!combos.length){
     var extra = data.adapters.length ? '' : ' 컨버터가 아직 하나도 없어서 이종교배 조합은 나오지 않아요 — 장비 탭에서 컨버터를 추가하면 계산돼요.';
-    out.innerHTML = '<div class="card"><div class="muted">이 조건에 맞는 조합이 없어요.' + esc(extra) + '</div></div>';
+    out.innerHTML = '<div class="card empty"><span class="e-ic">🔍</span>'
+      + '<div class="muted">이 조건에 맞는 조합이 없어요.' + esc(extra) + '</div></div>';
     return;
   }
   var p = PURPOSES[purpose];
-  var h = '<div class="card"><h3>' + esc(purpose) + ' 추천 조합</h3>'
+  var h = '<div class="card"><div class="panel-head"><h3>' + esc(purpose) + ' 추천 조합</h3>'
+    + '<span class="count">' + esc(combos.length) + '건</span></div>'
     + '<div class="muted">목표 화각 ' + esc(p.lo) + '–' + esc(p.hi) + 'mm (35mm 환산) · ' + esc(p.why) + '</div></div>';
 
   combos.forEach(function(c, i){
     var digital = isDigital(c.body);
     var sugg = digital ? [] : filmSuggestions(purpose, c.body, 2);
     var f = formatLabel(c.body.format);
-    h += '<div class="card"><div class="rec" style="border-left-color:' + (i === 0 ? 'var(--accent)' : 'var(--accent2)') + '">'
-      + '<div class="h"><i>' + (i + 1) + '</i><span>' + esc(nameOf(c.body))
-      + (c.fixed ? '' : ' + ' + esc(c.lens.model)) + '</span></div>'
-      + '<div class="d">' + esc(f) + ' · ' + esc(mountText(c)) + ' · ' + esc(adapterText(c.path)) + '</div>'
-      + '<div class="d" style="margin-top:6px"><b style="font-size:18px;letter-spacing:-.02em">' + esc(c.eq) + 'mm</b>'
-      + '<span class="dim"> · 35mm 환산 · 화각 ' + esc(aov(c.eq)) + '° · 최대 f/' + esc(c.lens.aperture || '-') + '</span></div>'
-      + '<div class="d">적합도 ' + esc(c.score) + '점'
-      + (c.path && c.path.hops ? ' <span class="pill warn">이종교배 ' + esc(c.path.hops) + '단</span>' : ' <span class="pill ok">직결</span>')
-      + (c.fixed ? ' <span class="pill">고정 렌즈</span>' : '')
+    var hops = c.path && c.path.hops;
+    var tone = c.score >= 80 ? 'ok' : c.score >= 60 ? 'gold' : 'bad';
+    var gauge = c.score >= 80 ? 'var(--green)' : c.score >= 60 ? 'var(--amber)' : 'var(--red)';
+    h += '<article class="combo' + (i === 0 ? ' top' : '') + '">'
+      + '<div class="combo-head"><span class="rank">' + (i + 1) + '</span><div style="min-width:0">'
+      +   '<div class="combo-title">' + esc(nameOf(c.body))
+      +     (c.fixed ? '' : '<span class="plus">+</span>' + esc(c.lens.model)) + '</div>'
+      +   '<div class="combo-meta">' + esc(f)
+      +     '<span class="pill ' + (hops ? 'warn' : 'ok') + '">' + (hops ? '이종교배 ' + esc(hops) + '단' : '직결') + '</span>'
+      +     (c.fixed ? '<span class="pill">고정 렌즈</span>' : '')
+      +   '</div>'
+      + '</div></div>'
+      + '<div class="metrics">'
+      +   '<div class="metric"><b>' + esc(c.eq) + 'mm</b><span>35mm 환산</span></div>'
+      +   '<div class="metric"><b>' + esc(aov(c.eq)) + '°</b><span>화각</span></div>'
+      +   '<div class="metric"><b>f/' + esc(c.lens.aperture || '-') + '</b><span>최대 조리개</span></div>'
       + '</div>'
-      + '<div class="bar"><i style="width:' + Math.max(6, Math.min(100, c.score)) + '%;background:' + (c.score >= 80 ? 'var(--ok)' : c.score >= 60 ? 'var(--accent)' : 'var(--bad)') + '"></i></div>'
-      + '</div>';
+      + '<div class="score"><span class="score-lb">적합도</span>'
+      +   '<div class="bar"><i style="width:' + Math.max(6, Math.min(100, c.score)) + '%;background:' + gauge + '"></i></div>'
+      +   '<b class="num">' + esc(c.score) + '</b></div>'
+      + '<div class="dim" style="margin:8px 0 0 37px">' + esc(mountText(c)) + ' · ' + esc(adapterText(c.path)) + '</div>';
 
     if(digital){
-      h += '<div class="muted" style="margin-top:6px">디지털 바디 — 필름 추천은 건너뜁니다.</div>';
+      h += '<div class="muted" style="margin-top:9px">디지털 바디 — 필름 추천은 건너뜁니다.</div>';
     }else if(!sugg.length){
-      h += '<div class="muted" style="margin-top:6px">이 포맷(' + esc(filmFormatOf(c.body) || '-') + ')에 맞는 스톡이 카탈로그에 없어요. 필름 탭에서 직접 등록해 주세요.</div>';
+      h += '<div class="muted" style="margin-top:9px">이 포맷(' + esc(filmFormatOf(c.body) || '-') + ')에 맞는 스톡이 카탈로그에 없어요. 필름 탭에서 직접 등록해 주세요.</div>';
     }else{
       var top = sugg[0];
-      var inv = invSummary(top);
       if(i === 0){
-        h += '<div class="muted" style="margin-top:8px;font-weight:700;color:var(--text)">필름 추천</div>';
+        h += '<div class="film-pick"><div class="fp-head">필름 추천</div>';
         sugg.forEach(function(s){
           var is = invSummary(s);
-          h += '<div class="item"><div><div class="t">' + esc(s.film.stock) + '</div>'
-            + '<div class="d">ISO ' + esc(s.film.iso) + ' · ' + esc(s.film.type || '') + (s.film.character ? ' · ' + esc(s.film.character) : '') + '</div>'
-            + '</div><div class="ops"><span class="pill ' + is.cls + '">' + esc(is.txt) + '</span></div></div>';
+          h += '<div class="fp-row"><div><div class="fp-name">' + esc(s.film.stock) + '</div>'
+            + '<div class="fp-meta">ISO ' + esc(s.film.iso) + ' · ' + esc(s.film.type || '') + (s.film.character ? ' · ' + esc(s.film.character) : '') + '</div>'
+            + '</div><span class="pill ' + is.cls + '">' + esc(is.txt) + '</span></div>';
         });
+        h += '</div>';
       }else{
-        h += '<div class="d" style="margin-top:7px">필름 ' + esc(top.film.stock) + ' <span class="pill ' + inv.cls + '">' + esc(inv.txt) + '</span></div>';
+        var inv = invSummary(top);
+        h += '<div class="fp-line">필름 ' + esc(top.film.stock)
+          + ' <span class="pill ' + inv.cls + '">' + esc(inv.txt) + '</span></div>';
       }
     }
-    h += '</div>';
+    h += '</article>';
   });
 
   /* 이 바디/포맷에 쓸 수 있는 보유 필름 전체 */
@@ -852,13 +1120,15 @@ function runRec(){
   if(fmtUsed){
     var held = (data.films || []).filter(function(f){ return !f.format || f.format === 'any' || f.format === fmtUsed; });
     if(held.length){
-      h += '<div class="card"><h3>' + esc(fmtUsed) + ' 보유 필름</h3>';
+      h += '<div class="card"><div class="panel-head"><h3>' + esc(fmtUsed) + ' 보유 필름</h3>'
+        + '<span class="count">' + esc(held.length) + '종</span></div>';
       held.forEach(function(f){
         var st = expiryState(f.expiry);
+        var rolls = Number(f.rolls) || 0;
         h += '<div class="item"><div><div class="t">' + esc(f.stock) + '</div>'
           + '<div class="d">ISO ' + esc(f.iso) + (f.expiry ? ' · ' + esc(f.expiry) + ' 만료' : '') + '</div></div>'
           + '<div class="ops">' + (st ? '<span class="pill ' + st.cls + '">' + esc(st.text) + '</span>' : '')
-          + '<span class="pill ' + ((Number(f.rolls) || 0) > 0 ? 'ok' : 'bad') + '">' + esc(Number(f.rolls) || 0) + '롤</span></div></div>';
+          + '<span class="pill ' + (rolls > 0 ? 'ok' : 'bad') + '">' + esc(rolls) + '롤</span></div></div>';
       });
       h += '</div>';
     }
@@ -875,38 +1145,45 @@ function renderFilm(){
     byFmt[k] = (byFmt[k] || 0) + (Number(f.rolls) || 0);
   });
   var h = '';
-  h += '<div class="grid">'
-    + stat('보유 롤', totalRolls + '롤')
-    + Object.keys(byFmt).map(function(k){ return stat(k, byFmt[k] + '롤'); }).join('')
+  h += '<div class="kpi">'
+    + kpi('보유 롤', totalRolls + '롤', (data.films || []).length ? (data.films || []).length + '종 등록' : '등록 없음', 'green')
+    + Object.keys(byFmt).map(function(k){ return kpi(k, byFmt[k] + '롤', '', ''); }).join('')
     + '</div>';
 
-  h += '<div class="card"><div class="row"><h3>필름 재고</h3><button class="ghost sm" data-add="films">+ 추가</button></div>';
+  h += '<div class="card"><div class="panel-head"><h3>필름 재고</h3><div class="head-ops">'
+    + '<span class="count">' + esc((data.films || []).length) + '종</span>'
+    + '<button class="ghost sm" data-add="films">+ 추가</button></div></div>';
   if(!data.films.length){
     h += '<div class="muted">아직 등록된 필름이 없어요. 상자에 있는 스톡·ISO·롤 수·유효기간을 넣어 두면 조합 추천에 재고가 붙어요.</div>';
   }
   data.films.forEach(function(f){
     var st = expiryState(f.expiry);
     var rolls = Number(f.rolls) || 0;
-    h += '<div class="item"><div><div class="t">' + esc(f.stock) + '</div>'
-      + '<div class="d">' + esc(f.format || '포맷 미지정') + ' · ISO ' + esc(f.iso)
+    h += '<div class="fcard"><div class="fcard-main">'
+      + '<div class="fcard-name">' + esc(f.stock) + '</div>'
+      + '<div class="fcard-meta">' + esc(f.format || '포맷 미지정') + ' · ISO ' + esc(f.iso)
       + (f.expiry ? ' · ' + esc(f.expiry) + ' 만료' : ' · 유효기간 미입력') + '</div>'
-      + (f.notes ? '<div class="dim">' + esc(f.notes) + '</div>' : '')
+      + (f.notes ? '<div class="dim" style="margin-top:4px">' + esc(f.notes) + '</div>' : '')
+      + (st ? '<div style="margin-top:7px"><span class="pill ' + st.cls + '">' + esc(st.text) + '</span></div>' : '')
       + privLine('films', f.id)
-      + '</div><div class="ops">'
-      + '<span class="pill ' + (rolls > 1 ? 'ok' : 'bad') + '">' + esc(rolls) + '롤</span>'
-      + (st ? '<span class="pill ' + st.cls + '">' + esc(st.text) + '</span>' : '')
+      + '</div><div class="fcard-side">'
+      + '<div class="rolls' + (rolls > 0 ? '' : ' zero') + '"><b>' + esc(rolls) + '</b><span>롤</span></div>'
+      + '<div class="ops">'
       + '<button class="ghost sm" data-roll="' + esc(f.id) + '" data-dir="-1">−</button>'
       + '<button class="ghost sm" data-roll="' + esc(f.id) + '" data-dir="1">+</button>'
       + '<button class="ghost sm" data-edit="films:' + esc(f.id) + '">수정</button>'
-      + '</div></div>';
+      + '</div></div></div>';
   });
   h += '</div>';
 
-  h += '<div class="card"><h3>스톡 카탈로그</h3><div class="muted" style="margin-bottom:6px">조합 추천이 쓰는 기본 목록이에요. 필름을 추가할 때 스톡명을 여기서 고르면 재고가 자동으로 연결돼요.</div>';
+  h += '<div class="card"><div class="panel-head"><h3>스톡 카탈로그</h3>'
+    + '<span class="count">' + esc((data.filmCatalog || []).length) + '종</span></div>'
+    + '<div class="muted" style="margin-bottom:8px">조합 추천이 쓰는 기본 목록이에요. 필름을 추가할 때 스톡명을 여기서 고르면 재고가 자동으로 연결돼요.</div>';
   (data.filmCatalog || []).forEach(function(f){
     h += '<div class="item"><div><div class="t">' + esc(f.stock) + ' <span class="dim">ISO ' + esc(f.iso) + '</span></div>'
-      + '<div class="d">' + esc(f.type) + ' · ' + esc((f.formats || []).join(' / ')) + ' · ' + esc((f.bestFor || []).join('·')) + '</div>'
-      + '<div class="dim">' + esc(f.character || '') + '</div></div></div>';
+      + '<div class="d">' + esc(f.type) + ' · ' + esc((f.formats || []).join(' / ')) + '</div>'
+      + '<div class="tags" style="margin-top:6px">' + (f.bestFor || []).map(function(b){ return '<span class="tag">' + esc(b) + '</span>'; }).join('') + '</div>'
+      + '<div class="dim" style="margin-top:5px">' + esc(f.character || '') + '</div></div></div>';
   });
   h += '</div>';
   return h;
@@ -918,7 +1195,7 @@ function renderData(){
   ['bodies','lenses','adapters','films'].forEach(function(t){
     privItems += Object.keys(priv[t] || {}).filter(function(id){ return hasPriv(t, id); }).length;
   });
-  return '<div class="card"><h3>백업 · 복원</h3>'
+  return '<div class="card"><div class="panel-head"><h3>백업 · 복원</h3><span class="count">JSON</span></div>'
     + '<div class="note"><b>장비 목록 JSON</b>에는 시리얼·구입가·개인 메모가 들어가지 않아요. 공유하거나 다른 사람에게 보여도 안전한 내용만 담깁니다.</div>'
     + '<div class="btns">'
     + '<button class="ghost" id="btnExport">장비 목록 내보내기</button>'
@@ -936,7 +1213,7 @@ function renderData(){
     + '<div class="sect">초기화</div>'
     + '<div class="btns"><button class="ghost danger" id="btnReset">장비 목록을 초기값으로</button>'
     + '<button class="ghost danger" id="btnPrivClear">개인 기록 모두 지우기</button></div>'
-    + '<div class="dim" style="margin-top:10px">저장 위치 · 이 브라우저 localStorage (' + esc(KEY) + ', ' + esc(PKEY) + ')</div>'
+    + '<div class="dim" style="margin-top:12px">저장 위치 · 이 브라우저 localStorage (' + esc(KEY) + ', ' + esc(PKEY) + ')</div>'
     + '</div>';
 }
 
@@ -1226,6 +1503,7 @@ function renderAll(){
   document.getElementById('subline').textContent = '바디 ' + data.bodies.length + ' · 렌즈 ' + data.lenses.length
     + ' · 컨버터 ' + data.adapters.length + ' · 필름 ' + rollCount + '롤' + (loadedN ? ' · 장전 ' + loadedN + '대' : '');
   bindRec();
+  syncRecChips();
   window.scrollTo(0, keepScroll);
 }
 function bindRec(){
@@ -1233,9 +1511,9 @@ function bindRec(){
   var l = document.getElementById('recLens');
   var p = document.getElementById('recPurpose');
   if(!b || !l || !p) return;
-  b.onchange = function(){ if(b.value) l.value = ''; if(recAuto) runRec(); };
-  l.onchange = function(){ if(l.value) b.value = ''; if(recAuto) runRec(); };
-  p.onchange = function(){ if(recAuto) runRec(); };
+  b.onchange = function(){ if(b.value) l.value = ''; syncRecChips(); if(recAuto) runRec(); };
+  l.onchange = function(){ if(l.value) b.value = ''; syncRecChips(); if(recAuto) runRec(); };
+  p.onchange = function(){ syncRecChips(); if(recAuto) runRec(); };
 }
 function showTab(name){
   ['home','gear','rec','film','data'].forEach(function(n){
@@ -1272,6 +1550,26 @@ document.addEventListener('click', function(e){
 
   var add = t.getAttribute('data-add');
   if(add){ openSheet(add, null); return; }
+
+  if(t.hasAttribute && t.hasAttribute('data-pick-body')){
+    var pbEl = document.getElementById('recBody');
+    var plEl = document.getElementById('recLens');
+    if(pbEl) pbEl.value = t.getAttribute('data-pick-body') || '';
+    if(plEl && pbEl && pbEl.value) plEl.value = '';
+    syncRecChips(); if(recAuto) runRec(); return;
+  }
+  if(t.hasAttribute && t.hasAttribute('data-pick-lens')){
+    var plEl2 = document.getElementById('recLens');
+    var pbEl2 = document.getElementById('recBody');
+    if(plEl2) plEl2.value = t.getAttribute('data-pick-lens') || '';
+    if(pbEl2 && plEl2 && plEl2.value) pbEl2.value = '';
+    syncRecChips(); if(recAuto) runRec(); return;
+  }
+  if(t.hasAttribute && t.hasAttribute('data-pick-purpose')){
+    var ppEl = document.getElementById('recPurpose');
+    if(ppEl) ppEl.value = t.getAttribute('data-pick-purpose') || '스냅';
+    syncRecChips(); if(recAuto) runRec(); return;
+  }
 
   var ed = t.getAttribute('data-edit');
   if(ed){ var parts = ed.split(':'); openSheet(parts[0], parts[1]); return; }
