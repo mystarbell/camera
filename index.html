@@ -2596,6 +2596,7 @@ var SCAN_MAX_PX = 900;      /* 셀프스캔 사진을 줄일 긴 변(px) */
 var SCAN_QUALITY = 0.76;    /* 셀프스캔 JPEG 품질 */
 var SCAN_BUDGET = 3600000;  /* priv 전체(문자열 길이) 상한 — NAS api.php 4MB·브라우저 5MB 안쪽 */
 var histView = 'rolls';     /* rolls | gallery */
+var openRolls = {};         /* 펼쳐 둔 히스토리 롤 — 다시 그려도 접히지 않게 */
 var spotDraft = {bodyId:'', spotId:'', lat:null, lng:null, shot:''};
 
 function pad2(n){ return n < 10 ? '0' + n : String(n); }
@@ -2924,7 +2925,7 @@ function histCardHtml(roll){
   var shots = (roll.spots instanceof Array) ? roll.spots : [];
   var first = shots.filter(function(s){ return s && s.shot; })[0];
   var map = shots.length >= 2 ? rollRouteUrl(shots) : (shots.length ? spotMapsUrl(shots[0]) : '');
-  var h = '<details class="hcard">'
+  var h = '<details class="hcard" data-hroll="' + esc(roll.id) + '"' + (openRolls[roll.id] ? ' open' : '') + '>'
     + '<summary>'
     + '<span class="h-thumb">' + (first ? '<img src="' + esc(first.shot) + '" alt="" loading="lazy" />' : '<span aria-hidden="true">🎞️</span>') + '</span>'
     + '<span class="h-main">'
@@ -3736,6 +3737,15 @@ document.addEventListener('change', function(e){
     t.value = '';
   }
 });
+/* 펼쳐 둔 히스토리 카드가 다시 그려질 때 접히지 않도록 상태를 기억한다 */
+document.addEventListener('toggle', function(e){
+  var el = e && e.target;
+  if(!el || !el.getAttribute) return;
+  var hroll = el.getAttribute('data-hroll');
+  if(!hroll) return;
+  if(el.open) openRolls[hroll] = true; else delete openRolls[hroll];
+}, true);
+
 function readJSON(file, ok){
   var reader = new FileReader();
   reader.onload = function(){
