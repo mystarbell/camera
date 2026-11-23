@@ -225,6 +225,13 @@ select[hidden]{display:none}
 .chips button{flex:0 0 auto;background:var(--surface);border:1px solid var(--line2);color:var(--ink2);border-radius:999px;padding:9px 15px;font-size:13.5px;font-weight:700;min-height:42px;cursor:pointer}
 .chips button.on{background:var(--ink);border-color:var(--ink);color:#fdfbf5}
 
+/* ---------- 필름 검색 ---------- */
+#lfSearch,#fmSearch{background:var(--surface2);border-color:var(--line2)}
+#lfResults .item,#fmResults .item{padding:11px 0;gap:9px}
+#lfResults .item .t,#fmResults .item .t{font-size:14.5px;word-break:keep-all}
+#lfResults .item .d,#fmResults .item .d{font-size:12.5px}
+.fpick-note{font-size:12.5px;color:var(--ink2);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:8px 11px;margin-top:8px;line-height:1.5}
+
 /* ---------- 시트 ---------- */
 .modal{position:fixed;inset:0;background:rgba(30,26,18,.42);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:none;align-items:flex-end;z-index:60}
 .modal.on{display:flex}
@@ -363,6 +370,364 @@ var FORMATS = {
   'aps-c':   {label:'디지털 APS-C', crop:1.50, film:null},
   'm43':     {label:'디지털 M4/3', crop:2.00, film:null}
 };
+
+/* ================= 필름 카탈로그 ================= */
+/* 35mm·120·127(4×4) 대표 스톡 42종. keywords에 한글 별칭을 넣어 '포트라'·'골드'·'흑백'·'127'로도 찾는다.
+   필름 장전과 재고 추가 화면의 검색 추천은 이 목록 + 사용자가 등록한 보유 필름(data.films)을 함께 쓴다. */
+var DEFAULT_FILMS = [
+  {stock:"Kodak Gold 200",name:"Kodak Gold 200",brand:"Kodak",iso:200,format:"35mm",formats:["35mm"],type:"컬러 네거티브",defaultExp:36,popular:100,keywords:["코닥", "골드", "kodak", "gold", "200", "가성비", "따뜻한"],bestFor:["여행", "스냅"],character:"따뜻한 색, 가성비 좋은 데일리"},
+  {stock:"Kodak ColorPlus 200",name:"Kodak ColorPlus 200",brand:"Kodak",iso:200,format:"35mm",formats:["35mm"],type:"컬러 네거티브",defaultExp:36,popular:95,keywords:["코닥", "컬러플러스", "칼라플러스", "colorplus", "color plus", "200", "가성비"],bestFor:["스냅", "여행"],character:"부드러운 색, 저렴한 데일리"},
+  {stock:"Kodak UltraMax 400",name:"Kodak UltraMax 400",brand:"Kodak",iso:400,format:"35mm",formats:["35mm"],type:"컬러 네거티브",defaultExp:36,popular:88,keywords:["코닥", "울트라맥스", "ultramax", "400", "고감도"],bestFor:["스냅", "실내"],character:"관용도 넓은 만능 400"},
+  {stock:"Kodak ProImage 100",name:"Kodak ProImage 100",brand:"Kodak",iso:100,format:"35mm",formats:["35mm"],type:"컬러 네거티브",defaultExp:36,popular:60,keywords:["코닥", "프로이미지", "proimage", "100", "인물"],bestFor:["인물", "여행"],character:"차분하고 자연스러운 피부톤"},
+  {stock:"Kodak Ektar 100",name:"Kodak Ektar 100",brand:"Kodak",iso:100,format:"35mm",formats:["35mm", "120"],type:"컬러 네거티브",defaultExp:36,popular:70,keywords:["코닥", "엑타", "엑타르", "ektar", "100", "풍경", "채도"],bestFor:["풍경", "여행"],character:"고채도·미세 입자"},
+  {stock:"Kodak Portra 160",name:"Kodak Portra 160",brand:"Kodak",iso:160,format:"35mm",formats:["35mm", "120"],type:"컬러 네거티브",defaultExp:36,popular:85,keywords:["코닥", "포트라", "portra", "160", "인물", "피부톤"],bestFor:["인물", "여행"],character:"부드러운 피부톤, 고운 입자"},
+  {stock:"Kodak Portra 400",name:"Kodak Portra 400",brand:"Kodak",iso:400,format:"35mm",formats:["35mm", "120"],type:"컬러 네거티브",defaultExp:36,popular:99,keywords:["코닥", "포트라", "portra", "400", "인물", "만능"],bestFor:["인물", "실내", "여행", "스냅"],character:"부드러운 피부톤, 관용도 넓음"},
+  {stock:"Kodak Portra 800",name:"Kodak Portra 800",brand:"Kodak",iso:800,format:"35mm",formats:["35mm", "120"],type:"컬러 네거티브",defaultExp:36,popular:75,keywords:["코닥", "포트라", "portra", "800", "실내", "야간"],bestFor:["실내", "인물"],character:"실내 아이들 스냅에 강함"},
+  {stock:"Kodak Tri-X 400",name:"Kodak Tri-X 400",brand:"Kodak",iso:400,format:"35mm",formats:["35mm"],type:"흑백",defaultExp:36,popular:90,keywords:["코닥", "트릭스", "트라이엑스", "trix", "tri-x", "400", "흑백"],bestFor:["인물", "스냅", "여행"],character:"거친 매력의 클래식 흑백"},
+  {stock:"Kodak T-Max 100",name:"Kodak T-Max 100",brand:"Kodak",iso:100,format:"35mm",formats:["35mm"],type:"흑백",defaultExp:36,popular:62,keywords:["코닥", "티맥스", "tmax", "t-max", "100", "흑백", "고운입자"],bestFor:["풍경", "인물"],character:"고운 입자, 깔끔한 계조"},
+  {stock:"Kodak T-Max 400",name:"Kodak T-Max 400",brand:"Kodak",iso:400,format:"35mm",formats:["35mm"],type:"흑백",defaultExp:36,popular:66,keywords:["코닥", "티맥스", "tmax", "t-max", "400", "흑백"],bestFor:["인물", "스냅"],character:"입자와 감도의 균형"},
+  {stock:"Kodak Ektachrome E100",name:"Kodak Ektachrome E100",brand:"Kodak",iso:100,format:"35mm",formats:["35mm", "120"],type:"슬라이드",defaultExp:36,popular:55,keywords:["코닥", "엑타크롬", "ektachrome", "e100", "100", "슬라이드"],bestFor:["풍경", "스냅"],character:"차분한 청록, 현대적 슬라이드"},
+  {stock:"Kodak 200 (127)",name:"Kodak 200 (127)",brand:"Kodak",iso:200,format:"127",formats:["127"],type:"컬러 네거티브",defaultExp:12,popular:80,keywords:["코닥", "127", "200", "4x4", "4×4", "베이비", "롤라이", "baby"],bestFor:["스냅", "인물"],character:"127 규격 데일리 컬러"},
+  {stock:"Fujicolor 200 (C200)",name:"Fujicolor 200 (C200)",brand:"Fujifilm",iso:200,format:"35mm",formats:["35mm"],type:"컬러 네거티브",defaultExp:36,popular:92,keywords:["후지", "후지필름", "후지컬러", "c200", "200", "가성비"],bestFor:["여행", "스냅"],character:"맑고 차분한 색"},
+  {stock:"Fujifilm Superia X-TRA 400",name:"Fujifilm Superia X-TRA 400",brand:"Fujifilm",iso:400,format:"35mm",formats:["35mm"],type:"컬러 네거티브",defaultExp:36,popular:78,keywords:["후지", "슈페리아", "수페리아", "superia", "xtra", "x-tra", "400"],bestFor:["스냅", "여행"],character:"푸른 기운의 400"},
+  {stock:"Fujifilm Superia Premium 400",name:"Fujifilm Superia Premium 400",brand:"Fujifilm",iso:400,format:"35mm",formats:["35mm"],type:"컬러 네거티브",defaultExp:36,popular:64,keywords:["후지", "슈페리아", "프리미엄", "superia", "premium", "400", "인물"],bestFor:["인물", "스냅"],character:"일본 내수, 피부톤 개선"},
+  {stock:"Fujifilm Pro 400H",name:"Fujifilm Pro 400H",brand:"Fujifilm",iso:400,format:"35mm",formats:["35mm", "120"],type:"컬러 네거티브",defaultExp:36,popular:72,keywords:["후지", "프로400h", "400h", "pro400h", "400", "웨딩", "인물"],bestFor:["인물", "스냅"],character:"에어리한 하이라이트"},
+  {stock:"Fujifilm Velvia 50",name:"Fujifilm Velvia 50",brand:"Fujifilm",iso:50,format:"35mm",formats:["35mm", "120"],type:"슬라이드",defaultExp:36,popular:68,keywords:["후지", "벨비아", "velvia", "50", "슬라이드", "풍경"],bestFor:["풍경"],character:"강한 채도, 노출 정확도 요구"},
+  {stock:"Fujifilm Velvia 100",name:"Fujifilm Velvia 100",brand:"Fujifilm",iso:100,format:"35mm",formats:["35mm", "120"],type:"슬라이드",defaultExp:36,popular:58,keywords:["후지", "벨비아", "velvia", "100", "슬라이드", "풍경"],bestFor:["풍경"],character:"선명한 채도의 슬라이드"},
+  {stock:"Fujifilm Provia 100F",name:"Fujifilm Provia 100F",brand:"Fujifilm",iso:100,format:"35mm",formats:["35mm", "120"],type:"슬라이드",defaultExp:36,popular:60,keywords:["후지", "프로비아", "provia", "100f", "100", "슬라이드"],bestFor:["풍경", "여행"],character:"중립적 색, 깔끔한 계조"},
+  {stock:"Fujifilm Neopan Acros 100 II",name:"Fujifilm Neopan Acros 100 II",brand:"Fujifilm",iso:100,format:"35mm",formats:["35mm", "120"],type:"흑백",defaultExp:36,popular:66,keywords:["후지", "아크로스", "네오판", "acros", "neopan", "100", "흑백"],bestFor:["풍경", "인물"],character:"매끈한 계조의 흑백"},
+  {stock:"Ilford HP5 Plus 400",name:"Ilford HP5 Plus 400",brand:"Ilford",iso:400,format:"35mm",formats:["35mm", "120"],type:"흑백",defaultExp:36,popular:94,keywords:["일포드", "hp5", "hp5plus", "hp5 plus", "400", "흑백", "클래식"],bestFor:["인물", "여행", "스냅"],character:"관용도 큰 클래식 흑백"},
+  {stock:"Ilford FP4 Plus 125",name:"Ilford FP4 Plus 125",brand:"Ilford",iso:125,format:"35mm",formats:["35mm", "120"],type:"흑백",defaultExp:36,popular:70,keywords:["일포드", "fp4", "fp4plus", "fp4 plus", "125", "흑백"],bestFor:["풍경", "인물"],character:"고운 입자와 부드러운 계조"},
+  {stock:"Ilford Delta 100",name:"Ilford Delta 100",brand:"Ilford",iso:100,format:"35mm",formats:["35mm", "120"],type:"흑백",defaultExp:36,popular:65,keywords:["일포드", "델타", "delta", "100", "흑백"],bestFor:["풍경", "인물"],character:"현대적 고운 입자"},
+  {stock:"Ilford Delta 400",name:"Ilford Delta 400",brand:"Ilford",iso:400,format:"35mm",formats:["35mm", "120"],type:"흑백",defaultExp:36,popular:63,keywords:["일포드", "델타", "delta", "400", "흑백"],bestFor:["인물", "스냅"],character:"선명한 400 흑백"},
+  {stock:"Ilford Delta 3200",name:"Ilford Delta 3200",brand:"Ilford",iso:3200,format:"35mm",formats:["35mm", "120"],type:"흑백",defaultExp:36,popular:74,keywords:["일포드", "델타", "delta", "3200", "흑백", "야간", "고감도"],bestFor:["실내"],character:"어두운 실내·야간용 고감도"},
+  {stock:"Ilford XP2 Super 400",name:"Ilford XP2 Super 400",brand:"Ilford",iso:400,format:"35mm",formats:["35mm"],type:"흑백",defaultExp:36,popular:52,keywords:["일포드", "xp2", "xp2super", "xp2 super", "400", "흑백", "씨네"],bestFor:["인물", "스냅"],character:"C-41 현상 흑백, 부드러운 입자"},
+  {stock:"Ilford Pan F Plus 50",name:"Ilford Pan F Plus 50",brand:"Ilford",iso:50,format:"35mm",formats:["35mm"],type:"흑백",defaultExp:36,popular:50,keywords:["일포드", "팬에프", "panf", "pan f", "50", "흑백", "고운입자"],bestFor:["풍경"],character:"최고 수준의 고운 입자"},
+  {stock:"CineStill 50D",name:"CineStill 50D",brand:"CineStill",iso:50,format:"35mm",formats:["35mm"],type:"컬러 네거티브",defaultExp:36,popular:54,keywords:["씨네스틸", "cinestill", "50d", "50", "영화", "데이라이트"],bestFor:["풍경", "스냅"],character:"영화용 데이라이트, 고운 입자"},
+  {stock:"CineStill 400D",name:"CineStill 400D",brand:"CineStill",iso:400,format:"35mm",formats:["35mm"],type:"컬러 네거티브",defaultExp:36,popular:57,keywords:["씨네스틸", "cinestill", "400d", "400", "영화"],bestFor:["인물", "스냅"],character:"영화용 400, 자연스러운 색"},
+  {stock:"CineStill 800T",name:"CineStill 800T",brand:"CineStill",iso:800,format:"35mm",formats:["35mm"],type:"컬러 네거티브(텅스텐)",defaultExp:36,popular:82,keywords:["씨네스틸", "cinestill", "800t", "800", "야간", "텅스텐", "할레이션"],bestFor:["실내"],character:"야간·형광등 아래 할레이션"},
+  {stock:"CineStill BwXX",name:"CineStill BwXX",brand:"CineStill",iso:250,format:"35mm",formats:["35mm"],type:"흑백",defaultExp:36,popular:48,keywords:["씨네스틸", "cinestill", "bwxx", "흑백", "영화"],bestFor:["인물", "스냅"],character:"영화용 더블X 흑백"},
+  {stock:"Lomography Color Negative 100",name:"Lomography Color Negative 100",brand:"Lomography",iso:100,format:"35mm",formats:["35mm"],type:"컬러 네거티브",defaultExp:36,popular:46,keywords:["로모", "로모그래피", "lomo", "lomography", "100", "컬러"],bestFor:["스냅", "여행"],character:"선명한 색의 데일리"},
+  {stock:"Lomography Color Negative 400",name:"Lomography Color Negative 400",brand:"Lomography",iso:400,format:"35mm",formats:["35mm"],type:"컬러 네거티브",defaultExp:36,popular:56,keywords:["로모", "로모그래피", "lomo", "lomography", "400", "컬러"],bestFor:["스냅", "실내"],character:"관용도 좋은 400"},
+  {stock:"Lomography Color Negative 800",name:"Lomography Color Negative 800",brand:"Lomography",iso:800,format:"35mm",formats:["35mm"],type:"컬러 네거티브",defaultExp:36,popular:44,keywords:["로모", "로모그래피", "lomo", "lomography", "800", "야간"],bestFor:["실내"],character:"야간·실내용 800"},
+  {stock:"Fomapan 100",name:"Fomapan 100",brand:"Foma",iso:100,format:"35mm",formats:["35mm", "120"],type:"흑백",defaultExp:36,popular:58,keywords:["포마", "포마판", "foma", "fomapan", "100", "흑백", "체코"],bestFor:["풍경", "인물"],character:"클래식한 계조의 저가 흑백"},
+  {stock:"Fomapan 200",name:"Fomapan 200",brand:"Foma",iso:200,format:"35mm",formats:["35mm", "120"],type:"흑백",defaultExp:36,popular:62,keywords:["포마", "포마판", "foma", "fomapan", "200", "흑백"],bestFor:["인물", "스냅"],character:"부드러운 중간 톤"},
+  {stock:"Fomapan 400",name:"Fomapan 400",brand:"Foma",iso:400,format:"35mm",formats:["35mm", "120"],type:"흑백",defaultExp:36,popular:60,keywords:["포마", "포마판", "foma", "fomapan", "400", "흑백", "가성비"],bestFor:["인물", "스냅"],character:"거친 매력의 저가 400"},
+  {stock:"ReraPan 100 (127)",name:"ReraPan 100 (127)",brand:"ReraPan",iso:100,format:"127",formats:["127"],type:"흑백",defaultExp:12,popular:72,keywords:["레라판", "rerapan", "127", "100", "흑백", "4x4", "4×4", "베이비"],bestFor:["풍경", "인물"],character:"현존하는 127 흑백"},
+  {stock:"ReraPan 400 (127)",name:"ReraPan 400 (127)",brand:"ReraPan",iso:400,format:"127",formats:["127"],type:"흑백",defaultExp:12,popular:66,keywords:["레라판", "rerapan", "127", "400", "흑백", "4x4", "4×4"],bestFor:["인물", "스냅"],character:"127 고감도 흑백"},
+  {stock:"ReraChrome 100 (127)",name:"ReraChrome 100 (127)",brand:"ReraChrome",iso:100,format:"127",formats:["127"],type:"슬라이드",defaultExp:12,popular:50,keywords:["레라크롬", "rerachrome", "127", "100", "슬라이드", "4x4", "4×4"],bestFor:["풍경"],character:"127 슬라이드"},
+  {stock:"Shanghai GP3 100 (127)",name:"Shanghai GP3 100 (127)",brand:"Shanghai",iso:100,format:"127",formats:["127"],type:"흑백",defaultExp:12,popular:68,keywords:["상하이", "shanghai", "gp3", "127", "100", "흑백", "4x4", "4×4"],bestFor:["풍경", "인물"],character:"저렴한 127 흑백"},
+];
+
+/* 예전에 저장된 카탈로그 항목(스톡명만 있던 10종)도 검색·표시에 필요한 필드를 갖추게 한다 */
+function filmStockSame(a, b){
+  var ka = maskStock(a), kb = maskStock(b);
+  if(!ka || !kb) return false;
+  if(ka === kb) return true;
+  var long = ka.length >= kb.length ? ka : kb;
+  var short = ka.length >= kb.length ? kb : ka;
+  if(long.indexOf(short) !== 0) return false;
+  var rest = long.slice(short.length);
+  return /^[0-9]+$/.test(rest) && rest.length <= 4;
+}
+function filmDefaultsFor(stock){
+  var name = String(stock === undefined || stock === null ? '' : stock);
+  if(!maskStock(name)) return null;
+  var list = DEFAULT_FILMS;
+  for(var i = 0; i < list.length; i++){ if(filmStockSame(list[i].stock, name)) return list[i]; }
+  return null;
+}
+function enrichFilmEntry(f){
+  if(!f || typeof f !== 'object') return f;
+  var d = filmDefaultsFor(f.stock || f.name);
+  if(!f.stock && f.name) f.stock = f.name;
+  if(!f.name) f.name = f.stock || (d ? d.name : '');
+  if(!f.brand && d) f.brand = d.brand;
+  if((f.iso === undefined || f.iso === null || f.iso === '') && d) f.iso = d.iso;
+  if(!f.type && d) f.type = d.type;
+  if(!f.formats || !f.formats.length) f.formats = d ? d.formats.slice() : (f.format ? [f.format] : ['35mm']);
+  if(!f.format) f.format = d ? d.format : f.formats[0];
+  if(f.formats.indexOf(f.format) < 0) f.formats.unshift(f.format);
+  if(!f.defaultExp) f.defaultExp = d ? d.defaultExp : (f.format === '35mm' ? 36 : 12);
+  if(!f.keywords || !f.keywords.length) f.keywords = d ? d.keywords.slice() : [];
+  if(!f.popular) f.popular = d ? d.popular : 10;
+  return f;
+}
+/* 저장된 목록 + 내장 목록을 합친다 — 스톡명이 같은 항목은 저장된 쪽(사용자 메모)을 남긴다 */
+function mergeFilmCatalog(list){
+  var out = [], seen = {};
+  (list || []).forEach(function(f){
+    if(!f || !(f.stock || f.name)) return;
+    var key = maskStock(f.stock || f.name);
+    if(!key || seen[key]) return;
+    seen[key] = 1;
+    out.push(enrichFilmEntry(f));
+  });
+  DEFAULT_FILMS.forEach(function(d){
+    var key = maskStock(d.stock);
+    if(!key || seen[key]) return;
+    var dup = out.filter(function(f){
+      return filmStockSame(f.stock || f.name, d.stock) && (!f.iso || Number(f.iso) === Number(d.iso));
+    })[0];
+    if(dup) return;
+    seen[key] = 1;
+    out.push(clone(d));
+  });
+  return out;
+}
+function filmFormatsOf(f){
+  if(!f) return [];
+  var out = [], seen = {};
+  (f.formats || []).forEach(function(x){ if(x && !seen[x]){ seen[x] = 1; out.push(x); } });
+  if(f.format && !seen[f.format]) out.push(f.format);
+  return out;
+}
+/* 그 바디 포맷에 맞는 컷수 — 35mm 36컷, 120·127 12컷 */
+function filmExpFor(f, fmt){
+  if(fmt === '35mm') return 36;
+  if(fmt === '120' || fmt === '127') return 12;
+  var n = Number(f && f.defaultExp);
+  if(n) return n;
+  return filmFormatsOf(f).indexOf('35mm') >= 0 ? 36 : 12;
+}
+function filmEntryFor(stock){
+  var key = maskStock(stock);
+  if(!key) return null;
+  var cat = data.filmCatalog || [];
+  var hit = cat.filter(function(f){ return maskStock(f.stock) === key; })[0]
+    || cat.filter(function(f){ return filmStockSame(f.stock, stock); })[0];
+  if(hit) return hit;
+  var d = filmDefaultsFor(stock);
+  return d ? enrichFilmEntry(clone(d)) : null;
+}
+function filmRowFor(stock, fmt){
+  var name = String(stock === undefined || stock === null ? '' : stock).trim();
+  var key = maskStock(name);
+  var entry = filmEntryFor(name);
+  var own = (data.films || []).filter(function(f){ return maskStock(f.stock) === key; });
+  var rolls = own.reduce(function(n,f){ return n + (Number(f.rolls) || 0); }, 0);
+  var formats = filmFormatsOf(entry);
+  if(!formats.length){
+    own.forEach(function(f){ if(f.format && formats.indexOf(f.format) < 0) formats.push(f.format); });
+  }
+  var iso = null;
+  if(own.length){
+    var oi = own[0].iso;
+    if(oi !== undefined && oi !== null && oi !== '') iso = Number(oi);
+  }
+  if(iso === null && entry && entry.iso) iso = Number(entry.iso);
+  if(iso === null) iso = isoFromStock(name);
+  return {
+    stock: name, iso: iso, type: (entry && entry.type) || '',
+    formats: formats, format: (entry && entry.format) || formats[0] || '',
+    exp: filmExpFor(entry || {defaultExp: null}, fmt),
+    rolls: rolls, owned: own.length > 0, entry: entry || null, compatible: true
+  };
+}
+function filmQueryTokens(q){
+  var t = String(q === undefined || q === null ? '' : q).toLowerCase()
+    .replace(/[()\[\]{},·]/g, ' ').replace(/\s+/g, ' ').trim();
+  return t ? t.split(' ') : [];
+}
+function filmRowHay(r){
+  var e = r.entry || {};
+  var parts = [r.stock, e.brand, e.type, e.character, r.iso, e.defaultExp];
+  parts = parts.concat(e.keywords || []);
+  (r.formats || []).forEach(function(x){ parts.push(x); });
+  return parts.join(' ').toLowerCase();
+}
+/* 검색어가 없으면 그 바디 포맷의 필름만(내 보유 → 인기 순), 검색어가 있으면 다른 포맷도 참고로 함께 */
+function filmPickerResults(q, fmt){
+  var tokens = filmQueryTokens(q);
+  var rows = [], seen = {};
+  function push(row){
+    var key = maskStock(row.stock);
+    if(!key) return;
+    var same = seen[key] || null;
+    if(!same){
+      for(var i = 0; i < rows.length; i++){
+        if(filmStockSame(rows[i].stock, row.stock)){ same = rows[i]; break; }
+      }
+    }
+    if(same){
+      var ex = same;
+      ex.owned = ex.owned || row.owned;
+      if(ex.rolls < row.rolls) ex.rolls = row.rolls;
+      if(!ex.entry && row.entry) ex.entry = row.entry;
+      if(!ex.type) ex.type = row.type;
+      if(!ex.iso) ex.iso = row.iso;
+      if(!ex.formats.length) ex.formats = row.formats;
+      return;
+    }
+    seen[key] = row;
+    rows.push(row);
+  }
+  (data.films || []).forEach(function(f){
+    var name = String(f.stock || '').trim();
+    if(!name) return;
+    var row = filmRowFor(name, fmt);
+    if(f.format && f.format !== 'any'){
+      row.format = f.format;
+      if(row.formats.indexOf(f.format) < 0) row.formats = [f.format];
+    }
+    push(row);
+  });
+  (data.filmCatalog || []).forEach(function(f){
+    var name = String(f.stock || '').trim();
+    if(!name) return;
+    push(filmRowFor(name, fmt));
+  });
+  rows.forEach(function(r){
+    r.compatible = !fmt || !r.formats.length || r.formats.indexOf(fmt) >= 0 || r.formats.indexOf('any') >= 0;
+    r.hay = filmRowHay(r);
+  });
+  rows = rows.filter(function(r){
+    if(!tokens.length) return r.compatible;
+    return tokens.every(function(t){ return r.hay.indexOf(t) >= 0; });
+  });
+  rows.sort(function(a,b){
+    if(a.compatible !== b.compatible) return a.compatible ? -1 : 1;
+    if((a.rolls > 0) !== (b.rolls > 0)) return a.rolls > 0 ? -1 : 1;
+    var pa = Number((a.entry || {}).popular) || 0, pb = Number((b.entry || {}).popular) || 0;
+    if(pa !== pb) return pb - pa;
+    if(a.rolls !== b.rolls) return b.rolls - a.rolls;
+    return a.stock < b.stock ? -1 : (a.stock > b.stock ? 1 : 0);
+  });
+  return rows;
+}
+function filmPickRowHtml(r, fmt, bodyId){
+  var badges = '';
+  if(r.rolls > 0) badges += ' <span class="pill ok">보유 ' + esc(r.rolls) + '롤</span>';
+  else if(r.owned) badges += ' <span class="pill bad">재고 0롤</span>';
+  var cur = bodyId ? loadedStock(bodyById(bodyId)) : '';
+  if(cur && cur === r.stock) badges += ' <span class="pill ok">장전 중</span>';
+  var meta = [];
+  if(r.iso !== null && r.iso !== undefined) meta.push('ISO ' + r.iso);
+  if(r.type) meta.push(r.type);
+  if(r.formats && r.formats.length) meta.push(r.formats.join('/'));
+  if(r.exp) meta.push(r.exp + '컷');
+  if(r.owned) meta.push(r.rolls > 0 ? r.rolls + '롤 남음' : '재고 없음');
+  if(!r.compatible) meta.push('포맷 다름');
+  var isoAttr = (r.iso === null || r.iso === undefined) ? '' : r.iso;
+  var ops = bodyId
+    ? '<button class="ghost sm" data-set-body="' + esc(bodyId) + '" data-set="' + esc(r.stock) + '" data-set-iso="' + esc(isoAttr) + '" data-set-exp="' + esc(r.exp || '') + '">장전</button>'
+    : '<button class="ghost sm" data-fpick="' + esc(r.stock) + '">이 필름</button>';
+  return '<div class="item"><div style="min-width:0"><div class="t">' + esc(r.stock) + badges + '</div>'
+    + '<div class="d">' + esc(meta.join(' · ')) + '</div></div><div class="ops">' + ops + '</div></div>';
+}
+function filmPickerSectionsHtml(q, fmt, bodyId){
+  var rows = filmPickerResults(q, fmt);
+  var held = rows.filter(function(r){ return r.owned && r.compatible; });
+  var cat = rows.filter(function(r){ return !r.owned && r.compatible; });
+  var other = rows.filter(function(r){ return !r.compatible; });
+  var h = '<div class="sect">보유 필름에서 고르기</div>';
+  if(!held.length) h += '<div class="dim">' + esc(fmt || '필름') + ' 보유 필름이 없어요. 아래 목록에서 고르거나 필름 탭에서 재고를 먼저 등록하세요.</div>';
+  held.forEach(function(r){ h += filmPickRowHtml(r, fmt, bodyId); });
+  h += '<div class="sect">카탈로그에서 고르기 <span class="dim">' + esc((data.filmCatalog || []).length) + '종</span></div>';
+  var shown = cat.slice(0, q ? 24 : 14);
+  if(!shown.length) h += '<div class="dim">맞는 필름이 없어요 — 검색어를 바꾸거나 아래에 직접 입력하세요.</div>';
+  shown.forEach(function(r){ h += filmPickRowHtml(r, fmt, bodyId); });
+  if(cat.length > shown.length) h += '<div class="dim" style="margin-top:8px">' + (cat.length - shown.length) + '종 더 있어요 — 검색어를 넣어 좁혀 보세요.</div>';
+  if(other.length){
+    h += '<div class="sect">다른 포맷 (참고)</div>';
+    other.slice(0, 12).forEach(function(r){ h += filmPickRowHtml(r, fmt, bodyId); });
+  }
+  return h;
+}
+function filmAddSectionsHtml(q){
+  var rows = filmPickerResults(q, '');
+  var held = rows.filter(function(r){ return r.owned; });
+  var cat = rows.filter(function(r){ return !r.owned; });
+  var h = '<div class="sect">내 보유 필름</div>';
+  if(!held.length) h += '<div class="dim">아직 등록된 필름이 없어요 — 아래 카탈로그에서 골라 롤 수를 넣으면 돼요.</div>';
+  held.forEach(function(r){ h += filmPickRowHtml(r, '', ''); });
+  h += '<div class="sect">카탈로그 <span class="dim">' + esc((data.filmCatalog || []).length) + '종</span></div>';
+  var shown = cat.slice(0, q ? 24 : 14);
+  if(!shown.length) h += '<div class="dim">맞는 필름이 없어요 — 아래 스톡명 칸에 직접 입력해도 됩니다.</div>';
+  shown.forEach(function(r){ h += filmPickRowHtml(r, '', ''); });
+  if(cat.length > shown.length) h += '<div class="dim" style="margin-top:8px">' + (cat.length - shown.length) + '종 더 있어요 — 검색어를 넣어 좁혀 보세요.</div>';
+  return h;
+}
+function filmAddPickerHtml(){
+  return '<label for="fmSearch">카탈로그에서 찾기</label>'
+    + '<input id="fmSearch" type="search" autocomplete="off" placeholder="200, 포트라, 코닥, 흑백, 127 …" oninput="onFilmAddSearch(this.value)" />'
+    + '<div class="dim" style="margin-top:5px">목록에서 하나를 누르면 스톡명·ISO·포맷이 채워집니다. 롤 수만 정하면 돼요.</div>'
+    + '<div id="fmResults">' + filmAddSectionsHtml('') + '</div>'
+    + '<div id="fmPicked" class="fpick-note">아직 고르지 않았어요 — 아래 스톡명 칸에 직접 입력해도 됩니다.</div>';
+}
+function onFilmSearch(v){
+  var box = document.getElementById('lfResults');
+  if(!box || !lfCtx) return;
+  box.innerHTML = filmPickerSectionsHtml(v, lfCtx.fmt, lfCtx.bodyId);
+}
+function onFilmAddSearch(v){
+  var box = document.getElementById('fmResults');
+  if(!box) return;
+  box.innerHTML = filmAddSectionsHtml(v);
+}
+/* 직접 입력한 이름도 목록의 스톡과 맞춰 본다('Ilford HP5 Plus' → 'Ilford HP5 Plus 400') */
+function findFilmChoice(stock, fmt){
+  var key = maskStock(stock);
+  if(!key) return null;
+  var list = filmStockChoices(fmt);
+  var exact = list.filter(function(c){ return maskStock(c.stock) === key; })[0];
+  if(exact) return exact;
+  var pref = list.filter(function(c){
+    var k = maskStock(c.stock);
+    return k && (k.indexOf(key) === 0 || key.indexOf(k) === 0);
+  });
+  var iso = isoFromStock(stock);
+  if(pref.length > 1 && iso !== null){
+    var byIso = pref.filter(function(c){ return Number(c.iso) === iso; })[0];
+    if(byIso) return byIso;
+  }
+  if(pref.length) return pref[0];
+  if(iso !== null){
+    var byIso2 = list.filter(function(c){ return Number(c.iso) === iso; })[0];
+    if(byIso2) return byIso2;
+  }
+  return null;
+}
+/* 필름 추가 시트: 고른 필름의 이름·ISO·포맷을 폼에 채운다 */
+function filmPickIntoFields(stock){
+  var row = filmRowFor(stock, '');
+  if(!row || !row.stock) return;
+  var sheet = document.getElementById('sheet');
+  if(!sheet) return;
+  function setv(k, v){
+    var el = sheet.querySelector('[data-k="' + k + '"]');
+    if(el) el.value = (v === undefined || v === null) ? '' : String(v);
+  }
+  setv('stock', row.stock);
+  setv('iso', (row.iso === null || row.iso === undefined) ? '' : row.iso);
+  var fmts = row.formats || [];
+  setv('format', fmts.indexOf('35mm') >= 0 ? '35mm' : (fmts[0] || row.format || ''));
+  var picked = document.getElementById('fmPicked');
+  if(picked) picked.textContent = row.stock + ' 선택됨' + (row.rolls > 0 ? ' · 보유 ' + row.rolls + '롤' : '') + ' — 롤 수만 넣고 저장하세요';
+  toast(row.stock + ' 선택');
+}
+/* 장전 실행 — exp(컷수)를 필름 메모에, minus면 보유 재고 1롤 차감 */
+function applyFilmChoice(id, stock, iso, exp, minus){
+  var b = bodyById(id);
+  var name = String(stock === undefined || stock === null ? '' : stock).trim();
+  if(!b || !name) return;
+  var fmt = filmFormatOf(b);
+  var row = filmRowFor(name, fmt);
+  var isoVal = (iso === undefined || iso === null || String(iso).trim() === '') ? row.iso : Number(iso);
+  var expVal = (exp === undefined || exp === null || String(exp).trim() === '') ? row.exp : Number(exp);
+  setLoaded(id, name, isoVal, expVal ? expVal + '컷' : '');
+  if(!minus) return;
+  var key = maskStock(name), target = null;
+  (data.films || []).forEach(function(f){
+    if(target) return;
+    if(maskStock(f.stock) === key && (Number(f.rolls) || 0) > 0) target = f;
+  });
+  if(!target) return;
+  target.rolls = (Number(target.rolls) || 0) - 1;
+  saveData(); renderAll();
+  toast(name + ' 장전 · 재고 1롤 차감해 ' + target.rolls + '롤');
+}
+
 var BODY_TYPE_LIST = ['필름 SLR','필름 레인지파인더','필름 TLR','필름 중형','필름 컴팩트','디지털','디지털 미러리스','디지털 DSLR','기타'];
 var MOUNTS = ['Nikon F','Canon EF','Canon RF','Sony E','Sony A','Fujifilm X','Leica M','Leica M39(LTM)','M42','Pentax K','Contax/Yashica','Olympus OM','Rollei QBM','Mamiya 645','Pentax 645','Hasselblad V','고정 렌즈'];
 var PURPOSES = {
@@ -400,12 +765,13 @@ var priv = loadPriv();
 var reveal = false;
 var gearFilter = 'all';
 var recAuto = true;
+var lfCtx = {bodyId:'', fmt:''};   /* 필름 장전 모달의 검색 대상 */
 
 function clone(o){ return JSON.parse(JSON.stringify(o)); }
 
 function normalize(d){
   d.bodies = d.bodies || []; d.lenses = d.lenses || []; d.adapters = d.adapters || [];
-  d.films = d.films || []; d.filmCatalog = d.filmCatalog || clone(seed.filmCatalog);
+  d.films = d.films || []; d.filmCatalog = mergeFilmCatalog(d.filmCatalog || clone(seed.filmCatalog || []));
   d.removed = d.removed || [];
   d.bodies.forEach(function(b){
     if(b.bodyType === undefined) b.bodyType = '';
@@ -548,6 +914,8 @@ function filmStockChoices(fmt){
     if(!stock) return;
     var key = maskStock(stock);
     if(!key || seen[key]) return;
+    var dup = out.filter(function(c){ return filmStockSame(c.stock, stock); })[0];
+    if(dup) return;
     seen[key] = true;
     out.push({stock:String(stock), iso:iso, src:src});
   }
@@ -568,8 +936,7 @@ function loadedIsoText(b){
   if(iso !== null) return iso;
   var s = loadedStock(b);
   if(!s) return null;
-  var key = maskStock(s);
-  var hit = filmStockChoices(filmFormatOf(b)).filter(function(c){ return maskStock(c.stock) === key; })[0];
+  var hit = findFilmChoice(s, filmFormatOf(b));
   return hit && hit.iso ? hit.iso : null;
 }
 function loadedBadge(b){
@@ -587,13 +954,14 @@ function loadedDetail(b){
   if(note) parts.push(note);
   return parts.length ? '<div class="dim">' + esc(parts.join(' · ')) + '</div>' : '';
 }
-function setLoaded(id, stock, iso){
+function setLoaded(id, stock, iso, note){
   var b = bodyById(id); if(!b) return;
   var s = String(stock === undefined || stock === null ? '' : stock).trim();
   var none = NO_FILM_LIST.indexOf(s) >= 0;
   b.loadedFilm = none ? NO_FILM : s;
   b.loadedIso = (none || iso === undefined || iso === null || String(iso).trim() === '') ? null : Number(iso);
   if(none) b.loadedFilmNote = '';
+  else if(note !== undefined && note !== null) b.loadedFilmNote = String(note).trim();
   saveData(); renderAll();
 }
 function aov(eq){ return Math.round(2 * Math.atan(43.2666 / (2 * eq)) * 180 / Math.PI); }
@@ -1766,7 +2134,7 @@ var SCHEMA = {
     {k:'notes', l:'공개 메모', t:'textarea', ph:'자동 초점 여부, 개조 상태 등'}
   ]},
   films: {label:'필름', fields:[
-    {k:'stock', l:'스톡명', t:'text', list:(seed.filmCatalog || []).map(function(f){ return f.stock; }), ph:'Kodak Portra 400'},
+    {k:'stock', l:'스톡명', t:'text', list:(data.filmCatalog || []).map(function(f){ return f.stock; }), ph:'Kodak Portra 400'},
     {k:'iso', l:'ISO (감도)', t:'number', ph:'400'},
     {k:'format', l:'포맷', t:'select', opts:['35mm','120','127','any'], blank:'포맷 선택'},
     {k:'rolls', l:'보유 롤 수', t:'number', ph:'3'},
@@ -1839,6 +2207,7 @@ function openSheet(type, id){
   var h = '<div class="grab"></div>'
     + '<div class="row"><h3>' + esc(cfg.label) + (cur ? ' 수정' : ' 추가') + '</h3>'
     + '<button class="ghost sm" id="sheetClose">닫기</button></div>';
+  if(type === 'films' && !cur) h += filmAddPickerHtml();
   cfg.fields.forEach(function(d){ h += fieldHtml(d, cur); });
   if(type === 'bodies') h += loadedFieldsHtml(cur);
   h += '<div class="sect">개인 기록 · 이 기기에만 저장</div>'
@@ -1900,8 +2269,7 @@ function openSheet(type, id){
       var isoRaw = isoIn ? String(isoIn.value).trim() : '';
       var isoVal = isoRaw === '' ? null : Number(isoRaw);
       if(stockName && (isoVal === null || isNaN(isoVal))){
-        var keyS = maskStock(stockName);
-        var hitS = filmStockChoices(filmFormatOf(obj)).filter(function(c){ return maskStock(c.stock) === keyS; })[0];
+        var hitS = findFilmChoice(stockName, filmFormatOf(obj));
         isoVal = hitS && hitS.iso ? Number(hitS.iso) : null;
       }
       obj.loadedFilm = stockName ? stockName : NO_FILM;
@@ -1940,44 +2308,24 @@ function openLoadedSheet(id){
   if(!isFilmBody(b)){ toast('필름 바디가 아니에요'); return; }
   var fmt = filmFormatOf(b);
   var cur = loadedStock(b);
-  var held = (data.films || []).filter(function(f){ return f.stock && (!f.format || f.format === 'any' || f.format === fmt); });
-  var heldKeys = {};
-  held.forEach(function(f){ heldKeys[maskStock(f.stock)] = true; });
-  var cat = filmStockChoices(fmt).filter(function(c){ return !heldKeys[maskStock(c.stock)]; });
+  lfCtx = {bodyId: id, fmt: fmt};
 
   var h = '<div class="grab"></div>'
     + '<div class="row"><h3>' + esc(nameOf(b)) + ' 필름</h3>'
     + '<button class="ghost sm" id="sheetClose">닫기</button></div>'
-    + '<div class="muted">지금 ' + loadedBadge(b) + (cur ? '' : ' — 필름이 들어 있지 않아요.') + '</div>';
-
-  h += '<div class="sect">보유 필름에서 고르기</div>';
-  if(!held.length){
-    h += '<div class="dim">' + esc(fmt || '필름') + ' 보유 필름이 없어요. 아래에서 직접 입력하거나 필름 탭에서 재고를 먼저 등록하세요.</div>';
-  }
-  held.forEach(function(f){
-    var n = Number(f.rolls) || 0;
-    h += '<div class="item"><div><div class="t">' + esc(f.stock)
-      + (f.stock === cur ? ' <span class="pill ok">장전 중</span>' : '') + '</div>'
-      + '<div class="d">ISO ' + esc(f.iso) + ' · ' + esc(n) + '롤 남음' + (f.expiry ? ' · ' + esc(f.expiry) + ' 만료' : '') + '</div></div>'
-      + '<div class="ops"><button class="ghost sm" data-set-body="' + esc(b.id) + '" data-set="' + esc(f.stock)
-      + '" data-set-iso="' + esc(f.iso) + '">장전</button></div></div>';
-  });
-
-  if(cat.length){
-    h += '<div class="sect">카탈로그에서 고르기</div>';
-    cat.forEach(function(c){
-      h += '<div class="item"><div><div class="t">' + esc(c.stock) + '</div>'
-        + '<div class="d">ISO ' + esc(c.iso) + ' · ' + esc(c.src) + (c.stock === cur ? ' · 장전 중' : '') + '</div></div>'
-        + '<div class="ops"><button class="ghost sm" data-set-body="' + esc(b.id) + '" data-set="' + esc(c.stock)
-        + '" data-set-iso="' + esc(c.iso) + '">장전</button></div></div>';
-    });
-  }
-
-  h += '<div class="sect">직접 입력</div>'
+    + '<div class="muted">지금 ' + loadedBadge(b) + (cur ? '' : ' — 필름이 들어 있지 않아요.') + '</div>'
+    + '<label for="lfSearch">필름 찾기</label>'
+    + '<input id="lfSearch" type="search" autocomplete="off" placeholder="200, 포트라, 코닥, 흑백, 127 …" oninput="onFilmSearch(this.value)" />'
+    + '<div class="dim" style="margin-top:5px">이름·브랜드·ISO·한글 별칭으로 찾아요. 하나를 누르면 필름명·ISO·컷수가 한 번에 채워집니다.</div>'
+    + '<div id="lfResults">' + filmPickerSectionsHtml('', fmt, id) + '</div>'
+    + '<label style="display:flex;align-items:center;gap:9px;margin-top:16px;font-size:13px">'
+    + '<input type="checkbox" id="lfMinus" style="width:auto;min-height:0;margin:0" />'
+    + '<span>고른 필름이 보유 재고면 1롤 차감</span></label>'
+    + '<div class="sect">직접 입력</div>'
     + '<label>스톡명</label><input id="lfStock" value="' + esc(cur) + '" placeholder="예: Kodak Portra 400" />'
     + '<div class="btns"><button class="btn" id="lfSave">이 필름으로 장전</button>'
     + '<button class="ghost" id="lfNone">미삽입으로</button></div>'
-    + '<div class="dim" style="margin-top:8px">ISO는 보유·카탈로그 목록에 있으면 자동으로 채우고, 없으면 비워 둡니다.</div>';
+    + '<div class="dim" style="margin-top:8px">ISO는 목록에 있으면 자동으로 채우고, 없으면 비워 둡니다.</div>';
 
   var sheet = document.getElementById('sheet');
   sheet.innerHTML = h;
@@ -1987,9 +2335,9 @@ function openLoadedSheet(id){
     var el = document.getElementById('lfStock');
     var v = el ? String(el.value).trim() : '';
     if(!v){ toast('스톡명을 입력해 주세요'); return; }
-    var key = maskStock(v);
-    var hit = filmStockChoices(fmt).filter(function(c){ return maskStock(c.stock) === key; })[0];
-    setLoaded(id, v, hit ? hit.iso : null);
+    var hit = findFilmChoice(v, fmt);
+    var exp = filmExpFor(hit || {defaultExp: null}, fmt);
+    setLoaded(id, v, hit ? hit.iso : isoFromStock(v), exp ? exp + '컷' : '');
     closeSheet();
     toast(v + ' 장전');
   };
@@ -2104,11 +2452,16 @@ document.addEventListener('click', function(e){
   var setBody = t.getAttribute('data-set-body');
   if(setBody){
     var stk = t.getAttribute('data-set') || '';
-    setLoaded(setBody, stk, t.getAttribute('data-set-iso'));
+    var exp = t.getAttribute('data-set-exp');
+    var minusEl = document.getElementById('lfMinus');
+    applyFilmChoice(setBody, stk, t.getAttribute('data-set-iso'), exp, !!(minusEl && minusEl.checked));
     closeSheet();
     toast(stk + ' 장전');
     return;
   }
+
+  var fpk = t.getAttribute('data-fpick');
+  if(fpk){ filmPickIntoFields(fpk); return; }
 
   var roll = t.getAttribute('data-roll');
   if(roll){
