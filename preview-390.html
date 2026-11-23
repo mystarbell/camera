@@ -33,7 +33,7 @@
     s.id = 'syncState'; s.className = 'pill ok sync';
     s.setAttribute('data-sync', 'saved');
     s.textContent = '서버에 저장됨';
-    wrap.appendChild(s);
+    wrap.insertBefore(s, d.getElementById('btnRefresh'));   /* NAS판과 같은 순서: 안내줄 → 배지 → ↻ */
   });
 </script>
 </body>
