@@ -11,6 +11,10 @@
 </style>
 </head>
 <body>
-<div class="wrap"><iframe id="f" title="카메라 대시보드 390px" src="index.html?preview=390"></iframe></div>
+<div class="wrap"><iframe id="f" title="카메라 대시보드 390px"></iframe></div>
+<script>
+  /* 캐시된 옛 index.html 이 뜨지 않도록 매번 다른 쿼리를 붙인다 */
+  document.getElementById('f').src = 'index.html?preview=390&v=' + Date.now();
+</script>
 </body>
 </html>
