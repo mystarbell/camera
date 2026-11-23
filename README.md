@@ -44,9 +44,9 @@
 
 ## 초기 장비 목록 (2026-11-23 확인)
 
-- **바디 9종** — Nikon F80 · Nikon AF600 · Rollei 35 · Rollei 35 S · Olympus XA · Olympus XA4 MACRO · Yashica-44 · Rolleiflex Baby Grey 4×4(수리 중) · Rolleiflex Baby Grey 4×4(Brightscreen 4408)
+- **바디 10종** — Nikon F80 · Nikon AF600 · Rollei 35 · Rollei 35 S · Olympus XA · Olympus XA4 MACRO · Yashica-44 · Rolleiflex Baby Grey 4×4 3대(일반 · Brightscreen 4408 · 수리 중)
 - **렌즈 4종** — AF-S NIKKOR 300mm f/4E PF ED VR · AF-S NIKKOR 24mm f/1.4G ED · AF-S NIKKOR 50mm f/1.4G · Ai Nikkor 35mm f/1.4S
-- 장전 중인 필름은 Rollei 35 · Rollei 35 S · Olympus XA4 MACRO 3대
+- 장전 중인 필름 5대 — Rollei 35(컬러플러스 200) · Rollei 35 S(포트라 160) · Olympus XA4 MACRO(울트라맥스 400) · Rolleiflex Baby 2대(Kodak 200 · 127)
 - `SEED_VERSION`을 올리면, 기기에 저장된 옛 목록에 빠진 시드 항목만 한 번 합칩니다(사용자가 고친 값·지운 항목은 유지).
 
 ## 아직 확인이 필요한 데이터

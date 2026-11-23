@@ -130,7 +130,8 @@ footer{max-width:940px;margin:0 auto;padding:4px 16px 20px;font-size:11px;color:
     {"id":"olympus-xa4","bodyType":"필름 컴팩트","maker":"Olympus","model":"Olympus XA4 MACRO","mount":"고정 렌즈","format":"35mm","fixedFocal":28,"fixedAperture":3.5,"status":"보유","loadedFilm":"Kodak UltraMax 400","loadedIso":400,"loadedFilmNote":"36컷","notes":"클로즈업 대응 컴팩트. 고정 Zuiko 28mm f/3.5 Macro."},
     {"id":"yashica-44","bodyType":"필름 TLR","maker":"Yashica","model":"Yashica-44","mount":"고정 렌즈","format":"127-44","fixedFocal":60,"fixedAperture":3.5,"status":"보유","loadedFilm":"미삽입","loadedIso":null,"loadedFilmNote":"","notes":"필름 장전 여부 확인 필요. 투톤 그레이/블랙 · 고정 Yashikor 60mm f/3.5 · 127 필름."},
     {"id":"rollei-baby","bodyType":"필름 TLR","maker":"Rollei","model":"Rolleiflex Baby Grey 4×4 (수리 중)","mount":"고정 렌즈","format":"127-44","fixedFocal":60,"fixedAperture":3.5,"status":"수리 중 (오버홀, 12월 초순 예상)","loadedFilm":"미삽입","loadedIso":null,"loadedFilmNote":"","notes":"그레이/블랙. 고정 Xenar 60mm f/3.5 · 127 필름. 리핸즈에 오버홀 접수."},
-    {"id":"rollei-baby-brightscreen","bodyType":"필름 TLR","maker":"Rollei","model":"Rolleiflex Baby Grey 4×4 (Brightscreen 4408)","mount":"고정 렌즈","format":"127-44","fixedFocal":60,"fixedAperture":3.5,"status":"보유","loadedFilm":"미삽입","loadedIso":null,"loadedFilmNote":"","notes":"Brightscreen Pattern 4408 포커싱 스크린 장착. 그레이/블랙 · 고정 Xenar 60mm f/3.5 · 127 필름. 수리 중인 기체와 별개."}
+    {"id":"rollei-baby-brightscreen","bodyType":"필름 TLR","maker":"Rollei","model":"Rolleiflex Baby Grey 4×4 (Brightscreen 4408)","mount":"고정 렌즈","format":"127-44","fixedFocal":60,"fixedAperture":3.5,"status":"보유","loadedFilm":"Kodak 200 (127)","loadedIso":200,"loadedFilmNote":"","notes":"Brightscreen Pattern 4408 포커싱 스크린 장착. 그레이/블랙 · 고정 Xenar 60mm f/3.5 · 127 필름. 수리 중인 기체와 별개."},
+    {"id":"rollei-baby-2","bodyType":"필름 TLR","maker":"Rollei","model":"Rolleiflex Baby Grey 4×4","mount":"고정 렌즈","format":"127-44","fixedFocal":60,"fixedAperture":3.5,"status":"보유","loadedFilm":"Kodak 200 (127)","loadedIso":200,"loadedFilmNote":"","notes":"그레이/블랙. 고정 Xenar 60mm f/3.5 · 127 필름."}
   ],
   "lenses": [
     {"id":"n300pf","maker":"Nikon","model":"AF-S NIKKOR 300mm f/4E PF ED VR","mount":"Nikon F","focal":300,"aperture":4,"format":"35mm","notes":"PF 회절 렌즈, 경량 망원."},
@@ -159,7 +160,7 @@ footer{max-width:940px;margin:0 auto;padding:4px 16px 20px;font-size:11px;color:
 /* ================= 기본 정의 ================= */
 var KEY = 'camera-dash-v1';
 var PKEY = 'camera-dash-private-v1';   /* 시리얼·구입가·개인메모: 이 기기에만 */
-var SEED_VERSION = 2;                  /* 시드 구성이 바뀌면 올림 — 저장된 목록에 빠진 시드 항목만 한 번 합침 */
+var SEED_VERSION = 3;                  /* 시드 구성이 바뀌면 올림 — 저장된 목록에 빠진 시드 항목만 한 번 합침 */
 var NO_FILM = '미삽입';
 var NO_FILM_LIST = ['', '미삽입', '없음', '미장전', '-'];
 var SPEC_KEYS = ['filter','hood','minFocus','elements','weight'];
