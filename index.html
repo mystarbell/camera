@@ -375,7 +375,7 @@ var PURPOSES = {
 var PURPOSE_ORDER = ['스냅','인물','풍경','여행','실내'];
 /* 상황·조건 칩 — 값·표시 이름 */
 var SIT_GROUPS = {
-  company: {label:'동행',  options:[['any','상관없음'],['alone','혼자'],['kids','아이랑 같이']]},
+  company: {label:'동행',  options:[['any','상관없음'],['alone','혼자'],['kids','아이랑 같이'],['date','데이트']]},
   place:   {label:'장소',  options:[['any','상관없음'],['city','도시 산책'],['nature','자연·외곽']]},
   weight:  {label:'무게',  options:[['any','상관없음'],['pocket','가볍게 주머니에'],['quality','화질·감성 우선']]}
 };
@@ -777,6 +777,14 @@ function situationFit(c, sit){
     else if(!af) up(12, '수동으로 구도를 다듬으며 천천히 찍기 좋아요');
     if(eq >= 35 && eq <= 50) up(8, eq + 'mm 표준 화각으로 시선 그대로 담기 좋아요');
     if(eq >= 120) down(8, eq + 'mm 망원은 혼자 천천히 걷기엔 부담스러워요');
+  }else if(sit.company === 'date'){
+    if(eq >= 35 && eq <= 60) up(26, eq + 'mm가 인물·데이트 화각(35–60mm)에 맞아요');
+    else if(eq > 85) down(18, eq + 'mm는 데이트에서 너무 멀리서 찍게 돼요');
+    if(ap && ap <= 2.8) up(12, 'f/' + ap + ' 밝은 렌즈가 배경을 부드럽게 풀어 줘요');
+    if(isMedium(c)) up(8, '중형 판형의 색과 계조가 데이트 사진에 어울려요');
+    if(af) up(4, 'AF라서 자연스러운 순간을 놓치지 않아요');
+    if(eq && eq < 28) down(8, eq + 'mm는 가까이서 얼굴이 왜곡될 수 있어요');
+    if(w >= 900) down(8, '약 ' + w + 'g은 데이트에 들고 다니기 무거워요');
   }
 
   if(sit.place === 'city'){
@@ -1007,6 +1015,20 @@ function loadedSituations(body, lensOpt, filmOpt){
   add('아이랑 외출', s, (af ? 'AF' : '수동 초점') + ' ' + lensLab + (isoLab ? ' · ' + isoLab : '')
     + (af ? ' — 움직이는 아이를 바로 잡기 좋아요' : ' — 아이를 따라가기엔 느려요'));
 
+  /* 데이트 (아내·연인과) */
+  s = 46;
+  if(eq && eq >= 35 && eq <= 60) s += 24;
+  else if(eq && eq > 60 && eq <= 85) s += 6;
+  else if(eq && eq > 85) s -= 18;
+  else if(eq && eq < 28) s -= 8;
+  if(ap && ap <= 2.8) s += 14;
+  if(med) s += 10;
+  if(fp && fp.portrait) s += 14;
+  if(fp && fp.bw) s -= 6;
+  if(af) s += 4;
+  add('데이트 · 인물', s, lensLab + (filmLab ? ' + ' + filmLab : '')
+    + (med ? ' — 큰 판형의 부드러운 색과 계조' : ' — 배경을 풀어낸 인물') + '이 잘 나와요');
+
   /* 도시 스냅 (날씨는 필름 ISO로) */
   s = 50;
   if(eq && eq >= 28 && eq <= 55) s += 26; else if(eq) s -= 10;
@@ -1053,7 +1075,14 @@ function loadedSituations(body, lensOpt, filmOpt){
   add('실내·저조도', s, isoLab + (ap ? ' · f/' + ap : '') + ' — 빛이 약한 곳에서도 노출이 서요');
 
   shots.sort(function(a, b){ return b.p - a.p; });
-  var top = shots.filter(function(x){ return x.p >= 62; }).slice(0, 2);
+  var top = [];
+  shots.forEach(function(x){
+    if(top.length >= 2 || x.p < 62) return;
+    /* 인물 계열 태그가 둘 다 차지하지 않게 */
+    var dup = /인물/.test(x.label) && top.some(function(y){ return /인물/.test(y.label); });
+    if(dup) return;
+    top.push(x);
+  });
   if(!top.length) top = shots.slice(0, 2);
   return {
     tags: top.map(function(x){ return x.label; }),
@@ -1468,9 +1497,9 @@ function sitTagHtml(sit){
     for(var i = 0; i < g.options.length; i++){ if(g.options[i][0] === key) return g.options[i][1]; }
     return '';
   }
-  if(sit.company !== 'any') out.push(label('company', sit.company));
-  if(sit.place !== 'any') out.push(label('place', sit.place));
-  if(sit.weight !== 'any') out.push(label('weight', sit.weight));
+  if(sit.company && sit.company !== 'any') out.push(label('company', sit.company));
+  if(sit.place && sit.place !== 'any') out.push(label('place', sit.place));
+  if(sit.weight && sit.weight !== 'any') out.push(label('weight', sit.weight));
   return out.map(function(t){ return '<span class="tag">' + esc(t) + '</span>'; }).join('');
 }
 function loadedLineHtml(body){
