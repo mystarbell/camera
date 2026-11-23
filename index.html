@@ -296,6 +296,10 @@ footer b{color:var(--ink2)}
   .combo-meta,.metrics,.score,.film-pick,.fp-line,.combo-loaded,.combo-why,.score-split,.combo-thumbs{margin-left:0}
   .combo-title{font-size:15px}
 }
+@media(max-width:430px){
+  /* 좁은 화면에서는 사진이 붙은 선택 칩을 한 줄에 하나씩 — 두 칸이면 이름이 세 줄로 접힌다 */
+  .pick-chips.grid2{grid-template-columns:minmax(0,1fr)}
+}
 @media(max-width:400px){
   .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
   .sit-lb{flex-basis:30px;font-size:11.5px}
