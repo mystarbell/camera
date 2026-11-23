@@ -234,13 +234,32 @@ function loadData(){
   fresh.seedVersion = SEED_VERSION;
   return fresh;
 }
+/* 예전 시드의 추정값 목록 — 저장된 값이 이 중 하나일 때만 오늘 확인된 값으로 바로잡음 */
+var SEED_FIXES = {
+  'rollei-baby': {model:['Baby Rolleiflex 4×4','Rollei Baby Rolleiflex 4×4','Rolleiflex Baby 4×4'], fixedAperture:[2.8]}
+};
+function applySeedFix(b, s){
+  var fx = SEED_FIXES[s.id];
+  if(fx){
+    if(fx.model && fx.model.indexOf(b.model) >= 0 && s.model) b.model = s.model;
+    if(fx.fixedAperture && fx.fixedAperture.indexOf(Number(b.fixedAperture)) >= 0 && s.fixedAperture) b.fixedAperture = s.fixedAperture;
+  }
+  /* 오늘 확인한 장전 필름은 저장된 값이 비어 있을 때만 채움 */
+  if(!loadedStock(b) && s.loadedFilm && s.loadedFilm !== NO_FILM){
+    b.loadedFilm = s.loadedFilm;
+    b.loadedIso = s.loadedIso === undefined ? null : s.loadedIso;
+    b.loadedFilmNote = s.loadedFilmNote || '';
+  }
+}
 /* 기기에 저장된 옛 목록에 새로 확인된 시드 항목만 더한다(사용자가 고친 값·지운 항목은 그대로) */
 function mergeSeed(d){
   var removed = d.removed || [];
   (seed.bodies || []).forEach(function(s){
     if(s.id === 'olympus-unknown') return;                 /* 확인 필요 임시 항목은 시드에서 사라짐 */
     if(removed.indexOf(s.id) >= 0) return;
-    if(!d.bodies.filter(function(b){ return b.id === s.id; }).length) d.bodies.push(clone(s));
+    var hit = d.bodies.filter(function(b){ return b.id === s.id; })[0];
+    if(hit) applySeedFix(hit, s);
+    else d.bodies.push(clone(s));
   });
   (seed.lenses || []).forEach(function(s){
     if(removed.indexOf(s.id) >= 0) return;
