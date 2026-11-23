@@ -134,7 +134,7 @@ button.danger{color:var(--red);border-color:var(--red-line);background:var(--red
 .item .ops{display:flex;gap:6px;flex:0 0 auto;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 
 /* ---------- 장비 카드 ---------- */
-.gear-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.gear-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
 .gear{position:relative;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px}
 .gear.is-loaded{border-left:4px solid var(--amber-solid);background:linear-gradient(180deg,#fffcf4 0%,var(--surface) 60%)}
 .gear.is-repair{border-left:4px solid #d98551}
@@ -146,7 +146,7 @@ button.danger{color:var(--red);border-color:var(--red-line);background:var(--red
 .gear-ops{display:flex;gap:7px;justify-content:flex-end;align-items:center;flex-wrap:wrap;margin-top:auto;padding-top:11px;border-top:1px solid var(--line)}
 
 /* ---------- 장전 필름 카드 ---------- */
-.film-grid{display:grid;grid-template-columns:1fr;gap:9px}
+.film-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:9px}
 .fb{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:12px 13px 11px;display:flex;flex-direction:column;gap:8px}
 .fb.loaded{background:linear-gradient(180deg,#fffaf0 0%,var(--surface) 70%);border-color:var(--amber-line)}
 .fb-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
@@ -271,6 +271,7 @@ footer b{color:var(--ink2)}
 .thumb.xs{width:30px;height:30px;border-radius:8px}
 .thumb.md{width:56px;height:56px;border-radius:12px}
 .thumb-id{display:flex;align-items:center;gap:10px;min-width:0}
+.gear,.fb{min-width:0}
 .thumb-id .gear-name,.thumb-id .fb-name{min-width:0}
 .pick-chips button.pick-thumb{display:flex;align-items:center;gap:9px;text-align:left}
 .pick-chips button .pt-txt{display:block;min-width:0}
