@@ -262,6 +262,23 @@ select[hidden]{display:none}
 footer{max-width:1000px;margin:0 auto;padding:10px 18px 30px;font-size:12px;color:var(--ink3);line-height:1.75}
 footer b{color:var(--ink2)}
 
+/* ---------- 장비·필름 썸네일 ---------- */
+.thumb{position:relative;display:inline-block;flex:0 0 auto;width:48px;height:48px;border-radius:11px;overflow:hidden;background:#fff;border:1px solid var(--line2);vertical-align:middle;box-shadow:0 1px 0 rgba(90,70,30,.05)}
+.thumb::after{content:attr(data-fb);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:19px;line-height:1;opacity:.45}
+.thumb img{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:cover;background:#fffdf8;display:block}
+.thumb img.gone{display:none}
+.thumb.sm{width:40px;height:40px;border-radius:9px}
+.thumb.xs{width:30px;height:30px;border-radius:8px}
+.thumb.md{width:56px;height:56px;border-radius:12px}
+.thumb-id{display:flex;align-items:center;gap:10px;min-width:0}
+.thumb-id .gear-name,.thumb-id .fb-name{min-width:0}
+.pick-chips button.pick-thumb{display:flex;align-items:center;gap:9px;text-align:left}
+.pick-chips button .pt-txt{display:block;min-width:0}
+.pick-chips button.on .thumb{border-color:#6d6656}
+.combo-thumbs{display:flex;align-items:center;gap:8px;margin:11px 0 0 37px}
+.fp-row .thumb{vertical-align:-10px;margin-right:7px}
+.fp-line .thumb{vertical-align:-9px}
+
 @media(min-width:720px){
   h1{font-size:23px}
   .pick-chips.grid2{grid-template-columns:repeat(auto-fill,minmax(215px,1fr))}
@@ -275,7 +292,7 @@ footer b{color:var(--ink2)}
   footer{padding:10px 24px 34px}
 }
 @media(max-width:520px){
-  .combo-meta,.metrics,.score,.film-pick,.fp-line,.combo-loaded,.combo-why,.score-split{margin-left:0}
+  .combo-meta,.metrics,.score,.film-pick,.fp-line,.combo-loaded,.combo-why,.score-split,.combo-thumbs{margin-left:0}
   .combo-title{font-size:15px}
 }
 @media(max-width:400px){
@@ -634,7 +651,7 @@ function filmPickRowHtml(r, fmt, bodyId){
   var ops = bodyId
     ? '<button class="ghost sm" data-set-body="' + esc(bodyId) + '" data-set="' + esc(r.stock) + '" data-set-iso="' + esc(isoAttr) + '" data-set-exp="' + esc(exp || '') + '">장전</button>'
     : '<button class="ghost sm" data-fpick="' + esc(r.stock) + '">이 필름</button>';
-  return '<div class="item"><div style="min-width:0"><div class="t">' + esc(r.stock) + badges + '</div>'
+  return '<div class="item">' + thumbHtml('films', r.stock, 'sm') + '<div style="min-width:0;flex:1 1 auto"><div class="t">' + esc(r.stock) + badges + '</div>'
     + '<div class="d">' + esc(meta.join(' · ')) + '</div></div><div class="ops">' + ops + '</div></div>';
 }
 function filmPickerSectionsHtml(q, fmt, bodyId){
@@ -1529,6 +1546,37 @@ function loadedSituations(body, lensOpt, filmOpt){
   };
 }
 
+/* ================= 썸네일 ================= */
+/* assets/thumbs/ 에 미리 만들어 둔 로컬 썸네일(120~240px JPEG)을 쓴다.
+   바깥 링크를 걸지 않아 끊기지 않고, 못 불러오면 브랜드 배지 → 이모지 순서로 물러난다. */
+var THUMB_LENS = {'n300pf':'nikon-300-4e','n24':'nikon-24-14g','n50':'nikon-50-14g','n35ai':'nikon-35-14ai'};
+var THUMB_BODY = {'rollei-baby-brightscreen':'rollei-baby','rollei-baby-2':'rollei-baby'};
+var THUMB_BRANDS = {'kodak':'kodak','fujifilm':'fujifilm','fuji':'fujifilm','fujicolor':'fujifilm','ilford':'ilford','cinestill':'cinestill','lomography':'lomography','lomo':'lomography','foma':'foma','rera':'rera'};
+function thumbSlug(s){ return String(s === undefined || s === null ? '' : s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
+function filmThumbPath(stock){ return 'assets/thumbs/film-' + thumbSlug(stock) + '.jpg'; }
+function filmBrandPath(stock){
+  var first = String(stock === undefined || stock === null ? '' : stock).trim().split(' ')[0].toLowerCase();
+  var b = THUMB_BRANDS[first];
+  return b ? 'assets/thumbs/film-brand-' + b + '.jpg' : '';
+}
+/* 이미지가 없으면 필름은 브랜드 배지로, 그것도 없으면 이모지 자리표시자로 */
+function thumbFallback(img){
+  var alt = img.getAttribute('data-alt');
+  if(alt){ img.setAttribute('src', alt); img.removeAttribute('data-alt'); return; }
+  img.className = 'gone';
+}
+function thumbHtml(kind, key, cls){
+  if(!key) return '';
+  var src, alt = '', fb = '📷';
+  if(kind === 'bodies') src = 'assets/thumbs/body-' + (THUMB_BODY[key] || key) + '.jpg';
+  else if(kind === 'lenses') src = 'assets/thumbs/lens-' + (THUMB_LENS[key] || key) + '.jpg';
+  else { src = filmThumbPath(key); alt = filmBrandPath(key); fb = '🎞️'; }
+  return '<span class="thumb' + (cls ? ' ' + cls : '') + '" data-fb="' + fb + '">'
+    + '<img src="' + esc(src) + '" alt="" loading="lazy" decoding="async"'
+    + (alt ? ' data-alt="' + esc(alt) + '"' : '')
+    + ' onerror="thumbFallback(this)"></span>';
+}
+
 /* ================= 요약 ================= */
 function kpi(label, value, note, tone, unit){
   return '<div class="kpi-item' + (tone ? ' ' + tone : '') + '">'
@@ -1583,7 +1631,7 @@ function renderHome(){
   if(repair.length){
     h += '<div class="card"><div class="panel-head"><h3>수리·점검 중</h3><span class="count">' + esc(repair.length) + '대</span></div>';
     repair.forEach(function(b){
-      h += '<div class="item"><div><div class="t">' + esc(nameOf(b)) + '</div>'
+      h += '<div class="item">' + thumbHtml('bodies', b.id, 'sm') + '<div style="min-width:0;flex:1 1 auto"><div class="t">' + esc(nameOf(b)) + '</div>'
         + '<div class="d">' + esc(b.status) + '</div></div>'
         + '<div class="ops"><span class="pill warn">진행 중</span></div></div>';
     });
@@ -1593,7 +1641,7 @@ function renderHome(){
   if(unknown.length){
     h += '<div class="card"><div class="panel-head"><h3>확인해서 채울 것</h3><span class="count">' + esc(unknown.length) + '건</span></div>';
     unknown.forEach(function(x){
-      h += '<div class="item"><div><div class="t">' + esc(nameOf(x)) + '</div>'
+      h += '<div class="item">' + thumbHtml(data.bodies.indexOf(x) >= 0 ? 'bodies' : 'lenses', x.id, 'sm') + '<div style="min-width:0;flex:1 1 auto"><div class="t">' + esc(nameOf(x)) + '</div>'
         + '<div class="d">' + esc(x.notes || x.status || '') + '</div></div>'
         + '<div class="ops"><span class="pill warn">확인 필요</span></div></div>';
     });
@@ -1603,12 +1651,12 @@ function renderHome(){
   if(lowFilm.length || expFilm.length){
     h += '<div class="card"><div class="panel-head"><h3>필름 알림</h3><span class="count">' + esc(lowFilm.length + expFilm.length) + '건</span></div>';
     lowFilm.forEach(function(f){
-      h += '<div class="item"><div><div class="t">' + esc(f.stock) + '</div>'
+      h += '<div class="item">' + thumbHtml('films', f.stock, 'sm') + '<div style="min-width:0;flex:1 1 auto"><div class="t">' + esc(f.stock) + '</div>'
         + '<div class="d">' + esc(f.format || '') + ' · ' + esc((Number(f.rolls)||0) + '롤 남음') + '</div></div>'
         + '<div class="ops"><span class="pill warn">재고 부족</span></div></div>';
     });
     expFilm.forEach(function(x){
-      h += '<div class="item"><div><div class="t">' + esc(x.f.stock) + '</div>'
+      h += '<div class="item">' + thumbHtml('films', x.f.stock, 'sm') + '<div style="min-width:0;flex:1 1 auto"><div class="t">' + esc(x.f.stock) + '</div>'
         + '<div class="d">' + esc(x.f.format || '') + ' · ' + esc(x.f.expiry) + ' 만료</div></div>'
         + '<div class="ops"><span class="pill ' + x.st.cls + '">' + esc(x.st.text) + '</span></div></div>';
     });
@@ -1627,7 +1675,8 @@ function renderHome(){
       loadedBodies.forEach(function(b){
         var adv = loadedSituations(b);
         h += '<div class="fb loaded">'
-          + '<div class="fb-top"><div class="fb-name">' + esc(nameOf(b)) + '</div>'
+          + '<div class="fb-top"><div class="thumb-id">' + thumbHtml('bodies', b.id, 'md')
+          + '<div class="fb-name">' + esc(nameOf(b)) + '</div></div>'
           + '<div class="fb-format">' + esc(formatLabel(b.format)) + '</div></div>'
           + '<div class="fb-badge">' + loadedBadge(b) + '</div>'
           + loadedDetail(b)
@@ -1680,7 +1729,8 @@ function gearBodyCard(b, withAdvice){
     + (b.fixedFocal ? '<span class="tag">고정 ' + esc(b.fixedFocal + 'mm' + (b.fixedAperture ? ' f/' + b.fixedAperture : '')) + '</span>' : '');
   var adv = (withAdvice && isLoaded) ? loadedSituations(b) : null;
   return '<article class="gear' + (repair ? ' is-repair' : (isLoaded ? ' is-loaded' : '')) + '">'
-    + '<div class="gear-top"><div class="gear-name">' + esc(nameOf(b)) + '</div>' + statusPill + '</div>'
+    + '<div class="gear-top"><div class="thumb-id">' + thumbHtml('bodies', b.id, 'md')
+    + '<div class="gear-name">' + esc(nameOf(b)) + '</div></div>' + statusPill + '</div>'
     + '<div class="tags">' + tags + '</div>'
     + (film ? '<div class="film-row">' + loadedBadge(b) + '</div>' + loadedDetail(b) : '')
     + (adv ? '<div class="fb-advice"><div class="fb-tags">'
@@ -1733,7 +1783,8 @@ function renderGear(){
     data.lenses.forEach(function(l){
       var spec = lensSpecText(l);
       h += '<article class="gear">'
-        + '<div class="gear-top"><div class="gear-name">' + esc(l.model) + '</div></div>'
+        + '<div class="gear-top"><div class="thumb-id">' + thumbHtml('lenses', l.id, 'md')
+        + '<div class="gear-name">' + esc(l.model) + '</div></div></div>'
         + '<div class="tags">'
         +   '<span class="tag">' + esc(l.mount || '미지정') + '</span>'
         +   '<span class="tag">' + esc(l.focal + 'mm') + '</span>'
@@ -1782,7 +1833,8 @@ function renderGear(){
       var st = expiryState(f.expiry);
       var rolls = Number(f.rolls) || 0;
       h += '<article class="gear">'
-        + '<div class="gear-top"><div class="gear-name">' + esc(f.stock) + '</div>'
+        + '<div class="gear-top"><div class="thumb-id">' + thumbHtml('films', f.stock, 'md')
+        + '<div class="gear-name">' + esc(f.stock) + '</div></div>'
         + '<span class="pill ' + (rolls > 1 ? 'ok' : 'bad') + '">' + esc(rolls) + '롤</span></div>'
         + '<div class="tags"><span class="tag">' + esc(f.format || '포맷 미지정') + '</span>'
         + '<span class="tag">ISO ' + esc(f.iso) + '</span>'
@@ -1852,8 +1904,9 @@ function renderRec(){
     + '<div class="pick-chips grid2" id="pickBodyChips">'
     + '<button type="button" class="reset" data-pick-body="">선택 안 함</button>';
   data.bodies.forEach(function(b){
-    h += '<button type="button" data-pick-body="' + esc(b.id) + '">' + esc(nameOf(b))
-      + '<span class="m">' + esc(b.bodyType || '종류 미지정') + (b.fixedFocal ? ' · 고정 ' + esc(b.fixedFocal) + 'mm' : '') + '</span></button>';
+    h += '<button type="button" class="pick-thumb" data-pick-body="' + esc(b.id) + '">' + thumbHtml('bodies', b.id, 'xs')
+      + '<span class="pt-txt">' + esc(nameOf(b))
+      + '<span class="m">' + esc(b.bodyType || '종류 미지정') + (b.fixedFocal ? ' · 고정 ' + esc(b.fixedFocal) + 'mm' : '') + '</span></span></button>';
   });
   h += '</div><select id="recBody" hidden aria-label="바디 선택">' + recBodyOptions() + '</select></div>';
 
@@ -1862,8 +1915,9 @@ function renderRec(){
     + '<div class="pick-chips grid2" id="pickLensChips">'
     + '<button type="button" class="reset" data-pick-lens="">선택 안 함</button>';
   data.lenses.forEach(function(l){
-    h += '<button type="button" data-pick-lens="' + esc(l.id) + '">' + esc(l.model)
-      + '<span class="m">' + esc(l.mount) + ' · ' + esc(l.focal) + 'mm f/' + esc(l.aperture) + '</span></button>';
+    h += '<button type="button" class="pick-thumb" data-pick-lens="' + esc(l.id) + '">' + thumbHtml('lenses', l.id, 'xs')
+      + '<span class="pt-txt">' + esc(l.model)
+      + '<span class="m">' + esc(l.mount) + ' · ' + esc(l.focal) + 'mm f/' + esc(l.aperture) + '</span></span></button>';
   });
   h += '</div><select id="recLens" hidden aria-label="렌즈 선택">' + recLensOptions() + '</select></div>';
 
@@ -2001,6 +2055,8 @@ function runRec(){
       +     (c.repair ? '<span class="pill warn">수리 중</span>' : '')
       +   '</div>'
       + '</div></div>'
+      + '<div class="combo-thumbs">' + thumbHtml('bodies', c.body.id, 'sm')
+      +   (c.fixed ? '' : '<span class="plus">+</span>' + thumbHtml('lenses', c.lens.id, 'sm')) + '</div>'
       + '<div class="metrics">'
       +   '<div class="metric"><b>' + esc(c.eq) + 'mm</b><span>35mm 환산</span></div>'
       +   '<div class="metric"><b>' + esc(aov(c.eq)) + '°</b><span>화각</span></div>'
@@ -2025,14 +2081,15 @@ function runRec(){
         h += '<div class="film-pick"><div class="fp-head">필름 추천</div>';
         sugg.forEach(function(s){
           var is = invSummary(s);
-          h += '<div class="fp-row"><div class="fp-line-top"><span class="fp-name">' + esc(s.film.stock) + '</span>'
+          h += '<div class="fp-row"><div class="fp-line-top">' + thumbHtml('films', s.film.stock, 'xs')
+            + '<span class="fp-name">' + esc(s.film.stock) + '</span>'
             + '<span class="pill ' + is.cls + '">' + esc(is.txt) + '</span></div>'
             + '<div class="fp-meta">ISO ' + esc(s.film.iso) + ' · ' + esc(s.film.type || '') + (s.film.character ? ' · ' + esc(s.film.character) : '') + '</div></div>';
         });
         h += '</div>';
       }else{
         var inv = invSummary(top);
-        h += '<div class="fp-line">필름 ' + esc(top.film.stock)
+        h += '<div class="fp-line">필름 ' + thumbHtml('films', top.film.stock, 'xs') + esc(top.film.stock)
           + ' <span class="pill ' + inv.cls + '">' + esc(inv.txt) + '</span></div>';
       }
     }
@@ -2061,7 +2118,7 @@ function runRec(){
       held.forEach(function(f){
         var st = expiryState(f.expiry);
         var rolls = Number(f.rolls) || 0;
-        h += '<div class="item"><div><div class="t">' + esc(f.stock) + '</div>'
+        h += '<div class="item">' + thumbHtml('films', f.stock, 'sm') + '<div style="min-width:0;flex:1 1 auto"><div class="t">' + esc(f.stock) + '</div>'
           + '<div class="d">ISO ' + esc(f.iso) + (f.expiry ? ' · ' + esc(f.expiry) + ' 만료' : '') + '</div></div>'
           + '<div class="ops">' + (st ? '<span class="pill ' + st.cls + '">' + esc(st.text) + '</span>' : '')
           + '<span class="pill ' + (rolls > 0 ? 'ok' : 'bad') + '">' + esc(rolls) + '롤</span></div></div>';
@@ -2111,7 +2168,7 @@ function renderFilm(){
   data.films.forEach(function(f){
     var st = expiryState(f.expiry);
     var rolls = Number(f.rolls) || 0;
-    h += '<div class="fcard"><div class="fcard-main">'
+    h += '<div class="fcard">' + thumbHtml('films', f.stock, 'md') + '<div class="fcard-main">'
       + '<div class="fcard-name">' + esc(f.stock) + '</div>'
       + '<div class="fcard-meta">' + esc(f.format || '포맷 미지정') + ' · ISO ' + esc(f.iso)
       + (f.expiry ? ' · ' + esc(f.expiry) + ' 만료' : ' · 유효기간 미입력') + '</div>'
@@ -2132,7 +2189,7 @@ function renderFilm(){
     + '<span class="count">' + esc((data.filmCatalog || []).length) + '종</span></div>'
     + '<div class="muted" style="margin-bottom:8px">조합 추천이 쓰는 기본 목록이에요. 필름을 추가할 때 스톡명을 여기서 고르면 재고가 자동으로 연결돼요.</div>';
   (data.filmCatalog || []).forEach(function(f){
-    h += '<div class="item"><div><div class="t">' + esc(f.stock) + ' <span class="dim">ISO ' + esc(f.iso) + '</span></div>'
+    h += '<div class="item">' + thumbHtml('films', f.stock, 'sm') + '<div style="min-width:0;flex:1 1 auto"><div class="t">' + esc(f.stock) + ' <span class="dim">ISO ' + esc(f.iso) + '</span></div>'
       + '<div class="d">' + esc(f.type) + ' · ' + esc((f.formats || []).join(' / ')) + '</div>'
       + '<div class="tags" style="margin-top:6px">' + (f.bestFor || []).map(function(b){ return '<span class="tag">' + esc(b) + '</span>'; }).join('') + '</div>'
       + '<div class="dim" style="margin-top:5px">' + esc(f.character || '') + '</div></div></div>';
