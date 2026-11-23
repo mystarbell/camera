@@ -122,10 +122,15 @@ footer{max-width:940px;margin:0 auto;padding:4px 16px 20px;font-size:11px;color:
 <script id="seed-data" type="application/json">
 {
   "bodies": [
-    {"id":"rollei-baby","bodyType":"필름 TLR","maker":"Rollei","model":"Baby Rolleiflex 4×4","mount":"고정 렌즈","format":"127-44","fixedFocal":60,"fixedAperture":2.8,"status":"수리 중 · 오버홀(12월 초순 예상)","notes":"고정 60mm f/2.8 추정 — 렌즈 표기 확인 필요. 127 필름 사용."},
-    {"id":"rollei-35","bodyType":"필름 컴팩트","maker":"Rollei","model":"Rollei 35","mount":"고정 렌즈","format":"35mm","fixedFocal":40,"fixedAperture":3.5,"status":"보유","notes":"40mm f/3.5 추정(35·35S·35T 중 모델 확인 필요)."},
-    {"id":"nikon-f80","bodyType":"필름 SLR","maker":"Nikon","model":"F80","mount":"Nikon F","format":"35mm","fixedFocal":null,"fixedAperture":null,"status":"보유","loadedFilm":"미삽입","loadedIso":null,"loadedFilmNote":"","notes":"이베이에서 영입. AF-S는 AF 구동, Ai는 수동(측광 일부 제한)."},
-    {"id":"olympus-unknown","bodyType":"","maker":"Olympus","model":"모델 확인 필요","mount":"확인 필요","format":"35mm","fixedFocal":null,"fixedAperture":null,"status":"확인 필요","notes":"올림푸스 모델·마운트 확인 후 정리. 필름 SLR/RF/컴팩트 중 어느 쪽인지도 함께."}
+    {"id":"nikon-f80","bodyType":"필름 SLR","maker":"Nikon","model":"Nikon F80","mount":"Nikon F","format":"35mm","fixedFocal":null,"fixedAperture":null,"status":"보유","loadedFilm":"미삽입","loadedIso":null,"loadedFilmNote":"","notes":"이베이에서 영입. AF-S는 AF 구동, Ai는 수동(측광 일부 제한)."},
+    {"id":"nikon-af600","bodyType":"필름 컴팩트","maker":"Nikon","model":"Nikon AF600","mount":"고정 렌즈","format":"35mm","fixedFocal":28,"fixedAperture":3.5,"status":"보유","loadedFilm":"미삽입","loadedIso":null,"loadedFilmNote":"","notes":"파노라마 지원. 고정 28mm f/3.5 Macro."},
+    {"id":"rollei-35","bodyType":"필름 컴팩트","maker":"Rollei","model":"Rollei 35","mount":"고정 렌즈","format":"35mm","fixedFocal":40,"fixedAperture":3.5,"status":"보유","loadedFilm":"Kodak ColorPlus 200","loadedIso":200,"loadedFilmNote":"36컷","notes":"블랙 · 싱가포르 생산. 고정 Tessar 40mm f/3.5."},
+    {"id":"rollei-35s","bodyType":"필름 컴팩트","maker":"Rollei","model":"Rollei 35 S","mount":"고정 렌즈","format":"35mm","fixedFocal":40,"fixedAperture":2.8,"status":"보유","loadedFilm":"Kodak Portra 160","loadedIso":160,"loadedFilmNote":"36컷","notes":"실버. 고정 Rollei-HFT Sonnar 40mm f/2.8."},
+    {"id":"olympus-xa","bodyType":"필름 레인지파인더","maker":"Olympus","model":"Olympus XA","mount":"고정 렌즈","format":"35mm","fixedFocal":35,"fixedAperture":2.8,"status":"보유","loadedFilm":"미삽입","loadedIso":null,"loadedFilmNote":"","notes":"클램셸형 레인지파인더. 고정 F.Zuiko 35mm f/2.8."},
+    {"id":"olympus-xa4","bodyType":"필름 컴팩트","maker":"Olympus","model":"Olympus XA4 MACRO","mount":"고정 렌즈","format":"35mm","fixedFocal":28,"fixedAperture":3.5,"status":"보유","loadedFilm":"Kodak UltraMax 400","loadedIso":400,"loadedFilmNote":"36컷","notes":"클로즈업 대응 컴팩트. 고정 Zuiko 28mm f/3.5 Macro."},
+    {"id":"yashica-44","bodyType":"필름 TLR","maker":"Yashica","model":"Yashica-44","mount":"고정 렌즈","format":"127-44","fixedFocal":60,"fixedAperture":3.5,"status":"보유","loadedFilm":"미삽입","loadedIso":null,"loadedFilmNote":"","notes":"필름 장전 여부 확인 필요. 투톤 그레이/블랙 · 고정 Yashikor 60mm f/3.5 · 127 필름."},
+    {"id":"rollei-baby","bodyType":"필름 TLR","maker":"Rollei","model":"Rolleiflex Baby Grey 4×4 (수리 중)","mount":"고정 렌즈","format":"127-44","fixedFocal":60,"fixedAperture":3.5,"status":"수리 중 (오버홀, 12월 초순 예상)","loadedFilm":"미삽입","loadedIso":null,"loadedFilmNote":"","notes":"그레이/블랙. 고정 Xenar 60mm f/3.5 · 127 필름. 리핸즈에 오버홀 접수."},
+    {"id":"rollei-baby-brightscreen","bodyType":"필름 TLR","maker":"Rollei","model":"Rolleiflex Baby Grey 4×4 (Brightscreen 4408)","mount":"고정 렌즈","format":"127-44","fixedFocal":60,"fixedAperture":3.5,"status":"보유","loadedFilm":"미삽입","loadedIso":null,"loadedFilmNote":"","notes":"Brightscreen Pattern 4408 포커싱 스크린 장착. 그레이/블랙 · 고정 Xenar 60mm f/3.5 · 127 필름. 수리 중인 기체와 별개."}
   ],
   "lenses": [
     {"id":"n300pf","maker":"Nikon","model":"AF-S NIKKOR 300mm f/4E PF ED VR","mount":"Nikon F","focal":300,"aperture":4,"format":"35mm","notes":"PF 회절 렌즈, 경량 망원."},
@@ -154,6 +159,7 @@ footer{max-width:940px;margin:0 auto;padding:4px 16px 20px;font-size:11px;color:
 /* ================= 기본 정의 ================= */
 var KEY = 'camera-dash-v1';
 var PKEY = 'camera-dash-private-v1';   /* 시리얼·구입가·개인메모: 이 기기에만 */
+var SEED_VERSION = 2;                  /* 시드 구성이 바뀌면 올림 — 저장된 목록에 빠진 시드 항목만 한 번 합침 */
 var NO_FILM = '미삽입';
 var NO_FILM_LIST = ['', '미삽입', '없음', '미장전', '-'];
 var SPEC_KEYS = ['filter','hood','minFocus','elements','weight'];
@@ -191,6 +197,7 @@ function clone(o){ return JSON.parse(JSON.stringify(o)); }
 function normalize(d){
   d.bodies = d.bodies || []; d.lenses = d.lenses || []; d.adapters = d.adapters || [];
   d.films = d.films || []; d.filmCatalog = d.filmCatalog || clone(seed.filmCatalog);
+  d.removed = d.removed || [];
   d.bodies.forEach(function(b){
     if(b.bodyType === undefined) b.bodyType = '';
     if(b.loadedFilm === undefined || b.loadedFilm === null) b.loadedFilm = NO_FILM;
@@ -216,10 +223,31 @@ function loadData(){
     var raw = localStorage.getItem(KEY);
     if(raw){
       var d = JSON.parse(raw);
-      if(d && d.bodies && d.lenses) return normalize(d);
+      if(d && d.bodies && d.lenses){
+        d = normalize(d);
+        return d.seedVersion === SEED_VERSION ? d : mergeSeed(d);
+      }
     }
   }catch(e){}
-  return normalize(clone(seed));
+  var fresh = normalize(clone(seed));
+  fresh.seedVersion = SEED_VERSION;
+  return fresh;
+}
+/* 기기에 저장된 옛 목록에 새로 확인된 시드 항목만 더한다(사용자가 고친 값·지운 항목은 그대로) */
+function mergeSeed(d){
+  var removed = d.removed || [];
+  (seed.bodies || []).forEach(function(s){
+    if(s.id === 'olympus-unknown') return;                 /* 확인 필요 임시 항목은 시드에서 사라짐 */
+    if(removed.indexOf(s.id) >= 0) return;
+    if(!d.bodies.filter(function(b){ return b.id === s.id; }).length) d.bodies.push(clone(s));
+  });
+  (seed.lenses || []).forEach(function(s){
+    if(removed.indexOf(s.id) >= 0) return;
+    if(!d.lenses.filter(function(l){ return l.id === s.id; }).length) d.lenses.push(clone(s));
+  });
+  d.bodies = d.bodies.filter(function(b){ return b.id !== 'olympus-unknown'; });
+  d.seedVersion = SEED_VERSION;
+  return d;
 }
 function saveData(){
   try{ localStorage.setItem(KEY, JSON.stringify(data)); }
@@ -258,6 +286,15 @@ function toast(msg){
 }
 function num(v){ var n = Number(v); return isFinite(n) && v !== '' && v !== null ? n : null; }
 function money(v){ var n = num(v); return n === null ? '' : n.toLocaleString('ko-KR') + '원'; }
+function nameOf(x){
+  if(!x) return '';
+  var maker = String(x.maker || '').trim(), model = String(x.model || '').trim();
+  if(!maker) return model;
+  if(!model) return maker;
+  /* 모델명이 이미 제조사로 시작하면(Rollei 35, Yashica-44) 두 번 쓰지 않음 */
+  if(model.toLowerCase().indexOf(maker.toLowerCase()) === 0) return model;
+  return maker + ' ' + model;
+}
 function bodyById(id){ return data.bodies.filter(function(b){ return b.id === id; })[0]; }
 function lensById(id){ return data.lenses.filter(function(l){ return l.id === id; })[0]; }
 function formatLabel(f){ return FORMATS[f] ? FORMATS[f].label : (f || '포맷 미지정'); }
@@ -532,7 +569,7 @@ function renderHome(){
   if(repair.length){
     h += '<div class="card"><h3>수리·점검 중</h3>';
     repair.forEach(function(b){
-      h += '<div class="item"><div><div class="t">' + esc((b.maker||'') + ' ' + (b.model||'')) + '</div>'
+      h += '<div class="item"><div><div class="t">' + esc(nameOf(b)) + '</div>'
         + '<div class="d">' + esc(b.status) + '</div></div>'
         + '<div class="ops"><span class="pill warn">진행 중</span></div></div>';
     });
@@ -544,7 +581,7 @@ function renderHome(){
   if(unknown.length){
     h += '<div class="card"><h3>확인해서 채울 것</h3>';
     unknown.forEach(function(x){
-      h += '<div class="item"><div><div class="t">' + esc((x.maker||'') + ' ' + (x.model||'')) + '</div>'
+      h += '<div class="item"><div><div class="t">' + esc(nameOf(x)) + '</div>'
         + '<div class="d">' + esc(x.notes || x.status || '') + '</div></div>'
         + '<div class="ops"><span class="pill warn">확인 필요</span></div></div>';
     });
@@ -573,7 +610,7 @@ function renderHome(){
       + '<span class="dim">' + esc(loadedCount) + '대 장전 · 총 ' + esc(filmBodies.length) + '대</span></div>';
     filmBodies.forEach(function(b){
       var isLoaded = !!loadedStock(b);
-      h += '<div class="item"><div><div class="t">' + esc((b.maker||'') + ' ' + (b.model||'')) + '</div>'
+      h += '<div class="item"><div><div class="t">' + esc(nameOf(b)) + '</div>'
         + '<div class="d">' + esc(formatLabel(b.format)) + (isLoaded ? '' : ' · 필름 없음') + '</div>'
         + loadedDetail(b)
         + '</div><div class="ops">' + loadedBadge(b)
@@ -622,7 +659,7 @@ function renderGear(){
     data.bodies.forEach(function(b){
       var film = isFilmBody(b);
       h += '<div class="item"><div>'
-        + '<div class="t">' + esc((b.maker||'') + ' ' + (b.model||'')) + '</div>'
+        + '<div class="t">' + esc(nameOf(b)) + '</div>'
         + '<div class="d">' + esc(b.bodyType || '종류 미지정') + ' · ' + esc(formatLabel(b.format)) + ' · 마운트 ' + esc(b.mount || '미지정')
         + (b.fixedFocal ? ' · 고정 ' + esc(b.fixedFocal + 'mm' + (b.fixedAperture ? ' f/' + b.fixedAperture : '')) : '')
         + '</div>'
@@ -709,7 +746,7 @@ function renderRec(){
     + '<div class="muted">바디를 고르면 그 바디에 물릴 렌즈를, 렌즈를 고르면 그 렌즈를 물릴 바디를 찾아요. 직결과 컨버터 경유를 한 번에 비교합니다.</div>'
     + '<label>1) 바디 고르기</label><select id="recBody"><option value="">— 선택 안 함 —</option>';
   data.bodies.forEach(function(b){
-    h += '<option value="' + esc(b.id) + '">' + esc((b.maker||'') + ' ' + (b.model||'') + (b.bodyType ? ' · ' + b.bodyType : '')) + '</option>';
+    h += '<option value="' + esc(b.id) + '">' + esc(nameOf(b) + (b.bodyType ? ' · ' + b.bodyType : '')) + '</option>';
   });
   h += '</select>'
     + '<label>또는 2) 렌즈 고르기 <span class="dim">(바디를 고르면 이쪽은 비워져요)</span></label><select id="recLens"><option value="">— 선택 안 함 —</option>';
@@ -753,7 +790,7 @@ function runRec(){
     var sugg = digital ? [] : filmSuggestions(purpose, c.body, 2);
     var f = formatLabel(c.body.format);
     h += '<div class="card"><div class="rec" style="border-left-color:' + (i === 0 ? 'var(--accent)' : 'var(--accent2)') + '">'
-      + '<div class="h"><i>' + (i + 1) + '</i><span>' + esc((c.body.maker||'') + ' ' + (c.body.model||''))
+      + '<div class="h"><i>' + (i + 1) + '</i><span>' + esc(nameOf(c.body))
       + (c.fixed ? '' : ' + ' + esc(c.lens.model)) + '</span></div>'
       + '<div class="d">' + esc(f) + ' · ' + esc(mountText(c)) + ' · ' + esc(adapterText(c.path)) + '</div>'
       + '<div class="d" style="margin-top:6px"><b style="font-size:18px;letter-spacing:-.02em">' + esc(c.eq) + 'mm</b>'
@@ -1078,6 +1115,8 @@ function openSheet(type, id){
     document.getElementById('sheetDel').onclick = function(){
       if(!confirm('이 항목을 삭제할까요? 개인 기록도 함께 지워집니다.')) return;
       data[type] = data[type].filter(function(x){ return x.id !== cur.id; });
+      data.removed = data.removed || [];
+      if(data.removed.indexOf(cur.id) < 0) data.removed.push(cur.id);
       if(priv[type]) delete priv[type][cur.id];
       saveData(); savePriv(); closeSheet(); renderAll(); toast('삭제했어요');
     };
@@ -1096,7 +1135,7 @@ function openLoadedSheet(id){
   var cat = filmStockChoices(fmt).filter(function(c){ return !heldKeys[maskStock(c.stock)]; });
 
   var h = '<div class="grab"></div>'
-    + '<div class="row"><h3>' + esc((b.maker || '') + ' ' + (b.model || '')) + ' 필름</h3>'
+    + '<div class="row"><h3>' + esc(nameOf(b)) + ' 필름</h3>'
     + '<button class="ghost sm" id="sheetClose">닫기</button></div>'
     + '<div class="muted">지금 ' + loadedBadge(b) + (cur ? '' : ' — 필름이 들어 있지 않아요.') + '</div>';
 
@@ -1268,7 +1307,8 @@ document.addEventListener('click', function(e){
   if(t.id === 'btnPrivImport'){ document.getElementById('filePriv').click(); return; }
   if(t.id === 'btnReset'){
     if(!confirm('장비 목록을 초기값으로 되돌릴까요? 개인 기록은 그대로 남습니다.')) return;
-    data = normalize(clone(seed)); saveData(); renderAll(); toast('초기값으로 되돌렸어요'); return;
+    data = normalize(clone(seed)); data.seedVersion = SEED_VERSION; data.removed = [];
+    saveData(); renderAll(); toast('초기값으로 되돌렸어요'); return;
   }
   if(t.id === 'btnPrivClear'){
     if(!confirm('시리얼·구입가·개인 메모를 모두 지울까요? 되돌릴 수 없습니다.')) return;

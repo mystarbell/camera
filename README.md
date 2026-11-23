@@ -42,10 +42,15 @@
 - GitHub Pages: `main` / `/` 에서 배포, `.nojekyll` 포함(정적 파일 그대로 서빙)
 - 파일 수정 후에는 `index.html`을 교체하고 커밋·푸시하면 1~2분 안에 반영됩니다.
 
+## 초기 장비 목록 (2026-11-23 확인)
+
+- **바디 9종** — Nikon F80 · Nikon AF600 · Rollei 35 · Rollei 35 S · Olympus XA · Olympus XA4 MACRO · Yashica-44 · Rolleiflex Baby Grey 4×4(수리 중) · Rolleiflex Baby Grey 4×4(Brightscreen 4408)
+- **렌즈 4종** — AF-S NIKKOR 300mm f/4E PF ED VR · AF-S NIKKOR 24mm f/1.4G ED · AF-S NIKKOR 50mm f/1.4G · Ai Nikkor 35mm f/1.4S
+- 장전 중인 필름은 Rollei 35 · Rollei 35 S · Olympus XA4 MACRO 3대
+- `SEED_VERSION`을 올리면, 기기에 저장된 옛 목록에 빠진 시드 항목만 한 번 합칩니다(사용자가 고친 값·지운 항목은 유지).
+
 ## 아직 확인이 필요한 데이터
 
-- Olympus 바디 모델·마운트·종류
-- Rolleiflex 계열 모델명(베이비 4×4 / 35 계열)과 고정 렌즈 화각
 - 보유 컨버터(이종교배) 목록과 배율(유리 있음/없음)
 - 필름 스톡별 재고 롤 수와 유효기간
 - 디지털 바디 보유 여부와 마운트
