@@ -632,7 +632,8 @@ function runRec(){
     var sugg = digital ? [] : filmSuggestions(purpose, c.body, 2);
     var f = formatLabel(c.body.format);
     h += '<div class="card"><div class="rec" style="border-left-color:' + (i === 0 ? 'var(--accent)' : 'var(--accent2)') + '">'
-      + '<div class="h"><i>' + (i + 1) + '</i><span>' + esc((c.body.maker||'') + ' ' + (c.body.model||'')) + ' + ' + esc(c.lens.model) + '</span></div>'
+      + '<div class="h"><i>' + (i + 1) + '</i><span>' + esc((c.body.maker||'') + ' ' + (c.body.model||''))
+      + (c.fixed ? '' : ' + ' + esc(c.lens.model)) + '</span></div>'
       + '<div class="d">' + esc(f) + ' · ' + esc(mountText(c)) + ' · ' + esc(adapterText(c.path)) + '</div>'
       + '<div class="d" style="margin-top:6px"><b style="font-size:18px;letter-spacing:-.02em">' + esc(c.eq) + 'mm</b>'
       + '<span class="dim"> · 35mm 환산 · 화각 ' + esc(aov(c.eq)) + '° · 최대 f/' + esc(c.lens.aperture || '-') + '</span></div>'
